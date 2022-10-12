@@ -6,7 +6,7 @@
 // David Lafreniere, Oct 2022.
 
 #include "Delegate.h"
-#include "DelegateThread.h"
+#include "IDelegateThread.h"
 #include "DelegateInvoker.h"
 #if USE_XALLOCATOR
 	#include <new>

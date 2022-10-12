@@ -7,7 +7,7 @@
 #include "DelegateOpt.h"
 #if USE_STD_THREADS
 
-#include "DelegateThread.h"
+#include "IDelegateThread.h"
 #include "DataTypes.h"
 #include <thread>
 #include <queue>

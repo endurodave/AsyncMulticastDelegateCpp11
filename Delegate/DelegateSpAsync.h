@@ -9,7 +9,7 @@
 // The std::shared_ptr<TClass> is used in lieu of a raw TClass* pointer. 
 
 #include "DelegateSp.h"
-#include "DelegateThread.h"
+#include "IDelegateThread.h"
 #include "DelegateInvoker.h"
 
 namespace DelegateLib {

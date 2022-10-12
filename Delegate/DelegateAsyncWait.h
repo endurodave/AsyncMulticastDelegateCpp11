@@ -6,7 +6,7 @@
 // David Lafreniere, Oct 2022.
 
 #include "Delegate.h"
-#include "DelegateThread.h"
+#include "IDelegateThread.h"
 #include "DelegateInvoker.h"
 #include "Semaphore.h"
 
@@ -17,6 +17,37 @@
 namespace DelegateLib {
 
 const int WAIT_INFINITE = -1;
+
+template <class RetType>
+class AsyncRet {
+public:
+	AsyncRet() { success = false; }
+	RetType retVal;
+	bool success;
+};
+
+template <class RetType>
+class AsyncRet<RetType*> {
+public:
+	AsyncRet() { success = false; retVal = NULL; }
+	RetType* retVal;
+	bool success;
+};
+
+template <>
+class AsyncRet<bool> {
+public:
+	AsyncRet() { success = false; retVal = false; }
+	bool retVal;
+	bool success;
+};
+
+template <>
+class AsyncRet<void> {
+public:
+	AsyncRet() { success = false; }
+	bool success;
+};
 
 // Declare DelegateMemberAsyncWaitBase as a class template. It will be specialized for all number of arguments.
 template <typename Signature>
@@ -145,6 +176,15 @@ public:
 		}
 	}
 
+	/// Invoke delegate function asynchronously
+	AsyncRet<RetType> AsyncInvoke()
+	{
+		AsyncRet<RetType> waitRetVal;
+		waitRetVal.retVal = operator()();
+		waitRetVal.success = DelegateMemberAsyncWaitBase<RetType(TClass(void))>::IsSuccess();
+		return waitRetVal;
+	}
+
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(DelegateMsgBase** msg) {
 		bool deleteData = false;
@@ -227,6 +267,15 @@ public:
 				delete delegate;
 			}
 		}
+	}
+
+	/// Invoke delegate function asynchronously
+	AsyncRet<void> AsyncInvoke()
+	{
+		AsyncRet<void> waitRetVal;
+		operator()();
+		waitRetVal.success = DelegateMemberAsyncWaitBase<void(TClass(void))>::IsSuccess();
+		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -380,6 +429,15 @@ public:
 		}
 	}
 
+	/// Invoke delegate function asynchronously
+	AsyncRet<RetType> AsyncInvoke(Param1 p1)
+	{
+		AsyncRet<RetType> waitRetVal;
+		waitRetVal.retVal = operator()(p1);
+		waitRetVal.success = DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>::IsSuccess();
+		return waitRetVal;
+	}
+
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(DelegateMsgBase** msg) {
 		bool deleteData = false;
@@ -467,6 +525,15 @@ public:
 				delete delegate;
 			}
 		}
+	}
+
+	/// Invoke delegate function asynchronously
+	AsyncRet<void> AsyncInvoke(Param1 p1)
+	{
+		AsyncRet<void> waitRetVal;
+		operator()(p1);
+		waitRetVal.success = DelegateMemberAsyncWaitBase<void (TClass(Param1))>::IsSuccess();
+		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -626,6 +693,15 @@ public:
 		}
 	}
 
+	/// Invoke delegate function asynchronously
+	AsyncRet<RetType> AsyncInvoke(Param1 p1, Param2 p2)
+	{
+		AsyncRet<RetType> waitRetVal;
+		waitRetVal.retVal = operator()(p1, p2);
+		waitRetVal.success = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>::IsSuccess();
+		return waitRetVal;
+	}
+
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(DelegateMsgBase** msg) {
 		bool deleteData = false;
@@ -714,6 +790,15 @@ public:
 				delete delegate;
 			}
 		}
+	}
+
+	/// Invoke delegate function asynchronously
+	AsyncRet<void> AsyncInvoke(Param1 p1, Param2 p2)
+	{
+		AsyncRet<void> waitRetVal;
+		operator()(p1, p2);
+		waitRetVal.success = DelegateMemberAsyncWaitBase<void (TClass(Param1, Param2))>::IsSuccess();
+		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -874,6 +959,15 @@ public:
 		}
 	}
 
+	/// Invoke delegate function asynchronously
+	AsyncRet<RetType> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3)
+	{
+		AsyncRet<RetType> waitRetVal;
+		waitRetVal.retVal = operator()(p1, p2, p3);
+		waitRetVal.success = DelegateMemberAsyncWaitBase<RetType (TClass(Param1, Param2, Param3))>::IsSuccess();
+		return waitRetVal;
+	}	
+
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(DelegateMsgBase** msg) {
 		bool deleteData = false;
@@ -963,6 +1057,15 @@ public:
 				delete delegate;
 			}
 		}
+	}
+
+	/// Invoke delegate function asynchronously
+	AsyncRet<void> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3)
+	{
+		AsyncRet<void> waitRetVal;
+		operator()(p1, p2, p3);
+		waitRetVal.success = DelegateMemberAsyncWaitBase<void (TClass(Param1, Param2, Param3))>::IsSuccess();
+		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -1124,6 +1227,15 @@ public:
 		}
 	}
 
+	/// Invoke delegate function asynchronously
+	AsyncRet<RetType> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4)
+	{
+		AsyncRet<RetType> waitRetVal;
+		waitRetVal.retVal = operator()(p1, p2, p3, p4);
+		waitRetVal.success = DelegateMemberAsyncWaitBase<RetType (TClass(Param1, Param2, Param3, Param4))>::IsSuccess();
+		return waitRetVal;
+	}
+
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(DelegateMsgBase** msg) {
 		bool deleteData = false;
@@ -1214,6 +1326,15 @@ public:
 				delete delegate;
 			}
 		}
+	}
+
+	/// Invoke delegate function asynchronously
+	AsyncRet<void> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4)
+	{
+		AsyncRet<void> waitRetVal;
+		operator()(p1, p2, p3, p4);
+		waitRetVal.success = DelegateMemberAsyncWaitBase<void (TClass(Param1, Param2, Param3, Param4))>::IsSuccess();
+		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -1376,6 +1497,15 @@ public:
 		}
 	}
 
+	/// Invoke delegate function asynchronously
+	AsyncRet<RetType> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)
+	{
+		AsyncRet<RetType> waitRetVal;
+		waitRetVal.retVal = operator()(p1, p2, p3, p4, p5);
+		waitRetVal.success = DelegateMemberAsyncWaitBase<RetType (TClass(Param1, Param2, Param3, Param4, Param5))>::IsSuccess();
+		return waitRetVal;
+	}
+
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(DelegateMsgBase** msg) {
 		bool deleteData = false;
@@ -1467,6 +1597,15 @@ public:
 				delete delegate;
 			}
 		}
+	}
+
+	/// Invoke delegate function asynchronously
+	AsyncRet<void> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)
+	{
+		AsyncRet<void> waitRetVal;
+		operator()(p1, p2, p3, p4, p5);
+		waitRetVal.success = DelegateMemberAsyncWaitBase<void (TClass(Param1, Param2, Param3, Param4, Param5))>::IsSuccess();
+		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -1623,6 +1762,15 @@ public:
 		}
 	}
 
+	/// Invoke delegate function asynchronously
+	AsyncRet<RetType> AsyncInvoke()
+	{
+		AsyncRet<RetType> waitRetVal;
+		waitRetVal.retVal = operator()();
+		waitRetVal.success = DelegateFreeAsyncWaitBase<RetType (void)>::IsSuccess();
+		return waitRetVal;
+	}
+
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(DelegateMsgBase** msg) {
 		bool deleteData = false;
@@ -1701,6 +1849,15 @@ public:
 				delete delegate;
 			}
 		}
+	}
+
+	/// Invoke delegate function asynchronously
+	AsyncRet<void> AsyncInvoke()
+	{
+		AsyncRet<void> waitRetVal;
+		operator()();
+		waitRetVal.success = DelegateFreeAsyncWaitBase<void(void)>::IsSuccess();
+		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -1838,6 +1995,15 @@ public:
 		}
 	}
 
+	/// Invoke delegate function asynchronously
+	AsyncRet<RetType> AsyncInvoke(Param1 p1)
+	{
+		AsyncRet<RetType> waitRetVal;
+		waitRetVal.retVal = operator()(p1);
+		waitRetVal.success = DelegateFreeAsyncWaitBase<RetType (Param1)>::IsSuccess();
+		return waitRetVal;
+	}
+
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(DelegateMsgBase** msg) {
 		bool deleteData = false;
@@ -1921,6 +2087,15 @@ public:
 				delete delegate;
 			}
 		}
+	}
+
+	/// Invoke delegate function asynchronously
+	AsyncRet<void> AsyncInvoke(Param1 p1)
+	{
+		AsyncRet<void> waitRetVal;
+		operator()(p1);
+		waitRetVal.success = DelegateFreeAsyncWaitBase<void (Param1)>::IsSuccess();
+		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -2064,6 +2239,15 @@ public:
 		}
 	}
 
+	/// Invoke delegate function asynchronously
+	AsyncRet<RetType> AsyncInvoke(Param1 p1, Param2 p2)
+	{
+		AsyncRet<RetType> waitRetVal;
+		waitRetVal.retVal = operator()(p1, p2);
+		waitRetVal.success = DelegateFreeAsyncWaitBase<RetType (Param1, Param2)>::IsSuccess();
+		return waitRetVal;
+	}
+
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(DelegateMsgBase** msg) {
 		bool deleteData = false;
@@ -2148,6 +2332,15 @@ public:
 				delete delegate;
 			}
 		}
+	}
+
+	/// Invoke delegate function asynchronously
+	AsyncRet<void> AsyncInvoke(Param1 p1, Param2 p2)
+	{
+		AsyncRet<void> waitRetVal;
+		operator()(p1, p2);
+		waitRetVal.success = DelegateFreeAsyncWaitBase<void (Param1, Param2)>::IsSuccess();
+		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -2292,6 +2485,15 @@ public:
 		}
 	}
 
+	/// Invoke delegate function asynchronously
+	AsyncRet<RetType> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3)
+	{
+		AsyncRet<RetType> waitRetVal;
+		waitRetVal.retVal = operator()(p1, p2, p3);
+		waitRetVal.success = DelegateFreeAsyncWaitBase<RetVal (Param1, Param2, Param3)>::IsSuccess();
+		return waitRetVal;
+	}
+
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(DelegateMsgBase** msg) {
 		bool deleteData = false;
@@ -2377,6 +2579,15 @@ public:
 				delete delegate;
 			}
 		}
+	}
+
+	/// Invoke delegate function asynchronously
+	AsyncRet<void> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3)
+	{
+		AsyncRet<void> waitRetVal;
+		operator()(p1, p2, p3);
+		waitRetVal.success = DelegateFreeAsyncWaitBase<void (Param1, Param2, Param3)>::IsSuccess();
+		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -2522,6 +2733,15 @@ public:
 		}
 	}
 
+	/// Invoke delegate function asynchronously
+	AsyncRet<RetType> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4)
+	{
+		AsyncRet<RetType> waitRetVal;
+		waitRetVal.retVal = operator()(p1, p2, p3, p4);
+		waitRetVal.success = DelegateFreeAsyncWaitBase<RetType (Param1, Param2, Param3, Param4)>::IsSuccess();
+		return waitRetVal;
+	}
+
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(DelegateMsgBase** msg) {
 		bool deleteData = false;
@@ -2608,6 +2828,15 @@ public:
 				delete delegate;
 			}
 		}
+	}
+
+	/// Invoke delegate function asynchronously
+	AsyncRet<void> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4)
+	{
+		AsyncRet<void> waitRetVal;
+		operator()(p1, p2, p3, p4);
+		waitRetVal.success = DelegateFreeAsyncWaitBase<void (Param1, Param2, Param3, Param4)>::IsSuccess();
+		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -2754,6 +2983,15 @@ public:
 		}
 	}
 
+	/// Invoke delegate function asynchronously
+	AsyncRet<RetType> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)
+	{
+		AsyncRet<RetType> waitRetVal;
+		waitRetVal.retVal = operator()(p1, p2, p3, p4, p5);
+		waitRetVal.success = DelegateFreeAsyncWaitBase<RetVal (Param1, Param2, Param3, Param4, Param5)>::IsSuccess();
+		return waitRetVal;
+	}
+
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(DelegateMsgBase** msg) {
 		bool deleteData = false;
@@ -2841,6 +3079,15 @@ public:
 				delete delegate;
 			}
 		}
+	}
+
+	/// Invoke delegate function asynchronously
+	AsyncRet<void> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)
+	{
+		AsyncRet<void> waitRetVal;
+		operator()(p1, p2, p3, p4, p5);
+		waitRetVal.success = DelegateFreeAsyncWaitBase<void (Param1, Param2, Param3, Param4, Param5)>::IsSuccess();
+		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
