@@ -3,7 +3,6 @@
 
 #include "DelegateLib.h"
 #include "LockGuard.h"
-#include <time.h>
 #include <list>
 
 using namespace DelegateLib;
@@ -37,7 +36,7 @@ public:
 
 	/// Get the current time in ticks. 
 	/// @return The current time in ticks. 
-	static DWORD GetTime() { return GetTickCount(); } 
+    static DWORD GetTime();
 
 	/// Computes the time difference in ticks between two tick values taking into
 	/// account rollover.

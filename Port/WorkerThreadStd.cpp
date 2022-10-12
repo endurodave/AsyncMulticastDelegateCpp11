@@ -4,9 +4,11 @@
 #include "WorkerThreadStd.h"
 #include "ThreadMsg.h"
 #include "Timer.h"
+#include <chrono>
 
 using namespace std;
 using namespace DelegateLib;
+using namespace std::chrono;
 
 #define MSG_DISPATCH_DELEGATE	1
 #define MSG_EXIT_THREAD			2
@@ -99,7 +101,7 @@ void WorkerThread::TimerThread()
 {
     while (!m_timerExit)
     {
-        std::this_thread::sleep_for(100ms);
+        std::this_thread::sleep_for((std::chrono::milliseconds)100);
 
         std::shared_ptr<ThreadMsg> threadMsg (new ThreadMsg(MSG_TIMER, 0));
 

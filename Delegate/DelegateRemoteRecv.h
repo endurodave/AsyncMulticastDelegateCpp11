@@ -460,7 +460,7 @@ public:
     }
 
     virtual bool operator==(const DelegateBase& rhs) const {
-        const DelegateFreeRemoteRecv<Param1, Param2>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<Param1, Param2>*>(&rhs);
+        const DelegateFreeRemoteRecv<void(Param1, Param2)>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<void(Param1, Param2)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
             DelegateFree<void(Param1, Param2)>::operator == (rhs);
@@ -509,7 +509,7 @@ public:
     }
 
     virtual bool operator==(const DelegateBase& rhs) const {
-        const DelegateFreeRemoteRecv<Param1, Param2, Param3>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<Param1, Param2, Param3>*>(&rhs);
+        const DelegateFreeRemoteRecv<void(Param1, Param2, Param3)>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<void(Param1, Param2, Param3)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
             DelegateFree<void(Param1, Param2, Param3)>::operator == (rhs);
@@ -562,7 +562,7 @@ public:
     }
 
     virtual bool operator==(const DelegateBase& rhs) const {
-        const DelegateFreeRemoteRecv<Param1, Param2, Param3, Param4>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<Param1, Param2, Param3, Param4>*>(&rhs);
+        const DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4)>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
             DelegateFree<void(Param1, Param2, Param3, Param4)>::operator == (rhs);
@@ -619,7 +619,7 @@ public:
     }
 
     virtual bool operator==(const DelegateBase& rhs) const {
-        const DelegateFreeRemoteRecv<Param1, Param2, Param3, Param4, Param5>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<Param1, Param2, Param3, Param4, Param5>*>(&rhs);
+        const DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4, Param5)>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4, Param5)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
             DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>::operator == (rhs);

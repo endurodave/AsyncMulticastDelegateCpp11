@@ -60,7 +60,7 @@ public:
     }
 
     virtual bool operator==(const DelegateBase& rhs) const {
-        const DelegateRemoteSend<Param1, Param2>* derivedRhs = dynamic_cast<const DelegateRemoteSend<Param1, Param2>*>(&rhs);
+        const DelegateRemoteSend<void(Param1, Param2)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1, Param2)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
             &m_transport == &derivedRhs->m_transport;
@@ -90,7 +90,7 @@ public:
     }
 
     virtual bool operator==(const DelegateBase& rhs) const {
-        const DelegateRemoteSend<Param1, Param2, Param3>* derivedRhs = dynamic_cast<const DelegateRemoteSend<Param1, Param2, Param3>*>(&rhs);
+        const DelegateRemoteSend<void(Param1, Param2, Param3)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1, Param2, Param3)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
             &m_transport == &derivedRhs->m_transport;
@@ -121,7 +121,7 @@ public:
     }
 
     virtual bool operator==(const DelegateBase& rhs) const {
-        const DelegateRemoteSend<Param1, Param2, Param3, Param4>* derivedRhs = dynamic_cast<const DelegateRemoteSend<Param1, Param2, Param3, Param4>*>(&rhs);
+        const DelegateRemoteSend<void(Param1, Param2, Param3, Param4)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1, Param2, Param3, Param4)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
             &m_transport == &derivedRhs->m_transport;
@@ -153,7 +153,7 @@ public:
     }
 
     virtual bool operator==(const DelegateBase& rhs) const {
-        const DelegateRemoteSend<Param1, Param2, Param3, Param4, Param5>* derivedRhs = dynamic_cast<const DelegateRemoteSend<Param1, Param2, Param3, Param4, Param5>*>(&rhs);
+        const DelegateRemoteSend<void(Param1, Param2, Param3, Param4, Param5)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1, Param2, Param3, Param4, Param5)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
             &m_transport == &derivedRhs->m_transport;
