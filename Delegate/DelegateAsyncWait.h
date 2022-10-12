@@ -2490,7 +2490,7 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()(p1, p2, p3);
-		waitRetVal.success = DelegateFreeAsyncWaitBase<RetVal (Param1, Param2, Param3)>::IsSuccess();
+		waitRetVal.success = DelegateFreeAsyncWaitBase<RetType (Param1, Param2, Param3)>::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -2988,7 +2988,7 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()(p1, p2, p3, p4, p5);
-		waitRetVal.success = DelegateFreeAsyncWaitBase<RetVal (Param1, Param2, Param3, Param4, Param5)>::IsSuccess();
+		waitRetVal.success = DelegateFreeAsyncWaitBase<RetType (Param1, Param2, Param3, Param4, Param5)>::IsSuccess();
 		return waitRetVal;
 	}
 
