@@ -221,7 +221,7 @@ int main(void)
     // Create a timer that expires every 250mS and calls 
     // TimerExpiredCb on workerThread1 upon expiration
     Timer timer;
-    //timer.Expired = MakeDelegate(&TimerExpiredCb, &workerThread1);   TODO FIX
+    timer.Expired = MakeDelegate(&TimerExpiredCb, &workerThread1);
     timer.Start(250);
 
 	// Run all unit tests (uncomment to run unit tests)
