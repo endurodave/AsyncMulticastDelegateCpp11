@@ -43,8 +43,14 @@ public:
 		return new DelegateMemberSp<RetType(TClass(void))>(*this); }
 
 	// Invoke the bound delegate function
-	virtual RetType operator()() {
-		return (*m_object.*m_func)(); }
+    virtual RetType operator()()
+    {
+        if (m_object)
+            return (*m_object.*m_func)();
+        else
+            return RetType();
+    }
+
 
 	virtual bool operator==(const DelegateBase& rhs) const 	{
 		const DelegateMemberSp<RetType(TClass(void))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(void))>*>(&rhs);
@@ -86,8 +92,14 @@ public:
 		return new DelegateMemberSp<RetType(TClass(Param1))>(*this); }
 
 	// Invoke the bound delegate function
-	virtual RetType operator()(Param1 p1) {
-		return (*m_object.*m_func)(p1); }
+    virtual RetType operator()(Param1 p1)
+    {
+        if (m_object)
+            return (*m_object.*m_func)(p1);
+        else
+            return RetType();
+    }
+
 
 	virtual bool operator==(const DelegateBase& rhs) const 	{
 		const DelegateMemberSp<RetType(TClass(Param1))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1))>*>(&rhs);
@@ -129,8 +141,14 @@ public:
 		return new DelegateMemberSp<RetType(TClass(Param1, Param2))>(*this); }
 
 	// Invoke the bound delegate function
-	virtual RetType operator()(Param1 p1, Param2 p2) {
-		return (*m_object.*m_func)(p1, p2); }
+    virtual RetType operator()(Param1 p1, Param2 p2)
+    {
+        if (m_object)
+            return (*m_object.*m_func)(p1, p2);
+        else
+            return RetType();
+    }
+
 
 	virtual bool operator==(const DelegateBase& rhs) const 	{
 		const DelegateMemberSp<RetType(TClass(Param1, Param2))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1, Param2))>*>(&rhs);
@@ -172,8 +190,14 @@ public:
 		return new DelegateMemberSp<RetType(TClass(Param1, Param2, Param3))>(*this); }
 
 	// Invoke the bound delegate function
-	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3) {
-		return (*m_object.*m_func)(p1, p2, p3); }
+    virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3)
+    {
+        if (m_object)
+            return (*m_object.*m_func)(p1, p2, p3);
+        else
+            return RetType();
+    }
+
 
 	virtual bool operator==(const DelegateBase& rhs) const 	{
 		const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3))>*>(&rhs);
@@ -215,8 +239,14 @@ public:
 		return new DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4))>(*this); }
 
 	// Invoke the bound delegate function
-	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
-		return (*m_object.*m_func)(p1, p2, p3, p4); }
+    virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4)
+    {
+        if (m_object)
+            return (*m_object.*m_func)(p1, p2, p3, p4);
+        else
+            return RetType();
+    }
+
 
 	virtual bool operator==(const DelegateBase& rhs) const 	{
 		const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4))>*>(&rhs);
@@ -258,8 +288,14 @@ public:
 		return new DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>(*this); }
 
 	// Invoke the bound delegate function
-	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
-		return (*m_object.*m_func)(p1, p2, p3, p4, p5); }
+	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)
+    {
+        if (m_object)
+            return (*m_object.*m_func)(p1, p2, p3, p4, p5);
+        else
+            return RetType();
+    }
+
 
 	virtual bool operator==(const DelegateBase& rhs) const 	{
 		const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>*>(&rhs);
