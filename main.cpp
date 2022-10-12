@@ -3,25 +3,17 @@
 #include "SysDataNoLock.h"
 #include "Timer.h"
 #include <iostream>
-#if USE_CPLUSPLUS_11
 #include <thread>
-#endif
 #if USE_STD_THREADS
 #include "WorkerThreadStd.h"
 #elif USE_WIN32_THREADS
 #include "WorkerThreadWin.h"
 #endif
 
-// TODO 
-// Use "auto" to simplify code
-// Typedef in delegate classes to simplify code
-// C++ 11 flag remove
-// Remove #if 0 code
-
 // main.cpp
 // @see https://www.codeproject.com/Articles/1160934/Asynchronous-Multicast-Delegates-in-Cplusplus
 // David Lafreniere, Dec 2016 
-// Updated to function-like template arguments, Oct 2022.
+// Oct 2022. Updated delegates to function-like template arguments. Old syntax depricated. 
 //
 // @see https://www.codeproject.com/Articles/5262271/Remote-Procedure-Calls-using-Cplusplus-Delegates
 // David Lafreniere, Mar 2020.
@@ -361,18 +353,12 @@ int main(void)
 
 	// Create a asynchronous blocking delegate and invoke. This thread will block until the 
 	// msg and year stack values are set by MemberFuncStdStringRetInt on workerThread1.
-#if USE_CPLUSPLUS_11
 	auto delegateI = MakeDelegate(&testClass, &TestClass::MemberFuncStdStringRetInt, &workerThread1, WAIT_INFINITE);
-#else
-	DelegateMemberAsyncWait1<TestClass, std::string&, int> delegateI =
-		MakeDelegate(&testClass, &TestClass::MemberFuncStdStringRetInt, &workerThread1, WAIT_INFINITE);
-#endif
 	std::string msg;
 	int year = delegateI(msg);
 	if (delegateI.IsSuccess())
 		cout << msg.c_str() << " " << year << endl;
 
-//#if USE_CPLUSPLUS_11
 	// Create a shared_ptr, create a delegate, then synchronously invoke delegate function
 	std::shared_ptr<TestClass> spObject(new TestClass());
 	auto delegateMemberSp = MakeDelegate(spObject, &TestClass::MemberFuncStdString);
@@ -419,15 +405,11 @@ int main(void)
     timer.Stop();
     timer.Expired.Clear();
 
-#ifdef USE_CPLUSPLUS_11
-    //std::this_thread::sleep_for(std::chrono::seconds(1));
-#endif
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	workerThread1.ExitThread();
 
-#ifdef USE_CPLUSPLUS_11
-    //std::this_thread::sleep_for(std::chrono::seconds(1));
-#endif
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	return 0;
 }

@@ -115,7 +115,7 @@ public:
 			return DelegateMemberAsyncWaitBase<RetType(TClass(void))>::operator()();
 		else {
 			// Create a clone instance of this delegate 
-			DelegateMemberAsyncWait<RetType(TClass(void))>* delegate = Clone();
+			auto delegate = Clone();
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
@@ -350,7 +350,7 @@ public:
 			return DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
-			DelegateMemberAsyncWait<RetType(TClass(Param1))>* delegate = Clone();
+			auto delegate = Clone();
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
@@ -596,7 +596,7 @@ public:
 			return DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
-			DelegateMemberAsyncWait<RetType(TClass(Param1, Param2))>* delegate = Clone();
+			auto delegate = Clone();
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
@@ -844,7 +844,7 @@ public:
 			return DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
-			DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3))>* delegate = Clone();
+			auto delegate = Clone();
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
@@ -1094,7 +1094,7 @@ public:
 			return DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
-			DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4))>* delegate = Clone();
+			auto delegate = Clone();
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
@@ -1346,7 +1346,7 @@ public:
 			return DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
-			DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* delegate = Clone();
+			auto delegate = Clone();
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
@@ -1808,7 +1808,7 @@ public:
 			return DelegateFreeAsyncWaitBase<RetType(Param1)>::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
-			DelegateFreeAsyncWait<RetType(Param1)>* delegate = Clone();
+			auto delegate = Clone();
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
@@ -2034,7 +2034,7 @@ public:
 			return DelegateFreeAsyncWaitBase<RetType(Param1, Param2)>::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
-			DelegateFreeAsyncWait<RetType(Param1, Param2)>* delegate = Clone();
+			auto delegate = Clone();
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
@@ -2262,7 +2262,7 @@ public:
 			return DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)>::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
-			DelegateFreeAsyncWait<RetType(Param1, Param2, Param3)>* delegate = Clone();
+			auto delegate = Clone();
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
@@ -2492,7 +2492,7 @@ public:
 			return DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)>::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
-			DelegateFreeAsyncWait<RetType(Param1, Param2, Param3, Param4)>* delegate = Clone();
+			auto delegate = Clone();
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
@@ -2724,7 +2724,7 @@ public:
 			return DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)>::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
-			DelegateFreeAsyncWait<RetType(Param1, Param2, Param3, Param4, Param5)>* delegate = Clone();
+			auto delegate = Clone();
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();

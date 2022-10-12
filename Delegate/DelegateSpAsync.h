@@ -127,7 +127,7 @@ public:
 			Param1 heapParam1 = DelegateParam<Param1>::New(p1);
 
 			// Create a clone instance of this delegate 
-			DelegateMemberSpAsync<void(TClass(Param1))>* delegate = Clone();
+			auto delegate = Clone();
 
 			// Create a new message instance 
 			DelegateMsg1<Param1>* msg = new DelegateMsg1<Param1>(delegate, heapParam1);
@@ -205,7 +205,7 @@ public:
 			Param2 heapParam2 = DelegateParam<Param2>::New(p2);
 
 			// Create a clone instance of this delegate 
-			DelegateMemberSpAsync<void(TClass(Param1, Param2))>* delegate = Clone();
+			auto delegate = Clone();
 
 			// Create a new message instance 
 			DelegateMsg2<Param1, Param2>* msg = new DelegateMsg2<Param1, Param2>(delegate, heapParam1, heapParam2);
@@ -286,7 +286,7 @@ public:
 			Param3 heapParam3 = DelegateParam<Param3>::New(p3);
 
 			// Create a clone instance of this delegate 
-			DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3))>* delegate = Clone();
+			auto delegate = Clone();
 
 			// Create a new message instance 
 			DelegateMsg3<Param1, Param2, Param3>* msg = new DelegateMsg3<Param1, Param2, Param3>(delegate, heapParam1, heapParam2, heapParam3);
@@ -370,7 +370,7 @@ public:
 			Param4 heapParam4 = DelegateParam<Param4>::New(p4);
 
 			// Create a clone instance of this delegate 
-			DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4))>* delegate = Clone();
+			auto delegate = Clone();
 
 			// Create a new message instance 
 			DelegateMsg4<Param1, Param2, Param3, Param4>* msg = new DelegateMsg4<Param1, Param2, Param3, Param4>(delegate, heapParam1, heapParam2, heapParam3, heapParam4);
@@ -457,7 +457,7 @@ public:
 			Param5 heapParam5 = DelegateParam<Param5>::New(p5);
 
 			// Create a clone instance of this delegate 
-			DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))>* delegate = Clone();
+			auto delegate = Clone();
 
 			// Create a new message instance 
 			DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* msg = new DelegateMsg5<Param1, Param2, Param3, Param4, Param5>(delegate, heapParam1, heapParam2, heapParam3, heapParam4, heapParam5);
