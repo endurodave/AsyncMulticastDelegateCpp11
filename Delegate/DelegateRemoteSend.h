@@ -32,7 +32,7 @@ public:
     }
 
 	virtual bool operator==(const DelegateBase& rhs) const {
-		const DelegateRemoteSend<Param1>* derivedRhs = dynamic_cast<const DelegateRemoteSend<Param1>*>(&rhs);
+		const DelegateRemoteSend<void(Param1)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1)>*>(&rhs);
 		return derivedRhs &&
 			m_id == derivedRhs->m_id &&
             &m_transport == &derivedRhs->m_transport; }
