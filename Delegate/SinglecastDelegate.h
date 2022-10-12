@@ -43,8 +43,8 @@ public:
 
 private:
 	// Prevent copying objects
-	SinglecastDelegate(const SinglecastDelegate&);
-	SinglecastDelegate& operator=(const SinglecastDelegate&);
+	SinglecastDelegate(const SinglecastDelegate&) = delete;
+	SinglecastDelegate& operator=(const SinglecastDelegate&) = delete;
 
 	Delegate<RetType(void)>* m_delegate;
 };
@@ -81,8 +81,8 @@ public:
 
 private:
 	// Prevent copying objects
-	SinglecastDelegate(const SinglecastDelegate&);
-	SinglecastDelegate& operator=(const SinglecastDelegate&);
+	SinglecastDelegate(const SinglecastDelegate&) = delete;
+	SinglecastDelegate& operator=(const SinglecastDelegate&) = delete;
 
 	Delegate<RetType(Param1)>* m_delegate;
 };
@@ -119,8 +119,8 @@ public:
 
 private:
 	// Prevent copying objects
-	SinglecastDelegate(const SinglecastDelegate&);
-	SinglecastDelegate& operator=(const SinglecastDelegate&);
+	SinglecastDelegate(const SinglecastDelegate&) = delete;
+	SinglecastDelegate& operator=(const SinglecastDelegate&) = delete;
 
 	Delegate<RetType(Param1, Param2)>* m_delegate;
 };
@@ -157,8 +157,8 @@ public:
 
 private:
 	// Prevent copying objects
-	SinglecastDelegate(const SinglecastDelegate&);
-	SinglecastDelegate& operator=(const SinglecastDelegate&);
+	SinglecastDelegate(const SinglecastDelegate&) = delete;
+	SinglecastDelegate& operator=(const SinglecastDelegate&) = delete;
 
 	Delegate<RetType(Param1, Param2, Param3)>* m_delegate;
 };
@@ -195,8 +195,8 @@ public:
 
 private:
 	// Prevent copying objects
-	SinglecastDelegate(const SinglecastDelegate&);
-	SinglecastDelegate& operator=(const SinglecastDelegate&);
+	SinglecastDelegate(const SinglecastDelegate&) = delete;
+	SinglecastDelegate& operator=(const SinglecastDelegate&) = delete;
 
 	Delegate<RetType(Param1, Param2, Param3, Param4)>* m_delegate;
 };
@@ -233,8 +233,8 @@ public:
 
 private:
 	// Prevent copying objects
-	SinglecastDelegate(const SinglecastDelegate&);
-	SinglecastDelegate& operator=(const SinglecastDelegate&);
+	SinglecastDelegate(const SinglecastDelegate&) = delete;
+	SinglecastDelegate& operator=(const SinglecastDelegate&) = delete;
 
 	Delegate<RetType(Param1, Param2, Param3, Param4, Param5)>* m_delegate;
 };

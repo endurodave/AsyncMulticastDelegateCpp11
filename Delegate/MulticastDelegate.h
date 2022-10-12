@@ -28,8 +28,8 @@ public:
 
 private:
 	// Prevent copying objects
-	MulticastDelegate(const MulticastDelegate&);
-	MulticastDelegate& operator=(const MulticastDelegate&);
+	MulticastDelegate(const MulticastDelegate&) = delete;
+	MulticastDelegate& operator=(const MulticastDelegate&) = delete;
 };
 
 template<typename Param1>
@@ -50,8 +50,8 @@ public:
 
 private:
 	// Prevent copying objects
-	MulticastDelegate(const MulticastDelegate&);
-	MulticastDelegate& operator=(const MulticastDelegate&);
+	MulticastDelegate(const MulticastDelegate&) = delete;
+	MulticastDelegate& operator=(const MulticastDelegate&) = delete;
 };
 
 template<typename Param1, class Param2>
@@ -72,8 +72,8 @@ public:
 
 private:
 	// Prevent copying objects
-	MulticastDelegate(const MulticastDelegate&);
-	MulticastDelegate& operator=(const MulticastDelegate&);
+	MulticastDelegate(const MulticastDelegate&) = delete;
+	MulticastDelegate& operator=(const MulticastDelegate&) = delete;
 };
 
 template<typename Param1, class Param2, class Param3>
@@ -94,8 +94,8 @@ public:
 
 private:
 	// Prevent copying objects
-	MulticastDelegate(const MulticastDelegate&);
-	MulticastDelegate& operator=(const MulticastDelegate&);
+	MulticastDelegate(const MulticastDelegate&) = delete;
+	MulticastDelegate& operator=(const MulticastDelegate&) = delete;
 };
 
 template<typename Param1, class Param2, class Param3, class Param4>
@@ -116,8 +116,8 @@ public:
 
 private:
 	// Prevent copying objects
-	MulticastDelegate(const MulticastDelegate&);
-	MulticastDelegate& operator=(const MulticastDelegate&);
+	MulticastDelegate(const MulticastDelegate&) = delete;
+	MulticastDelegate& operator=(const MulticastDelegate&) = delete;
 };
 
 template<typename Param1, class Param2, class Param3, class Param4, class Param5>
@@ -138,8 +138,8 @@ public:
 
 private:
 	// Prevent copying objects
-	MulticastDelegate(const MulticastDelegate&);
-	MulticastDelegate& operator=(const MulticastDelegate&);
+	MulticastDelegate(const MulticastDelegate&) = delete;
+	MulticastDelegate& operator=(const MulticastDelegate&) = delete;
 };
 
 }

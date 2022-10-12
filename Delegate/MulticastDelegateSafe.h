@@ -47,8 +47,8 @@ public:
 
 private:
 	// Prevent copying objects
-	MulticastDelegateSafe(const MulticastDelegateSafe&);
-	MulticastDelegateSafe& operator=(const MulticastDelegateSafe&);
+	MulticastDelegateSafe(const MulticastDelegateSafe&) = delete;
+	MulticastDelegateSafe& operator=(const MulticastDelegateSafe&) = delete;
 
 	/// Lock to make the class thread-safe
 	LOCK m_lock;
@@ -89,8 +89,8 @@ public:
 
 private:
 	// Prevent copying objects
-	MulticastDelegateSafe(const MulticastDelegateSafe&);
-	MulticastDelegateSafe& operator=(const MulticastDelegateSafe&);
+	MulticastDelegateSafe(const MulticastDelegateSafe&) = delete;
+	MulticastDelegateSafe& operator=(const MulticastDelegateSafe&) = delete;
 
 	/// Lock to make the class thread-safe
 	LOCK m_lock;
@@ -131,8 +131,8 @@ public:
 
 private:
 	// Prevent copying objects
-	MulticastDelegateSafe(const MulticastDelegateSafe&);
-	MulticastDelegateSafe& operator=(const MulticastDelegateSafe&);
+	MulticastDelegateSafe(const MulticastDelegateSafe&) = delete;
+	MulticastDelegateSafe& operator=(const MulticastDelegateSafe&) = delete;
 
 	/// Lock to make the class thread-safe
 	LOCK m_lock;
@@ -173,8 +173,8 @@ public:
 
 private:
 	// Prevent copying objects
-	MulticastDelegateSafe(const MulticastDelegateSafe&);
-	MulticastDelegateSafe& operator=(const MulticastDelegateSafe&);
+	MulticastDelegateSafe(const MulticastDelegateSafe&) = delete;
+	MulticastDelegateSafe& operator=(const MulticastDelegateSafe&) = delete;
 
 	/// Lock to make the class thread-safe
 	LOCK m_lock;
@@ -215,8 +215,8 @@ public:
 
 private:
 	// Prevent copying objects
-	MulticastDelegateSafe(const MulticastDelegateSafe&);
-	MulticastDelegateSafe& operator=(const MulticastDelegateSafe&);
+	MulticastDelegateSafe(const MulticastDelegateSafe&) = delete;
+	MulticastDelegateSafe& operator=(const MulticastDelegateSafe&) = delete;
 
 	/// Lock to make the class thread-safe
 	LOCK m_lock;
@@ -257,8 +257,8 @@ public:
 
 private:
 	// Prevent copying objects
-	MulticastDelegateSafe(const MulticastDelegateSafe&);
-	MulticastDelegateSafe& operator=(const MulticastDelegateSafe&);
+	MulticastDelegateSafe(const MulticastDelegateSafe&) = delete;
+	MulticastDelegateSafe& operator=(const MulticastDelegateSafe&) = delete;
 
 	/// Lock to make the class thread-safe
 	LOCK m_lock;

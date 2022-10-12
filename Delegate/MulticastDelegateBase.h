@@ -51,8 +51,8 @@ protected:
 
 private:
 	// Prevent copying objects
-	MulticastDelegateBase(const MulticastDelegateBase&);
-	MulticastDelegateBase& operator=(const MulticastDelegateBase&);
+	MulticastDelegateBase(const MulticastDelegateBase&) = delete;
+	MulticastDelegateBase& operator=(const MulticastDelegateBase&) = delete;
 
 	/// Head pointer to the delegate invocation list
 	InvocationNode* m_invocationHead;
