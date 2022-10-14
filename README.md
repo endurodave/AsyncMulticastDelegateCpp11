@@ -76,7 +76,7 @@ delegateMember(&testStruct);
 <p>Prefer this 2022 updated version of the library. The original C++03 version of the library is located below for reference.</p>
 
 <p><strong><a href="https://www.codeproject.com/Articles/1160934/Asynchronous-Multicast-Delegates-in-Cplusplus">Asynchronous Multicast Delegates in C++</a></strong> - by David Lafreniere (CodeProject)</p>
-<p><strong><a href="https://github.com/endurodave/AsyncMulticastDelegate">Asynchronous Multicast Delegates in C++</a></strong> - by David Lafreniere (GitHub)</p>
+<p><strong><a href="https://github.com/endurodave/AsyncMulticastDelegate">Asynchronous Multicast Delegates in C++ (2016)</a></strong> - by David Lafreniere (GitHub)</p>
 
 The article that follows uses the old syntax for examples. The explainations, however, are accurate.
 
