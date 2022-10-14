@@ -359,6 +359,13 @@ int main(void)
 	if (delegateI.IsSuccess())
 		cout << msg.c_str() << " " << year << endl;
 
+    // Alternate means to invoke a function asynchronousy using AsyncInvoke. This thread will block until the 
+	// msg and year stack values are set by MemberFuncStdStringRetInt on workerThread1.
+    std::string msg2;
+    auto asyncInvokeRetVal = MakeDelegate(&testClass, &TestClass::MemberFuncStdStringRetInt, &workerThread1, WAIT_INFINITE).AsyncInvoke(msg2);
+    if (asyncInvokeRetVal.success)
+        cout << msg.c_str() << " " << asyncInvokeRetVal.retVal << endl;
+
 	// Create a shared_ptr, create a delegate, then synchronously invoke delegate function
 	std::shared_ptr<TestClass> spObject(new TestClass());
 	auto delegateMemberSp = MakeDelegate(spObject, &TestClass::MemberFuncStdString);
