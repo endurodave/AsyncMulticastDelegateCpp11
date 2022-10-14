@@ -35,15 +35,15 @@ public:
 		m_func = func; }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func) {
 		m_object = object;
 		m_func = reinterpret_cast<MemberFunc>(func); }
 
-	virtual DelegateMemberSp<RetType(TClass(void))>* Clone() const {
+	virtual DelegateMemberSp<RetType(TClass(void))>* Clone() const override {
 		return new DelegateMemberSp<RetType(TClass(void))>(*this); }
 
 	// Invoke the bound delegate function
-    virtual RetType operator()()
+    virtual RetType operator()() override
     {
         if (m_object)
             return (*m_object.*m_func)();
@@ -51,8 +51,7 @@ public:
             return RetType();
     }
 
-
-	virtual bool operator==(const DelegateBase& rhs) const 	{
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberSp<RetType(TClass(void))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(void))>*>(&rhs);
 		return derivedRhs &&
 			m_func == derivedRhs->m_func && 
@@ -84,15 +83,15 @@ public:
 		m_func = func; }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func) {
 		m_object = object;
 		m_func = reinterpret_cast<MemberFunc>(func); }
 
-	virtual DelegateMemberSp<RetType(TClass(Param1))>* Clone() const {
+	virtual DelegateMemberSp<RetType(TClass(Param1))>* Clone() const override {
 		return new DelegateMemberSp<RetType(TClass(Param1))>(*this); }
 
 	// Invoke the bound delegate function
-    virtual RetType operator()(Param1 p1)
+    virtual RetType operator()(Param1 p1) override
     {
         if (m_object)
             return (*m_object.*m_func)(p1);
@@ -100,8 +99,7 @@ public:
             return RetType();
     }
 
-
-	virtual bool operator==(const DelegateBase& rhs) const 	{
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberSp<RetType(TClass(Param1))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1))>*>(&rhs);
 		return derivedRhs &&
 			m_func == derivedRhs->m_func && 
@@ -133,15 +131,15 @@ public:
 		m_func = func; }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func) {
 		m_object = object;
 		m_func = reinterpret_cast<MemberFunc>(func); }
 
-	virtual DelegateMemberSp<RetType(TClass(Param1, Param2))>* Clone() const {
+	virtual DelegateMemberSp<RetType(TClass(Param1, Param2))>* Clone() const override {
 		return new DelegateMemberSp<RetType(TClass(Param1, Param2))>(*this); }
 
 	// Invoke the bound delegate function
-    virtual RetType operator()(Param1 p1, Param2 p2)
+    virtual RetType operator()(Param1 p1, Param2 p2) override
     {
         if (m_object)
             return (*m_object.*m_func)(p1, p2);
@@ -149,8 +147,7 @@ public:
             return RetType();
     }
 
-
-	virtual bool operator==(const DelegateBase& rhs) const 	{
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberSp<RetType(TClass(Param1, Param2))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1, Param2))>*>(&rhs);
 		return derivedRhs &&
 			m_func == derivedRhs->m_func && 
@@ -182,15 +179,15 @@ public:
 		m_func = func; }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func) {
 		m_object = object;
 		m_func = reinterpret_cast<MemberFunc>(func); }
 
-	virtual DelegateMemberSp<RetType(TClass(Param1, Param2, Param3))>* Clone() const {
+	virtual DelegateMemberSp<RetType(TClass(Param1, Param2, Param3))>* Clone() const override {
 		return new DelegateMemberSp<RetType(TClass(Param1, Param2, Param3))>(*this); }
 
 	// Invoke the bound delegate function
-    virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3)
+    virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3) override
     {
         if (m_object)
             return (*m_object.*m_func)(p1, p2, p3);
@@ -198,8 +195,7 @@ public:
             return RetType();
     }
 
-
-	virtual bool operator==(const DelegateBase& rhs) const 	{
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3))>*>(&rhs);
 		return derivedRhs &&
 			m_func == derivedRhs->m_func && 
@@ -231,15 +227,15 @@ public:
 		m_func = func; }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func) {
 		m_object = object;
 		m_func = reinterpret_cast<MemberFunc>(func); }
 
-	virtual DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4))>* Clone() const {
+	virtual DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4))>* Clone() const override {
 		return new DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4))>(*this); }
 
 	// Invoke the bound delegate function
-    virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4)
+    virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override
     {
         if (m_object)
             return (*m_object.*m_func)(p1, p2, p3, p4);
@@ -247,8 +243,7 @@ public:
             return RetType();
     }
 
-
-	virtual bool operator==(const DelegateBase& rhs) const 	{
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4))>*>(&rhs);
 		return derivedRhs &&
 			m_func == derivedRhs->m_func && 
@@ -280,15 +275,15 @@ public:
 		m_func = func; }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func) {
 		m_object = object;
 		m_func = reinterpret_cast<MemberFunc>(func); }
 
-	virtual DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const {
+	virtual DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const override {
 		return new DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>(*this); }
 
 	// Invoke the bound delegate function
-	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)
+	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override
     {
         if (m_object)
             return (*m_object.*m_func)(p1, p2, p3, p4, p5);
@@ -296,8 +291,7 @@ public:
             return RetType();
     }
 
-
-	virtual bool operator==(const DelegateBase& rhs) const 	{
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>*>(&rhs);
 		return derivedRhs &&
 			m_func == derivedRhs->m_func && 

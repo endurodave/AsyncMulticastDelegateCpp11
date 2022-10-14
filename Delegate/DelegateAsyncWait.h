@@ -91,7 +91,7 @@ public:
 		m_thread = thread;
 		DelegateMember<RetType(TClass(void))>::Bind(object, func); }
 
-	virtual bool operator==(const DelegateBase& rhs) const 	{
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberAsyncWaitBase<RetType(TClass(void))>* derivedRhs = dynamic_cast<const DelegateMemberAsyncWaitBase<RetType(TClass(void))>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
@@ -137,7 +137,7 @@ public:
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : 
 		DelegateMemberAsyncWaitBase<RetType(TClass(void))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait() { }
-	virtual DelegateMemberAsyncWait<RetType(TClass(void))>* Clone() const {	
+	virtual DelegateMemberAsyncWait<RetType(TClass(void))>* Clone() const override {	
 		return new DelegateMemberAsyncWait<RetType(TClass(void))>(*this); }
 	
 	/// Invoke delegate function asynchronously
@@ -186,7 +186,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			LockGuard lockGuard(&this->m_lock);
@@ -230,11 +230,11 @@ public:
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(void))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait() { }
-	virtual DelegateMemberAsyncWait<void(TClass(void))>* Clone() const {
-		return new DelegateMemberAsyncWait<void(TClass(void))>(*this);	}
+	virtual DelegateMemberAsyncWait<void(TClass(void))>* Clone() const override {
+		return new DelegateMemberAsyncWait<void(TClass(void))>(*this); }
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()() {
+	virtual void operator()() override {
 		if (this->m_thread == 0)
 			DelegateMemberAsyncWaitBase<void(TClass(void))>::operator()();
 		else {
@@ -279,7 +279,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			LockGuard lockGuard(&this->m_lock);
@@ -342,7 +342,7 @@ public:
 		DelegateMember<RetType(TClass(Param1))>::Bind(object, func);
 	}
 
-	virtual bool operator==(const DelegateBase& rhs) const {
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>* derivedRhs = dynamic_cast<const DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
@@ -389,12 +389,12 @@ public:
 	DelegateMemberAsyncWait<RetType(TClass(Param1))>(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait() { }
-	virtual DelegateMemberAsyncWait<RetType(TClass(Param1))>* Clone() const {
+	virtual DelegateMemberAsyncWait<RetType(TClass(Param1))>* Clone() const override {
 		return new DelegateMemberAsyncWait<RetType(TClass(Param1))>(*this);
 	}
 
 	/// Invoke delegate function asynchronously
-	virtual RetType operator()(Param1 p1) {
+	virtual RetType operator()(Param1 p1) override {
 		if (this->m_thread == 0)
 			return DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>::operator()(p1);
 		else {
@@ -439,7 +439,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -489,12 +489,12 @@ public:
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait() { }
-	virtual DelegateMemberAsyncWait<void(TClass(Param1))>* Clone() const {
+	virtual DelegateMemberAsyncWait<void(TClass(Param1))>* Clone() const override {
 		return new DelegateMemberAsyncWait<void(TClass(Param1))>(*this);
 	}
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1) {
+	virtual void operator()(Param1 p1) override {
 		if (this->m_thread == 0)
 			DelegateMemberAsyncWaitBase<void(TClass(Param1))>::operator()(p1);
 		else {
@@ -537,7 +537,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -606,7 +606,7 @@ public:
 		DelegateMember<RetType(TClass(Param1, Param2))>::Bind(object, func);
 	}
 
-	virtual bool operator==(const DelegateBase& rhs) const {
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>* derivedRhs = dynamic_cast<const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
@@ -653,12 +653,12 @@ public:
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait() { }
-	virtual DelegateMemberAsyncWait<RetType(TClass(Param1, Param2))>* Clone() const {
+	virtual DelegateMemberAsyncWait<RetType(TClass(Param1, Param2))>* Clone() const override {
 		return new DelegateMemberAsyncWait<RetType(TClass(Param1, Param2))>(*this);
 	}
 
 	/// Invoke delegate function asynchronously
-	virtual RetType operator()(Param1 p1, Param2 p2) {
+	virtual RetType operator()(Param1 p1, Param2 p2) override {
 		if (this->m_thread == 0)
 			return DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>::operator()(p1, p2);
 		else {
@@ -703,7 +703,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -754,12 +754,12 @@ public:
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait() { }
-	virtual DelegateMemberAsyncWait<void(TClass(Param1, Param2))>* Clone() const {
+	virtual DelegateMemberAsyncWait<void(TClass(Param1, Param2))>* Clone() const override {
 		return new DelegateMemberAsyncWait<void(TClass(Param1, Param2))>(*this);
 	}
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1, Param2 p2) {
+	virtual void operator()(Param1 p1, Param2 p2) override {
 		if (this->m_thread == 0)
 			DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2))>::operator()(p1, p2);
 		else {
@@ -802,7 +802,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -872,7 +872,7 @@ public:
 		DelegateMember<RetType(TClass(Param1, Param2, Param3))>::Bind(object, func);
 	}
 
-	virtual bool operator==(const DelegateBase& rhs) const {
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>* derivedRhs = dynamic_cast<const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
@@ -919,7 +919,7 @@ public:
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait() { }
-	virtual DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3))>* Clone() const {
+	virtual DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3))>* Clone() const override {
 		return new DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3))>(*this);
 	}
 
@@ -969,7 +969,7 @@ public:
 	}	
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -1021,12 +1021,12 @@ public:
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait() { }
-	virtual DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3))>* Clone() const {
+	virtual DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3))>* Clone() const override {
 		return new DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3))>(*this);
 	}
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1, Param2 p2, Param3 p3) {
+	virtual void operator()(Param1 p1, Param2 p2, Param3 p3) override {
 		if (this->m_thread == 0)
 			DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3))>::operator()(p1, p2, p3);
 		else {
@@ -1069,7 +1069,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -1140,7 +1140,7 @@ public:
 		DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4))>::Bind(object, func);
 	}
 
-	virtual bool operator==(const DelegateBase& rhs) const {
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>* derivedRhs = dynamic_cast<const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
@@ -1187,7 +1187,7 @@ public:
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait() { }
-	virtual DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4))>* Clone() const {
+	virtual DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4))>* Clone() const override {
 		return new DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4))>(*this);
 	}
 
@@ -1237,7 +1237,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -1290,12 +1290,12 @@ public:
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait() { }
-	virtual DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3, Param4))>* Clone() const {
+	virtual DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3, Param4))>* Clone() const override {
 		return new DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3, Param4))>(*this);
 	}
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
+	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override {
 		if (this->m_thread == 0)
 			DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4))>::operator()(p1, p2, p3, p4);
 		else {
@@ -1338,7 +1338,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -1410,7 +1410,7 @@ public:
 		DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>::Bind(object, func);
 	}
 
-	virtual bool operator==(const DelegateBase& rhs) const {
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* derivedRhs = dynamic_cast<const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
@@ -1457,7 +1457,7 @@ public:
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait() { }
-	virtual DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const {
+	virtual DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const override {
 		return new DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>(*this);
 	}
 
@@ -1507,7 +1507,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -1561,12 +1561,12 @@ public:
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4, Param5))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait() { }
-	virtual DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const {
+	virtual DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const override {
 		return new DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3, Param4, Param5))>(*this);
 	}
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
+	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override {
 		if (this->m_thread == 0)
 			DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4, Param5))>::operator()(p1, p2, p3, p4, p5);
 		else {
@@ -1609,7 +1609,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -1680,7 +1680,7 @@ public:
 		DelegateFree<RetType(void)>::Bind(func);
 	}
 
-	virtual bool operator==(const DelegateBase& rhs) const {
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateFreeAsyncWaitBase<RetType(void)>* derivedRhs = dynamic_cast<const DelegateFreeAsyncWaitBase<RetType(void)>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
@@ -1772,7 +1772,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			LockGuard lockGuard(&this->m_lock);
@@ -1812,11 +1812,11 @@ public:
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase(func, thread, timeout) { }
 	DelegateFreeAsyncWait() { }
-	virtual DelegateFreeAsyncWait<void(void)>* Clone() const {
-		return new DelegateFreeAsyncWait<void(void)>(*this);	}
+	virtual DelegateFreeAsyncWait<void(void)>* Clone() const override {
+		return new DelegateFreeAsyncWait<void(void)>(*this); }
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()() {
+	virtual void operator()() override {
 		if (this->m_thread == 0)
 			return DelegateFreeAsyncWaitBase::operator()();
 		else {
@@ -1861,7 +1861,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			LockGuard lockGuard(&this->m_lock);
@@ -1912,7 +1912,7 @@ public:
 		DelegateFree<RetType(Param1)>::Bind(func);
 	}
 
-	virtual bool operator==(const DelegateBase& rhs) const {
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateFreeAsyncWaitBase<RetType(Param1)>* derivedRhs = dynamic_cast<const DelegateFreeAsyncWaitBase<RetType(Param1)>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
@@ -1955,7 +1955,7 @@ public:
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<RetType(Param1)>(func, thread, timeout) { }
 	DelegateFreeAsyncWait() { }
-	virtual DelegateFreeAsyncWait<RetType(Param1)>* Clone() const {
+	virtual DelegateFreeAsyncWait<RetType(Param1)>* Clone() const override {
 		return new DelegateFreeAsyncWait<RetType(Param1)>(*this);
 	}
 
@@ -2005,7 +2005,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			LockGuard lockGuard(&this->m_lock);
@@ -2051,12 +2051,12 @@ public:
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<void(Param1)>(func, thread, timeout) { }
 	DelegateFreeAsyncWait() { }
-	virtual DelegateFreeAsyncWait<void(Param1)>* Clone() const {
+	virtual DelegateFreeAsyncWait<void(Param1)>* Clone() const override {
 		return new DelegateFreeAsyncWait<void(Param1)>(*this);
 	}
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1) {
+	virtual void operator()(Param1 p1) override {
 		if (this->m_thread == 0)
 			DelegateFreeAsyncWaitBase<void(Param1)>::operator()(p1);
 		else {
@@ -2099,7 +2099,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			LockGuard lockGuard(&this->m_lock);
@@ -2156,7 +2156,7 @@ public:
 		DelegateFree<RetType(Param1, Param2)>::Bind(func);
 	}
 
-	virtual bool operator==(const DelegateBase& rhs) const {
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateFreeAsyncWaitBase<RetType(Param1, Param2)>* derivedRhs = dynamic_cast<const DelegateFreeAsyncWaitBase<RetType(Param1, Param2)>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
@@ -2199,7 +2199,7 @@ public:
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<RetType(Param1, Param2)>(func, thread, timeout) { }
 	DelegateFreeAsyncWait() { }
-	virtual DelegateFreeAsyncWait<RetType(Param1, Param2)>* Clone() const {
+	virtual DelegateFreeAsyncWait<RetType(Param1, Param2)>* Clone() const override {
 		return new DelegateFreeAsyncWait<RetType(Param1, Param2)>(*this);
 	}
 
@@ -2249,7 +2249,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			LockGuard lockGuard(&this->m_lock);
@@ -2296,12 +2296,12 @@ public:
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<void(Param1, Param2)>(func, thread, timeout) { }
 	DelegateFreeAsyncWait() { }
-	virtual DelegateFreeAsyncWait<void(Param1, Param2)>* Clone() const {
+	virtual DelegateFreeAsyncWait<void(Param1, Param2)>* Clone() const override {
 		return new DelegateFreeAsyncWait<void(Param1, Param2)>(*this);
 	}
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1, Param2 p2) {
+	virtual void operator()(Param1 p1, Param2 p2) override {
 		if (this->m_thread == 0)
 			DelegateFreeAsyncWaitBase<void(Param1, Param2)>::operator()(p1, p2);
 		else {
@@ -2344,7 +2344,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -2402,7 +2402,7 @@ public:
 		DelegateFree<RetType(Param1, Param2, Param3)>::Bind(func);
 	}
 
-	virtual bool operator==(const DelegateBase& rhs) const {
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)>* derivedRhs = dynamic_cast<const DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
@@ -2445,7 +2445,7 @@ public:
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)>(func, thread, timeout) { }
 	DelegateFreeAsyncWait() { }
-	virtual DelegateFreeAsyncWait<RetType(Param1, Param2, Param3)>* Clone() const {
+	virtual DelegateFreeAsyncWait<RetType(Param1, Param2, Param3)>* Clone() const override {
 		return new DelegateFreeAsyncWait<RetType(Param1, Param2, Param3)>(*this);
 	}
 
@@ -2495,7 +2495,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -2543,12 +2543,12 @@ public:
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3)>(func, thread, timeout) { }
 	DelegateFreeAsyncWait() { }
-	virtual DelegateFreeAsyncWait<void(Param1, Param2, Param3)>* Clone() const {
+	virtual DelegateFreeAsyncWait<void(Param1, Param2, Param3)>* Clone() const override {
 		return new DelegateFreeAsyncWait<void(Param1, Param2, Param3)>(*this);
 	}
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1, Param2 p2, Param3 p3) {
+	virtual void operator()(Param1 p1, Param2 p2, Param3 p3) override {
 		if (this->m_thread == 0)
 			DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3)>::operator()(p1, p2, p3);
 		else {
@@ -2591,7 +2591,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -2650,7 +2650,7 @@ public:
 		DelegateFree<RetType(Param1, Param2, Param3, Param4)>::Bind(func);
 	}
 
-	virtual bool operator==(const DelegateBase& rhs) const {
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)>* derivedRhs = dynamic_cast<const DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
@@ -2693,7 +2693,7 @@ public:
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)>(func, thread, timeout) { }
 	DelegateFreeAsyncWait() { }
-	virtual DelegateFreeAsyncWait<RetType(Param1, Param2, Param3, Param4)>* Clone() const {
+	virtual DelegateFreeAsyncWait<RetType(Param1, Param2, Param3, Param4)>* Clone() const override {
 		return new DelegateFreeAsyncWait<RetType(Param1, Param2, Param3, Param4)>(*this);
 	}
 
@@ -2743,7 +2743,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -2792,12 +2792,12 @@ public:
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4)>(func, thread, timeout) { }
 	DelegateFreeAsyncWait() { }
-	virtual DelegateFreeAsyncWait<void(Param1, Param2, Param3, Param4)>* Clone() const {
+	virtual DelegateFreeAsyncWait<void(Param1, Param2, Param3, Param4)>* Clone() const override {
 		return new DelegateFreeAsyncWait<void(Param1, Param2, Param3, Param4)>(*this);
 	}
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
+	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override {
 		if (this->m_thread == 0)
 			DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4)>::operator()(p1, p2, p3, p4);
 		else {
@@ -2840,7 +2840,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -2900,7 +2900,7 @@ public:
 		DelegateFree<RetType(Param1, Param2, Param3, Param4, Param5)>::Bind(func);
 	}
 
-	virtual bool operator==(const DelegateBase& rhs) const {
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)>* derivedRhs = dynamic_cast<const DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
@@ -2943,7 +2943,7 @@ public:
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)>(func, thread, timeout) { }
 	DelegateFreeAsyncWait() { }
-	virtual DelegateFreeAsyncWait<RetType(Param1, Param2, Param3, Param4, Param5)>* Clone() const {
+	virtual DelegateFreeAsyncWait<RetType(Param1, Param2, Param3, Param4, Param5)>* Clone() const override {
 		return new DelegateFreeAsyncWait<RetType(Param1, Param2, Param3, Param4, Param5)>(*this);
 	}
 
@@ -2993,7 +2993,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance
@@ -3043,12 +3043,12 @@ public:
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4, Param5)>(func, thread, timeout) { }
 	DelegateFreeAsyncWait() { }
-	virtual DelegateFreeAsyncWait<void(Param1, Param2, Param3, Param4, Param5)>* Clone() const {
+	virtual DelegateFreeAsyncWait<void(Param1, Param2, Param3, Param4, Param5)>* Clone() const override {
 		return new DelegateFreeAsyncWait<void(Param1, Param2, Param3, Param4, Param5)>(*this);
 	}
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
+	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override {
 		if (this->m_thread == 0)
 			DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4, Param5)>::operator()(p1, p2, p3, p4, p5);
 		else {
@@ -3091,7 +3091,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		bool deleteData = false;
 		{
 			// Typecast the base pointer to back to the templatized instance

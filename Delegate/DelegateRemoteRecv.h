@@ -79,12 +79,12 @@ public:
         DelegateMember<void(TClass(Param1))>::Bind(object, func);
     }
 
-    virtual DelegateMemberRemoteRecv<void(TClass(Param1))>* Clone() const {
+    virtual DelegateMemberRemoteRecv<void(TClass(Param1))>* Clone() const override {
         return new DelegateMemberRemoteRecv<void(TClass(Param1))>(*this);
     }
 
     /// Called by the remote system to invoke the delegate function
-    virtual void DelegateInvoke(std::istream& stream) {
+    virtual void DelegateInvoke(std::istream& stream) override {
         RemoteParam<Param1> param1;
 
         Param1 p1 = param1.Get();
@@ -97,7 +97,7 @@ public:
         DelegateMember<void(TClass(Param1))>::operator()(p1);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateMemberRemoteRecv<void(TClass(Param1))>* derivedRhs = dynamic_cast<const DelegateMemberRemoteRecv<void(TClass(Param1))>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
@@ -137,12 +137,12 @@ public:
         DelegateMember<void(TClass(Param1, Param2))>::Bind(object, func);
     }
 
-    virtual DelegateMemberRemoteRecv<void(TClass(Param1, Param2))>* Clone() const {
+    virtual DelegateMemberRemoteRecv<void(TClass(Param1, Param2))>* Clone() const override {
         return new DelegateMemberRemoteRecv<void(TClass(Param1, Param2))>(*this);
     }
 
     /// Called by the remote system to invoke the delegate function
-    virtual void DelegateInvoke(std::istream& stream) {
+    virtual void DelegateInvoke(std::istream& stream) override {
         RemoteParam<Param1> param1;
         RemoteParam<Param2> param2;
 
@@ -159,7 +159,7 @@ public:
         DelegateMember<void(TClass(Param1, Param2))>::operator()(p1, p2);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateMemberRemoteRecv<void(TClass(Param1, Param2))>* derivedRhs = dynamic_cast<const DelegateMemberRemoteRecv<void(TClass(Param1, Param2))>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
@@ -199,12 +199,12 @@ public:
         DelegateMember<void(TClass(Param1, Param2, Param3))>::Bind(object, func);
     }
 
-    virtual DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3))>* Clone() const {
+    virtual DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3))>* Clone() const override {
         return new DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3))>(*this);
     }
 
     /// Called by the remote system to invoke the delegate function
-    virtual void DelegateInvoke(std::istream& stream) {
+    virtual void DelegateInvoke(std::istream& stream) override {
         RemoteParam<Param1> param1;
         RemoteParam<Param2> param2;
         RemoteParam<Param3> param3;
@@ -225,7 +225,7 @@ public:
         DelegateMember<void(TClass(Param1, Param2, Param3))>::operator()(p1, p2, p3);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3))>* derivedRhs = dynamic_cast<const DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3))>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
@@ -265,12 +265,12 @@ public:
         DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>::Bind(object, func);
     }
 
-    virtual DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4))>* Clone() const {
+    virtual DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4))>* Clone() const override {
         return new DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4))>(*this);
     }
 
     /// Called by the remote system to invoke the delegate function
-    virtual void DelegateInvoke(std::istream& stream) {
+    virtual void DelegateInvoke(std::istream& stream) override {
         RemoteParam<Param1> param1;
         RemoteParam<Param2> param2;
         RemoteParam<Param3> param3;
@@ -295,7 +295,7 @@ public:
         DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>::operator()(p1, p2, p3, p4);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4))>* derivedRhs = dynamic_cast<const DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4))>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
@@ -335,12 +335,12 @@ public:
         DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>::Bind(object, func);
     }
 
-    virtual DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const {
+    virtual DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const override {
         return new DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4, Param5))>(*this);
     }
 
     /// Called by the remote system to invoke the delegate function
-    virtual void DelegateInvoke(std::istream& stream) {
+    virtual void DelegateInvoke(std::istream& stream) override {
         RemoteParam<Param1> param1;
         RemoteParam<Param2> param2;
         RemoteParam<Param3> param3;
@@ -369,7 +369,7 @@ public:
         DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>::operator()(p1, p2, p3, p4, p5);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4, Param5))>* derivedRhs = dynamic_cast<const DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4, Param5))>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
@@ -398,10 +398,10 @@ public:
         DelegateFree<Param1>::Bind(func);
     }
 
-    virtual DelegateFreeRemoteRecv* Clone() const { return new DelegateFreeRemoteRecv(*this); }
+    virtual DelegateFreeRemoteRecv* Clone() const override { return new DelegateFreeRemoteRecv(*this); }
 
     /// Called by the remote system to invoke the delegate function
-    virtual void DelegateInvoke(std::istream& stream) {
+    virtual void DelegateInvoke(std::istream& stream) override {
         RemoteParam<Param1> param1;
 
         Param1 p1 = param1.Get();
@@ -414,7 +414,7 @@ public:
         DelegateFree<Param1>::operator()(p1);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateFreeRemoteRecv<Param1>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<Param1>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
@@ -439,10 +439,10 @@ public:
         DelegateFree<void(Param1, Param2)>::Bind(func);
     }
 
-    virtual DelegateFreeRemoteRecv* Clone() const { return new DelegateFreeRemoteRecv(*this); }
+    virtual DelegateFreeRemoteRecv* Clone() const override { return new DelegateFreeRemoteRecv(*this); }
 
     /// Called by the remote system to invoke the delegate function
-    virtual void DelegateInvoke(std::istream& stream) {
+    virtual void DelegateInvoke(std::istream& stream) override {
         RemoteParam<Param1> param1;
         RemoteParam<Param2> param2;
 
@@ -459,7 +459,7 @@ public:
         DelegateFree<void(Param1, Param2)>::operator()(p1, p2);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateFreeRemoteRecv<void(Param1, Param2)>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<void(Param1, Param2)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
@@ -484,10 +484,10 @@ public:
         DelegateFree<void(Param1, Param2, Param3)>::Bind(func);
     }
 
-    virtual DelegateFreeRemoteRecv* Clone() const { return new DelegateFreeRemoteRecv(*this); }
+    virtual DelegateFreeRemoteRecv* Clone() const override { return new DelegateFreeRemoteRecv(*this); }
 
     /// Called by the remote system to invoke the delegate function
-    virtual void DelegateInvoke(std::istream& stream) {
+    virtual void DelegateInvoke(std::istream& stream) override {
         RemoteParam<Param1> param1;
         RemoteParam<Param2> param2;
         RemoteParam<Param3> param3;
@@ -508,7 +508,7 @@ public:
         DelegateFree<void(Param1, Param2, Param3)>::operator()(p1, p2, p3);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateFreeRemoteRecv<void(Param1, Param2, Param3)>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<void(Param1, Param2, Param3)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
@@ -533,10 +533,10 @@ public:
         DelegateFree<void(Param1, Param2, Param3, Param4)>::Bind(func);
     }
 
-    virtual DelegateFreeRemoteRecv* Clone() const { return new DelegateFreeRemoteRecv(*this); }
+    virtual DelegateFreeRemoteRecv* Clone() const override { return new DelegateFreeRemoteRecv(*this); }
 
     /// Called by the remote system to invoke the delegate function
-    virtual void DelegateInvoke(std::istream& stream) {
+    virtual void DelegateInvoke(std::istream& stream) override {
         RemoteParam<Param1> param1;
         RemoteParam<Param2> param2;
         RemoteParam<Param3> param3;
@@ -561,7 +561,7 @@ public:
         DelegateFree<void(Param1, Param2, Param3, Param4)>::operator()(p1, p2, p3, p4);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4)>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
@@ -586,10 +586,10 @@ public:
         DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>::Bind(func);
     }
 
-    virtual DelegateFreeRemoteRecv* Clone() const { return new DelegateFreeRemoteRecv(*this); }
+    virtual DelegateFreeRemoteRecv* Clone() const override { return new DelegateFreeRemoteRecv(*this); }
 
     /// Called by the remote system to invoke the delegate function
-    virtual void DelegateInvoke(std::istream& stream) {
+    virtual void DelegateInvoke(std::istream& stream) override {
         RemoteParam<Param1> param1;
         RemoteParam<Param2> param2;
         RemoteParam<Param3> param3;
@@ -618,7 +618,7 @@ public:
         DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>::operator()(p1, p2, p3, p4, p5);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4, Param5)>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4, Param5)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&

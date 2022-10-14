@@ -22,16 +22,16 @@ public:
     DelegateRemoteSend(IDelegateTransport& transport, std::iostream& stream, DelegateIdType id) : 
         m_transport(transport), m_stream(stream), m_id(id) { }
 
-	virtual DelegateRemoteSend* Clone() const { return new DelegateRemoteSend(*this); }
+	virtual DelegateRemoteSend* Clone() const override { return new DelegateRemoteSend(*this); }
 
 	/// Invoke the bound delegate function. 
-	virtual void operator()(Param1 p1) {
+	virtual void operator()(Param1 p1) override {
         m_stream << m_id << std::ends;
         m_stream << p1 << std::ends;
         m_transport.DispatchDelegate(m_stream);
     }
 
-	virtual bool operator==(const DelegateBase& rhs) const {
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateRemoteSend<void(Param1)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1)>*>(&rhs);
 		return derivedRhs &&
 			m_id == derivedRhs->m_id &&
@@ -49,17 +49,17 @@ public:
     DelegateRemoteSend(IDelegateTransport& transport, std::iostream& stream, DelegateIdType id) :
         m_transport(transport), m_stream(stream), m_id(id) { }
 
-    virtual DelegateRemoteSend* Clone() const { return new DelegateRemoteSend(*this); }
+    virtual DelegateRemoteSend* Clone() const override { return new DelegateRemoteSend(*this); }
 
     /// Invoke the bound delegate function. 
-    virtual void operator()(Param1 p1, Param2 p2) {
+    virtual void operator()(Param1 p1, Param2 p2) override {
         m_stream << m_id << std::ends;
         m_stream << p1 << std::ends;
         m_stream << p2 << std::ends;
         m_transport.DispatchDelegate(m_stream);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateRemoteSend<void(Param1, Param2)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1, Param2)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
@@ -78,10 +78,10 @@ public:
     DelegateRemoteSend(IDelegateTransport& transport, std::iostream& stream, DelegateIdType id) :
         m_transport(transport), m_stream(stream), m_id(id) { }
 
-    virtual DelegateRemoteSend* Clone() const { return new DelegateRemoteSend(*this); }
+    virtual DelegateRemoteSend* Clone() const override { return new DelegateRemoteSend(*this); }
 
     /// Invoke the bound delegate function. 
-    virtual void operator()(Param1 p1, Param2 p2, Param3 p3) {
+    virtual void operator()(Param1 p1, Param2 p2, Param3 p3) override {
         m_stream << m_id << std::ends;
         m_stream << p1 << std::ends;
         m_stream << p2 << std::ends;
@@ -89,7 +89,7 @@ public:
         m_transport.DispatchDelegate(m_stream);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateRemoteSend<void(Param1, Param2, Param3)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1, Param2, Param3)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
@@ -108,10 +108,10 @@ public:
     DelegateRemoteSend(IDelegateTransport& transport, std::iostream& stream, DelegateIdType id) :
         m_transport(transport), m_stream(stream), m_id(id) { }
 
-    virtual DelegateRemoteSend* Clone() const { return new DelegateRemoteSend(*this); }
+    virtual DelegateRemoteSend* Clone() const override { return new DelegateRemoteSend(*this); }
 
     /// Invoke the bound delegate function. 
-    virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
+    virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override {
         m_stream << m_id << std::ends;
         m_stream << p1 << std::ends;
         m_stream << p2 << std::ends;
@@ -120,7 +120,7 @@ public:
         m_transport.DispatchDelegate(m_stream);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateRemoteSend<void(Param1, Param2, Param3, Param4)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1, Param2, Param3, Param4)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
@@ -139,10 +139,10 @@ public:
     DelegateRemoteSend(IDelegateTransport& transport, std::iostream& stream, DelegateIdType id) :
         m_transport(transport), m_stream(stream), m_id(id) { }
 
-    virtual DelegateRemoteSend* Clone() const { return new DelegateRemoteSend(*this); }
+    virtual DelegateRemoteSend* Clone() const override { return new DelegateRemoteSend(*this); }
 
     /// Invoke the bound delegate function. 
-    virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
+    virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override {
         m_stream << m_id << std::ends;
         m_stream << p1 << std::ends;
         m_stream << p2 << std::ends;
@@ -152,7 +152,7 @@ public:
         m_transport.DispatchDelegate(m_stream);
     }
 
-    virtual bool operator==(const DelegateBase& rhs) const {
+    virtual bool operator==(const DelegateBase& rhs) const override {
         const DelegateRemoteSend<void(Param1, Param2, Param3, Param4, Param5)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1, Param2, Param3, Param4, Param5)>*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&

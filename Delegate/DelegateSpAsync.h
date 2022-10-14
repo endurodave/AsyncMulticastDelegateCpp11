@@ -37,21 +37,21 @@ public:
 		DelegateMemberSp<void(TClass(void))>::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
 		DelegateMemberSp<void(TClass(void))>::Bind(object, func); }
 
-	virtual DelegateMemberSpAsync<void(TClass(void))>* Clone() const {
+	virtual DelegateMemberSpAsync<void(TClass(void))>* Clone() const override {
 		return new DelegateMemberSpAsync<void(TClass(void))>(*this); }
 
-	virtual bool operator==(const DelegateBase& rhs) const 	{
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberSpAsync<void(TClass(void))>* derivedRhs = dynamic_cast<const DelegateMemberSpAsync<void(TClass(void))>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
 			DelegateMemberSp<void(TClass(void))>::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()() {
+	virtual void operator()() override {
 		if (m_thread == 0)
 			DelegateMemberSp<void(TClass(void))>::operator()();
 		else
@@ -69,7 +69,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		// Invoke the delegate function
 		DelegateMemberSp<void(TClass(void))>::operator()();
 
@@ -104,21 +104,21 @@ public:
 		DelegateMemberSp<void(TClass(Param1))>::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
 		DelegateMemberSp<void(TClass(Param1))>::Bind(object, func); }
 
-	virtual DelegateMemberSpAsync<void(TClass(Param1))>* Clone() const {
+	virtual DelegateMemberSpAsync<void(TClass(Param1))>* Clone() const override {
 		return new DelegateMemberSpAsync<void(TClass(Param1))>(*this); }
 
-	virtual bool operator==(const DelegateBase& rhs) const 	{
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberSpAsync<void(TClass(Param1))>* derivedRhs = dynamic_cast<const DelegateMemberSpAsync<void(TClass(Param1))>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
 			DelegateMemberSp<void(TClass(Param1))>::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1) {
+	virtual void operator()(Param1 p1) override {
 		if (m_thread == 0)
 			DelegateMemberSp<void(TClass(Param1))>::operator()(p1);
 		else
@@ -139,7 +139,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		// Typecast the base pointer to back to the templatized instance
 		DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(*msg);
 
@@ -181,21 +181,21 @@ public:
 		DelegateMemberSp<void(TClass(Param1, Param2))>::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
 		DelegateMemberSp<void(TClass(Param1, Param2))>::Bind(object, func); }
 
-	virtual DelegateMemberSpAsync<void(TClass(Param1, Param2))>* Clone() const {
+	virtual DelegateMemberSpAsync<void(TClass(Param1, Param2))>* Clone() const override {
 		return new DelegateMemberSpAsync<void(TClass(Param1, Param2))>(*this); }
 
-	virtual bool operator==(const DelegateBase& rhs) const 	{
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberSpAsync<void(TClass(Param1, Param2))>* derivedRhs = dynamic_cast<const DelegateMemberSpAsync<void(TClass(Param1, Param2))>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
 			DelegateMemberSp<void(TClass(Param1, Param2))>::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1, Param2 p2) {
+	virtual void operator()(Param1 p1, Param2 p2) override {
 		if (m_thread == 0)
 			DelegateMemberSp<void(TClass(Param1, Param2))>::operator()(p1, p2);
 		else
@@ -217,7 +217,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		// Typecast the base pointer to back to the templatized instance
 		DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(*msg);
 
@@ -261,21 +261,21 @@ public:
 		DelegateMemberSp<void(TClass(Param1, Param2, Param3))>::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
 		DelegateMemberSp<void(TClass(Param1, Param2, Param3))>::Bind(object, func); }
 
-	virtual DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3))>* Clone() const {
+	virtual DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3))>* Clone() const override {
 		return new DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3))>(*this); }
 
-	virtual bool operator==(const DelegateBase& rhs) const 	{
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3))>* derivedRhs = dynamic_cast<const DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3))>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
 			DelegateMemberSp<void(TClass(Param1, Param2, Param3))>::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1, Param2 p2, Param3 p3) {
+	virtual void operator()(Param1 p1, Param2 p2, Param3 p3) override {
 		if (m_thread == 0)
 			DelegateMemberSp<void(TClass(Param1, Param2, Param3))>::operator()(p1, p2, p3);
 		else
@@ -298,7 +298,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		// Typecast the base pointer to back to the templatized instance
 		DelegateMsg3<Param1, Param2, Param3>* delegateMsg = static_cast<DelegateMsg3<Param1, Param2, Param3>*>(*msg);
 
@@ -344,21 +344,21 @@ public:
 		DelegateMemberSp<void(TClass(Param1, Param2, Param3, Param4))>::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
 		DelegateMemberSp<void(TClass(Param1, Param2, Param3, Param4))>::Bind(object, func); }
 
-	virtual DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4))>* Clone() const {
+	virtual DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4))>* Clone() const override {
 		return new DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4))>(*this); }
 
-	virtual bool operator==(const DelegateBase& rhs) const 	{
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4))>* derivedRhs = dynamic_cast<const DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4))>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
 			DelegateMemberSp<void(TClass(Param1, Param2, Param3, Param4))>::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
+	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override {
 		if (m_thread == 0)
 			DelegateMemberSp<void(TClass(Param1, Param2, Param3, Param4))>::operator()(p1, p2, p3, p4);
 		else
@@ -382,7 +382,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		// Typecast the base pointer to back to the templatized instance
 		DelegateMsg4<Param1, Param2, Param3, Param4>* delegateMsg = static_cast<DelegateMsg4<Param1, Param2, Param3, Param4>*>(*msg);
 
@@ -430,21 +430,21 @@ public:
 		DelegateMemberSp<void(TClass(Param1, Param2, Param3, Param4, Param5))>::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
 		DelegateMemberSp<void(TClass(Param1, Param2, Param3, Param4, Param5))>::Bind(object, func); }
 
-	virtual DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const {
+	virtual DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const override {
 		return new DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))>(*this); }
 
-	virtual bool operator==(const DelegateBase& rhs) const 	{
+	virtual bool operator==(const DelegateBase& rhs) const override {
 		const DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))>* derivedRhs = dynamic_cast<const DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))>*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
 			DelegateMemberSp<void(TClass(Param1, Param2, Param3, Param4, Param5))>::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
-	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
+	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override {
 		if (m_thread == 0)
 			DelegateMemberSp<void(TClass(Param1, Param2, Param3, Param4, Param5))>::operator()(p1, p2, p3, p4, p5);
 		else
@@ -469,7 +469,7 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) {
+	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		// Typecast the base pointer to back to the templatized instance
 		DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* delegateMsg = static_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>*>(*msg);
 
