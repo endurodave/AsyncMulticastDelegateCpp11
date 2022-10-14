@@ -60,6 +60,8 @@ public:
     typedef TClass* ObjectPtr;
     typedef void (TClass::*MemberFunc)(Param1);
     typedef void (TClass::*ConstMemberFunc)(Param1) const;
+    using ClassType = DelegateMemberRemoteRecv<void(TClass(Param1))>;
+    using BaseType = DelegateMember<void(TClass(Param1))>;
 
     // Contructors take a class instance, member function, and delegete id 
     DelegateMemberRemoteRecv(ObjectPtr object, MemberFunc func, DelegateIdType id) : 
@@ -70,18 +72,16 @@ public:
     /// Bind a member function to a delegate. 
     void Bind(ObjectPtr object, MemberFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateMember<void(TClass(Param1))>::Bind(object, func);
+        BaseType::Bind(object, func);
     }
 
     /// Bind a const member function to a delegate. 
     void Bind(ObjectPtr object, ConstMemberFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateMember<void(TClass(Param1))>::Bind(object, func);
+        BaseType::Bind(object, func);
     }
 
-    virtual DelegateMemberRemoteRecv<void(TClass(Param1))>* Clone() const override {
-        return new DelegateMemberRemoteRecv<void(TClass(Param1))>(*this);
-    }
+    virtual ClassType* Clone() const override { return new ClassType(*this); }
 
     /// Called by the remote system to invoke the delegate function
     virtual void DelegateInvoke(std::istream& stream) override {
@@ -94,14 +94,14 @@ public:
         stream >> p1;
         stream.seekg(stream.tellg() + std::streampos(1));
 
-        DelegateMember<void(TClass(Param1))>::operator()(p1);
+        BaseType::operator()(p1);
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateMemberRemoteRecv<void(TClass(Param1))>* derivedRhs = dynamic_cast<const DelegateMemberRemoteRecv<void(TClass(Param1))>*>(&rhs);
+        auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
-            DelegateMember<void(TClass(Param1))>::operator == (rhs);
+            BaseType::operator == (rhs);
     }
 
     private:
@@ -114,6 +114,8 @@ public:
     typedef TClass* ObjectPtr;
     typedef void (TClass::*MemberFunc)(Param1, Param2);
     typedef void (TClass::*ConstMemberFunc)(Param1, Param2) const;
+    using ClassType = DelegateMemberRemoteRecv<void(TClass(Param1, Param2))>;
+    using BaseType = DelegateMember<void(TClass(Param1, Param2))>;
 
     // Contructors take a class instance, member function, and delegete id 
     DelegateMemberRemoteRecv(ObjectPtr object, MemberFunc func, DelegateIdType id) :
@@ -128,18 +130,16 @@ public:
     /// Bind a member function to a delegate. 
     void Bind(ObjectPtr object, MemberFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateMember<void(TClass(Param1, Param2))>::Bind(object, func);
+        BaseType::Bind(object, func);
     }
 
     /// Bind a const member function to a delegate. 
     void Bind(ObjectPtr object, ConstMemberFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateMember<void(TClass(Param1, Param2))>::Bind(object, func);
+        BaseType::Bind(object, func);
     }
 
-    virtual DelegateMemberRemoteRecv<void(TClass(Param1, Param2))>* Clone() const override {
-        return new DelegateMemberRemoteRecv<void(TClass(Param1, Param2))>(*this);
-    }
+    virtual ClassType* Clone() const override { return new ClassType(*this); }
 
     /// Called by the remote system to invoke the delegate function
     virtual void DelegateInvoke(std::istream& stream) override {
@@ -156,14 +156,14 @@ public:
         stream >> p2;
         stream.seekg(stream.tellg() + std::streampos(1));
 
-        DelegateMember<void(TClass(Param1, Param2))>::operator()(p1, p2);
+        BaseType::operator()(p1, p2);
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateMemberRemoteRecv<void(TClass(Param1, Param2))>* derivedRhs = dynamic_cast<const DelegateMemberRemoteRecv<void(TClass(Param1, Param2))>*>(&rhs);
+        auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
-            DelegateMember<void(TClass(Param1, Param2))>::operator == (rhs);
+            BaseType::operator == (rhs);
     }
 
 private:
@@ -176,6 +176,8 @@ public:
     typedef TClass* ObjectPtr;
     typedef void (TClass::*MemberFunc)(Param1, Param2, Param3);
     typedef void (TClass::*ConstMemberFunc)(Param1, Param2, Param3) const;
+    using ClassType = DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3))>;
+    using BaseType = DelegateMember<void(TClass(Param1, Param2, Param3))>;
 
     // Contructors take a class instance, member function, and delegete id 
     DelegateMemberRemoteRecv(ObjectPtr object, MemberFunc func, DelegateIdType id) :
@@ -190,17 +192,16 @@ public:
     /// Bind a member function to a delegate. 
     void Bind(ObjectPtr object, MemberFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateMember<void(TClass(Param1, Param2, Param3))>::Bind(object, func);
+        BaseType::Bind(object, func);
     }
 
     /// Bind a const member function to a delegate. 
     void Bind(ObjectPtr object, ConstMemberFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateMember<void(TClass(Param1, Param2, Param3))>::Bind(object, func);
+        BaseType::Bind(object, func);
     }
 
-    virtual DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3))>* Clone() const override {
-        return new DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3))>(*this);
+    virtual ClassType* Clone() const override { return new ClassType(*this);
     }
 
     /// Called by the remote system to invoke the delegate function
@@ -222,14 +223,14 @@ public:
         stream >> p3;
         stream.seekg(stream.tellg() + std::streampos(1));
 
-        DelegateMember<void(TClass(Param1, Param2, Param3))>::operator()(p1, p2, p3);
+        BaseType::operator()(p1, p2, p3);
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3))>* derivedRhs = dynamic_cast<const DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3))>*>(&rhs);
+        auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
-            DelegateMember<void(TClass(Param1, Param2, Param3))>::operator == (rhs);
+            BaseType::operator == (rhs);
     }
 
 private:
@@ -242,6 +243,8 @@ public:
     typedef TClass* ObjectPtr;
     typedef void (TClass::*MemberFunc)(Param1, Param2, Param3, Param4);
     typedef void (TClass::*ConstMemberFunc)(Param1, Param2, Param3, Param4) const;
+    using ClassType = DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4))>;
+    using BaseType = DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>;
 
     // Contructors take a class instance, member function, and delegete id 
     DelegateMemberRemoteRecv(ObjectPtr object, MemberFunc func, DelegateIdType id) :
@@ -256,18 +259,16 @@ public:
     /// Bind a member function to a delegate. 
     void Bind(ObjectPtr object, MemberFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>::Bind(object, func);
+        BaseType::Bind(object, func);
     }
 
     /// Bind a const member function to a delegate. 
     void Bind(ObjectPtr object, ConstMemberFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>::Bind(object, func);
+        BaseType::Bind(object, func);
     }
 
-    virtual DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4))>* Clone() const override {
-        return new DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4))>(*this);
-    }
+    virtual ClassType* Clone() const override { return new ClassType(*this); }
 
     /// Called by the remote system to invoke the delegate function
     virtual void DelegateInvoke(std::istream& stream) override {
@@ -292,14 +293,14 @@ public:
         stream >> p4;
         stream.seekg(stream.tellg() + std::streampos(1));
 
-        DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>::operator()(p1, p2, p3, p4);
+        BaseType::operator()(p1, p2, p3, p4);
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4))>* derivedRhs = dynamic_cast<const DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4))>*>(&rhs);
+        auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
-            DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>::operator == (rhs);
+            BaseType::operator == (rhs);
     }
 
 private:
@@ -312,6 +313,8 @@ public:
     typedef TClass* ObjectPtr;
     typedef void (TClass::*MemberFunc)(Param1, Param2, Param3, Param4, Param5);
     typedef void (TClass::*ConstMemberFunc)(Param1, Param2, Param3, Param4, Param5) const;
+    using ClassType = DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4, Param5))>;
+    using BaseType = DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>;
 
     // Contructors take a class instance, member function, and delegete id 
     DelegateMemberRemoteRecv(ObjectPtr object, MemberFunc func, DelegateIdType id) :
@@ -326,17 +329,16 @@ public:
     /// Bind a member function to a delegate. 
     void Bind(ObjectPtr object, MemberFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>::Bind(object, func);
+        BaseType::Bind(object, func);
     }
 
     /// Bind a const member function to a delegate. 
     void Bind(ObjectPtr object, ConstMemberFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>::Bind(object, func);
+        BaseType::Bind(object, func);
     }
 
-    virtual DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const override {
-        return new DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4, Param5))>(*this);
+    virtual ClassType* Clone() const override { return new ClassType(*this);
     }
 
     /// Called by the remote system to invoke the delegate function
@@ -366,14 +368,14 @@ public:
         stream >> p5;
         stream.seekg(stream.tellg() + std::streampos(1));
 
-        DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>::operator()(p1, p2, p3, p4, p5);
+        BaseType::operator()(p1, p2, p3, p4, p5);
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4, Param5))>* derivedRhs = dynamic_cast<const DelegateMemberRemoteRecv<void(TClass(Param1, Param2, Param3, Param4, Param5))>*>(&rhs);
+        auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
-            DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>::operator == (rhs);
+            BaseType::operator == (rhs);
     }
 
 private:
@@ -388,6 +390,8 @@ template <class Param1>
 class DelegateFreeRemoteRecv<void(Param1)> : public DelegateFree<void(Param1)>, public DelegateRemoteInvoker {
 public:
     typedef void(*FreeFunc)(Param1);
+    using ClassType = DelegateFreeRemoteRecv<void(Param1)>;
+    using BaseType = DelegateFree<void(Param1)>;
 
     // Contructors take a free function and delegete id 
     DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : DelegateRemoteInvoker(id) { Bind(func, id); }
@@ -395,10 +399,10 @@ public:
     /// Bind a free function to the delegate.
     void Bind(FreeFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateFree<Param1>::Bind(func);
+        BaseType::Bind(func);
     }
 
-    virtual DelegateFreeRemoteRecv* Clone() const override { return new DelegateFreeRemoteRecv(*this); }
+    virtual ClassType* Clone() const override { return new ClassType(*this); }
 
     /// Called by the remote system to invoke the delegate function
     virtual void DelegateInvoke(std::istream& stream) override {
@@ -411,14 +415,14 @@ public:
         stream >> p1;
         stream.seekg(stream.tellg() + std::streampos(1));
 
-        DelegateFree<Param1>::operator()(p1);
+        BaseType::operator()(p1);
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateFreeRemoteRecv<Param1>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<Param1>*>(&rhs);
+        auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
-            DelegateFree<Param1>::operator == (rhs);
+            BaseType::operator == (rhs);
     }
 
 private:
@@ -429,6 +433,8 @@ template <class Param1, class Param2>
 class DelegateFreeRemoteRecv<void(Param1, Param2)> : public DelegateFree<void(Param1, Param2)>, public DelegateRemoteInvoker {
 public:
     typedef void(*FreeFunc)(Param1, Param2);
+    using ClassType = DelegateFreeRemoteRecv<void(Param1, Param2)>;
+    using BaseType = DelegateFree<void(Param1, Param2)>;
 
     // Contructors take a free function and delegete id 
     DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : DelegateRemoteInvoker(id) { Bind(func, id); }
@@ -436,10 +442,10 @@ public:
     /// Bind a free function to the delegate.
     void Bind(FreeFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateFree<void(Param1, Param2)>::Bind(func);
+        BaseType::Bind(func);
     }
 
-    virtual DelegateFreeRemoteRecv* Clone() const override { return new DelegateFreeRemoteRecv(*this); }
+    virtual ClassType* Clone() const override { return new ClassType(*this); }
 
     /// Called by the remote system to invoke the delegate function
     virtual void DelegateInvoke(std::istream& stream) override {
@@ -456,14 +462,14 @@ public:
         stream >> p2;
         stream.seekg(stream.tellg() + std::streampos(1));
 
-        DelegateFree<void(Param1, Param2)>::operator()(p1, p2);
+        BaseType::operator()(p1, p2);
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateFreeRemoteRecv<void(Param1, Param2)>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<void(Param1, Param2)>*>(&rhs);
+        auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
-            DelegateFree<void(Param1, Param2)>::operator == (rhs);
+            BaseType::operator == (rhs);
     }
 
 private:
@@ -474,6 +480,8 @@ template <class Param1, class Param2, class Param3>
 class DelegateFreeRemoteRecv<void(Param1, Param2, Param3)> : public DelegateFree<void(Param1, Param2, Param3)>, public DelegateRemoteInvoker {
 public:
     typedef void(*FreeFunc)(Param1, Param2, Param3);
+    using ClassType = DelegateFreeRemoteRecv<void(Param1, Param2, Param3)>;
+    using BaseType = DelegateFree<void(Param1, Param2, Param3)>;
 
     // Contructors take a free function and delegete id 
     DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : DelegateRemoteInvoker(id) { Bind(func, id); }
@@ -481,10 +489,10 @@ public:
     /// Bind a free function to the delegate.
     void Bind(FreeFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateFree<void(Param1, Param2, Param3)>::Bind(func);
+        BaseType::Bind(func);
     }
 
-    virtual DelegateFreeRemoteRecv* Clone() const override { return new DelegateFreeRemoteRecv(*this); }
+    virtual ClassType* Clone() const override { return new ClassType(*this); }
 
     /// Called by the remote system to invoke the delegate function
     virtual void DelegateInvoke(std::istream& stream) override {
@@ -505,14 +513,14 @@ public:
         stream >> p3;
         stream.seekg(stream.tellg() + std::streampos(1));
 
-        DelegateFree<void(Param1, Param2, Param3)>::operator()(p1, p2, p3);
+        BaseType::operator()(p1, p2, p3);
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateFreeRemoteRecv<void(Param1, Param2, Param3)>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<void(Param1, Param2, Param3)>*>(&rhs);
+        auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
-            DelegateFree<void(Param1, Param2, Param3)>::operator == (rhs);
+            BaseType::operator == (rhs);
     }
 
 private:
@@ -523,6 +531,8 @@ template <class Param1, class Param2, class Param3, class Param4>
 class DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4)> : public DelegateFree<void(Param1, Param2, Param3, Param4)>, public DelegateRemoteInvoker {
 public:
     typedef void(*FreeFunc)(Param1, Param2, Param3, Param4);
+    using ClassType = DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4)>;
+    using BaseType = DelegateFree<void(Param1, Param2, Param3, Param4)>;
 
     // Contructors take a free function and delegete id 
     DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : DelegateRemoteInvoker(id) { Bind(func, id); }
@@ -530,10 +540,10 @@ public:
     /// Bind a free function to the delegate.
     void Bind(FreeFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateFree<void(Param1, Param2, Param3, Param4)>::Bind(func);
+        BaseType::Bind(func);
     }
 
-    virtual DelegateFreeRemoteRecv* Clone() const override { return new DelegateFreeRemoteRecv(*this); }
+    virtual ClassType* Clone() const override { return new ClassType(*this); }
 
     /// Called by the remote system to invoke the delegate function
     virtual void DelegateInvoke(std::istream& stream) override {
@@ -558,14 +568,14 @@ public:
         stream >> p4;
         stream.seekg(stream.tellg() + std::streampos(1));
 
-        DelegateFree<void(Param1, Param2, Param3, Param4)>::operator()(p1, p2, p3, p4);
+        BaseType::operator()(p1, p2, p3, p4);
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4)>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4)>*>(&rhs);
+        auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
-            DelegateFree<void(Param1, Param2, Param3, Param4)>::operator == (rhs);
+            BaseType::operator == (rhs);
     }
 
 private:
@@ -576,6 +586,8 @@ template <class Param1, class Param2, class Param3, class Param4, class Param5>
 class DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4, Param5)> : public DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>, public DelegateRemoteInvoker {
 public:
     typedef void(*FreeFunc)(Param1, Param2, Param3, Param4, Param5);
+    using ClassType = DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4, Param5)>;
+    using BaseType = DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>;
 
     // Contructors take a free function and delegete id 
     DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : DelegateRemoteInvoker(id) { Bind(func, id); }
@@ -583,10 +595,10 @@ public:
     /// Bind a free function to the delegate.
     void Bind(FreeFunc func, DelegateIdType id) {
         m_id = id;
-        DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>::Bind(func);
+        BaseType::Bind(func);
     }
 
-    virtual DelegateFreeRemoteRecv* Clone() const override { return new DelegateFreeRemoteRecv(*this); }
+    virtual ClassType* Clone() const override { return new ClassType(*this); }
 
     /// Called by the remote system to invoke the delegate function
     virtual void DelegateInvoke(std::istream& stream) override {
@@ -615,14 +627,14 @@ public:
         stream >> p5;
         stream.seekg(stream.tellg() + std::streampos(1));
 
-        DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>::operator()(p1, p2, p3, p4, p5);
+        BaseType::operator()(p1, p2, p3, p4, p5);
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4, Param5)>* derivedRhs = dynamic_cast<const DelegateFreeRemoteRecv<void(Param1, Param2, Param3, Param4, Param5)>*>(&rhs);
+        auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
-            DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>::operator == (rhs);
+            BaseType::operator == (rhs);
     }
 
 private:

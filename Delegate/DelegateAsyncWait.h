@@ -64,6 +64,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)();
 	typedef RetType (TClass::*ConstMemberFunc)() const;
+    using ClassType = DelegateMemberAsyncWaitBase<RetType(TClass(void))>;
+    using BaseType = DelegateMember<RetType(TClass(void))>;
 	
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
@@ -74,7 +76,7 @@ public:
 		Bind(object, func, thread);
 		LockGuard::Create(&m_lock);
 	}
-	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : DelegateMember<RetType(TClass(void))>(rhs), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
 		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
@@ -84,22 +86,22 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
 		m_thread = thread; 
-		DelegateMember<RetType(TClass(void))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
 	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread)	{
 		m_thread = thread;
-		DelegateMember<RetType(TClass(void))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberAsyncWaitBase<RetType(TClass(void))>* derivedRhs = dynamic_cast<const DelegateMemberAsyncWaitBase<RetType(TClass(void))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
-			DelegateMember<RetType(TClass(void))>::operator==(rhs); }
+			BaseType::operator==(rhs); }
 
 	DelegateMemberAsyncWaitBase& operator=(const DelegateMemberAsyncWaitBase& rhs) {
 		if (&rhs != this) {
-			DelegateMember<RetType(TClass(void))>::operator=(rhs);
+			BaseType::operator=(rhs);
 			Swap(rhs);
 		}
 		return *this;
@@ -131,6 +133,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)();
 	typedef RetType (TClass::*ConstMemberFunc)() const;
+    using ClassType = DelegateMemberAsyncWait<RetType(TClass(void))>;
+    using BaseType = DelegateMemberAsyncWaitBase<RetType(TClass(void))>;
 	
 	DelegateMemberAsyncWait(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : 
 		DelegateMemberAsyncWaitBase<RetType(TClass(void))>(object, func, thread, timeout) { }
@@ -143,7 +147,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()() {
 		if (this->m_thread == 0)
-			return DelegateMemberAsyncWaitBase<RetType(TClass(void))>::operator()();
+			return BaseType::operator()();
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -181,7 +185,7 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()();
-		waitRetVal.success = DelegateMemberAsyncWaitBase<RetType(TClass(void))>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -192,7 +196,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				m_retVal = DelegateMemberAsyncWaitBase<RetType(TClass(void))>::operator()();
+				m_retVal = BaseType::operator()();
 				this->m_sema.Signal();
 			}
 
@@ -208,7 +212,7 @@ public:
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
-		DelegateMemberAsyncWaitBase<RetType(TClass(void))>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 
@@ -224,6 +228,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef void (TClass::*MemberFunc)();
 	typedef void (TClass::*ConstMemberFunc)() const;
+    using ClassType = DelegateMemberAsyncWait<void(TClass(void))>;
+    using BaseType = DelegateMemberAsyncWaitBase<void(TClass(void))>;
 	
 	DelegateMemberAsyncWait(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(void))>(object, func, thread, timeout) { }
@@ -236,7 +242,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual void operator()() override {
 		if (this->m_thread == 0)
-			DelegateMemberAsyncWaitBase<void(TClass(void))>::operator()();
+			BaseType::operator()();
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -274,7 +280,7 @@ public:
 	{
 		AsyncRet<void> waitRetVal;
 		operator()();
-		waitRetVal.success = DelegateMemberAsyncWaitBase<void(TClass(void))>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -285,7 +291,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				DelegateMemberAsyncWaitBase<void(TClass(void))>::operator()();
+				BaseType::operator()();
 				this->m_sema.Signal();
 			}
 
@@ -301,7 +307,7 @@ public:
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
-		DelegateMemberAsyncWaitBase<void(TClass(void))>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 };
@@ -313,6 +319,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1);
 	typedef RetType (TClass::*ConstMemberFunc)(Param1) const;
+    using ClassType = DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>;
+    using BaseType = DelegateMember<RetType(TClass(Param1))>;
 	
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
@@ -323,7 +331,7 @@ public:
 		Bind(object, func, thread);
 		LockGuard::Create(&m_lock);
 	}
-	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : DelegateMember<RetType(TClass(Param1))>(rhs), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
 		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
@@ -333,25 +341,25 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<RetType(TClass(Param1))>::Bind(object, func);
+		BaseType::Bind(object, func);
 	}
 
 	/// Bind a const member function to a delegate. 
 	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<RetType(TClass(Param1))>::Bind(object, func);
+		BaseType::Bind(object, func);
 	}
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>* derivedRhs = dynamic_cast<const DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateMember<RetType(TClass(Param1))>::operator==(rhs);
+			BaseType::operator==(rhs);
 	}
 
 	DelegateMemberAsyncWaitBase& operator=(const DelegateMemberAsyncWaitBase& rhs) {
 		if (&rhs != this) {
-			DelegateMember<RetType(TClass(Param1))>::operator=(rhs);
+			BaseType::operator=(rhs);
 			Swap(rhs);
 		}
 		return *this;
@@ -383,6 +391,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1);
 	typedef RetType (TClass::*ConstMemberFunc)(Param1) const;
+    using ClassType = DelegateMemberAsyncWait<RetType(TClass(Param1))>;
+    using BaseType = DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>;
 	
 	DelegateMemberAsyncWait(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>(object, func, thread, timeout) { }
@@ -396,7 +406,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1) override {
 		if (this->m_thread == 0)
-			return DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>::operator()(p1);
+			return BaseType::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -434,7 +444,7 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()(p1);
-		waitRetVal.success = DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -451,7 +461,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				m_retVal = DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>::operator()(param1);
+				m_retVal = BaseType::operator()(param1);
 				this->m_sema.Signal();
 			}
 
@@ -467,7 +477,7 @@ public:
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
-		DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 
@@ -483,6 +493,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef void (TClass::*MemberFunc)(Param1);
 	typedef void (TClass::*ConstMemberFunc)(Param1) const;
+    using ClassType = DelegateMemberAsyncWait<void(TClass(Param1))>;
+    using BaseType = DelegateMemberAsyncWaitBase<void(TClass(Param1))>;
 	
 	DelegateMemberAsyncWait(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1))>(object, func, thread, timeout) { }
@@ -496,7 +508,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1) override {
 		if (this->m_thread == 0)
-			DelegateMemberAsyncWaitBase<void(TClass(Param1))>::operator()(p1);
+			BaseType::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -549,7 +561,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				DelegateMemberAsyncWaitBase<void(TClass(Param1))>::operator()(param1);
+				BaseType::operator()(param1);
 				this->m_sema.Signal();
 			}
 
@@ -565,7 +577,7 @@ public:
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
-		DelegateMemberAsyncWaitBase<void(TClass(Param1))>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 };
@@ -577,6 +589,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1, Param2);
 	typedef RetType (TClass::*ConstMemberFunc)(Param1, Param2) const;
+    using ClassType = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>;
+    using BaseType = DelegateMember<RetType(TClass(Param1, Param2))>;
 	
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
@@ -587,7 +601,7 @@ public:
 		Bind(object, func, thread);
 		LockGuard::Create(&m_lock);
 	}
-	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : DelegateMember<RetType(TClass(Param1, Param2))>(rhs), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
 		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
@@ -597,25 +611,25 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<RetType(TClass(Param1, Param2))>::Bind(object, func);
+		BaseType::Bind(object, func);
 	}
 
 	/// Bind a const member function to a delegate. 
 	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<RetType(TClass(Param1, Param2))>::Bind(object, func);
+		BaseType::Bind(object, func);
 	}
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>* derivedRhs = dynamic_cast<const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateMember<RetType(TClass(Param1, Param2))>::operator==(rhs);
+			BaseType::operator==(rhs);
 	}
 
 	DelegateMemberAsyncWaitBase& operator=(const DelegateMemberAsyncWaitBase& rhs) {
 		if (&rhs != this) {
-			DelegateMember<RetType(TClass(Param1, Param2))>::operator=(rhs);
+			BaseType::operator=(rhs);
 			Swap(rhs);
 		}
 		return *this;
@@ -647,6 +661,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1, Param2);
 	typedef RetType (TClass::*ConstMemberFunc)(Param1, Param2) const;
+    using ClassType = DelegateMemberAsyncWait<RetType(TClass(Param1, Param2))>;
+    using BaseType = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>;
 	
 	DelegateMemberAsyncWait(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>(object, func, thread, timeout) { }
@@ -660,7 +676,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2) override {
 		if (this->m_thread == 0)
-			return DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>::operator()(p1, p2);
+			return BaseType::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -698,7 +714,7 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()(p1, p2);
-		waitRetVal.success = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -716,7 +732,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				m_retVal = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>::operator()(param1, param2);
+				m_retVal = BaseType::operator()(param1, param2);
 				this->m_sema.Signal();
 			}
 
@@ -732,7 +748,7 @@ public:
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
-		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 
@@ -748,6 +764,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef void (TClass::*MemberFunc)(Param1, Param2);
 	typedef void (TClass::*ConstMemberFunc)(Param1, Param2) const;
+    using ClassType = DelegateMemberAsyncWait<void(TClass(Param1, Param2))>;
+    using BaseType = DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2))>;
 	
 	DelegateMemberAsyncWait(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2))>(object, func, thread, timeout) { }
@@ -761,7 +779,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2) override {
 		if (this->m_thread == 0)
-			DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2))>::operator()(p1, p2);
+			BaseType::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -815,7 +833,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2))>::operator()(param1, param2);
+				BaseType::operator()(param1, param2);
 				this->m_sema.Signal();
 			}
 
@@ -831,7 +849,7 @@ public:
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
-		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2))>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 };
@@ -843,6 +861,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1, Param2, Param3);
 	typedef RetType (TClass::*ConstMemberFunc)(Param1, Param2, Param3) const;
+    using ClassType = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>;
+    using BaseType = DelegateMember<RetType(TClass(Param1, Param2, Param3))>;
 	
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
@@ -853,7 +873,7 @@ public:
 		Bind(object, func, thread);
 		LockGuard::Create(&m_lock);
 	}
-	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : DelegateMember<RetType(TClass(Param1, Param2, Param3))>(rhs), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
 		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
@@ -863,25 +883,25 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<RetType(TClass(Param1, Param2, Param3))>::Bind(object, func);
+		BaseType::Bind(object, func);
 	}
 
 	/// Bind a const member function to a delegate. 
 	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<RetType(TClass(Param1, Param2, Param3))>::Bind(object, func);
+		BaseType::Bind(object, func);
 	}
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>* derivedRhs = dynamic_cast<const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateMember<RetType(TClass(Param1, Param2, Param3))>::operator==(rhs);
+			BaseType::operator==(rhs);
 	}
 
 	DelegateMemberAsyncWaitBase& operator=(const DelegateMemberAsyncWaitBase& rhs) {
 		if (&rhs != this) {
-			DelegateMember<RetType(TClass(Param1, Param2, Param3))>::operator=(rhs);
+			BaseType::operator=(rhs);
 			Swap(rhs);
 		}
 		return *this;
@@ -913,6 +933,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1, Param2, Param3);
 	typedef RetType (TClass::*ConstMemberFunc)(Param1, Param2, Param3) const;
+    using ClassType = DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3))>;
+    using BaseType = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>;
 	
 	DelegateMemberAsyncWait(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>(object, func, thread, timeout) { }
@@ -926,7 +948,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3) {
 		if (this->m_thread == 0)
-			return DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>::operator()(p1, p2, p3);
+			return BaseType::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -983,7 +1005,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				m_retVal = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>::operator()(param1, param2, param3);
+				m_retVal = BaseType::operator()(param1, param2, param3);
 				this->m_sema.Signal();
 			}
 
@@ -999,7 +1021,7 @@ public:
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
-		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 
@@ -1015,6 +1037,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef void (TClass::*MemberFunc)(Param1, Param2, Param3);
 	typedef void (TClass::*ConstMemberFunc)(Param1, Param2, Param3) const;
+    using ClassType = DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3))>;
+    using BaseType = DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3))>;
 	
 	DelegateMemberAsyncWait(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3))>(object, func, thread, timeout) { }
@@ -1028,7 +1052,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3) override {
 		if (this->m_thread == 0)
-			DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3))>::operator()(p1, p2, p3);
+			BaseType::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -1083,7 +1107,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3))>::operator()(param1, param2, param3);
+				BaseType::operator()(param1, param2, param3);
 				this->m_sema.Signal();
 			}
 
@@ -1099,7 +1123,7 @@ public:
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
-		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3))>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 };
@@ -1111,6 +1135,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1, Param2, Param3, Param4);
 	typedef RetType (TClass::*ConstMemberFunc)(Param1, Param2, Param3, Param4) const;
+    using ClassType = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>;
+    using BaseType = DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4))>;
 
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
@@ -1121,7 +1147,7 @@ public:
 		Bind(object, func, thread);
 		LockGuard::Create(&m_lock);
 	}
-	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4))>(rhs), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
 		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
@@ -1131,25 +1157,25 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4))>::Bind(object, func);
+		BaseType::Bind(object, func);
 	}
 
 	/// Bind a const member function to a delegate. 
 	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4))>::Bind(object, func);
+		BaseType::Bind(object, func);
 	}
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>* derivedRhs = dynamic_cast<const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4))>::operator==(rhs);
+			BaseType::operator==(rhs);
 	}
 
 	DelegateMemberAsyncWaitBase& operator=(const DelegateMemberAsyncWaitBase& rhs) {
 		if (&rhs != this) {
-			DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4))>::operator=(rhs);
+			BaseType::operator=(rhs);
 			Swap(rhs);
 		}
 		return *this;
@@ -1181,6 +1207,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1, Param2, Param3, Param4);
 	typedef RetType (TClass::*ConstMemberFunc)(Param1, Param2, Param3, Param4) const;
+    using ClassType = DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4))>;
+    using BaseType = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>;
 	
 	DelegateMemberAsyncWait(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>(object, func, thread, timeout) { }
@@ -1194,7 +1222,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
 		if (this->m_thread == 0)
-			return DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>::operator()(p1, p2, p3, p4);
+			return BaseType::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -1252,7 +1280,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				m_retVal = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>::operator()(param1, param2, param3, param4);
+				m_retVal = BaseType::operator()(param1, param2, param3, param4);
 				this->m_sema.Signal();
 			}
 
@@ -1268,7 +1296,7 @@ public:
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
-		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 
@@ -1284,6 +1312,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef void (TClass::*MemberFunc)(Param1, Param2, Param3, Param4);
 	typedef void (TClass::*ConstMemberFunc)(Param1, Param2, Param3, Param4) const;
+    using ClassType = DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3, Param4))>;
+    using BaseType = DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4))>;
 	
 	DelegateMemberAsyncWait(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4))>(object, func, thread, timeout) { }
@@ -1297,7 +1327,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override {
 		if (this->m_thread == 0)
-			DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4))>::operator()(p1, p2, p3, p4);
+			BaseType::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -1353,7 +1383,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4))>::operator()(param1, param2, param3, param4);
+				BaseType::operator()(param1, param2, param3, param4);
 				this->m_sema.Signal();
 			}
 
@@ -1369,7 +1399,7 @@ public:
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
-		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4))>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 };
@@ -1381,6 +1411,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1, Param2, Param3, Param4, Param5);
 	typedef RetType (TClass::*ConstMemberFunc)(Param1, Param2, Param3, Param4, Param5) const;
+    using ClassType = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>;
+    using BaseType = DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>;
 	
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
@@ -1391,7 +1423,7 @@ public:
 		Bind(object, func, thread);
 		LockGuard::Create(&m_lock);
 	}
-	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>(rhs), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
 		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
@@ -1401,25 +1433,25 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>::Bind(object, func);
+		BaseType::Bind(object, func);
 	}
 
 	/// Bind a const member function to a delegate. 
 	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>::Bind(object, func);
+		BaseType::Bind(object, func);
 	}
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* derivedRhs = dynamic_cast<const DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>::operator==(rhs);
+			BaseType::operator==(rhs);
 	}
 
 	DelegateMemberAsyncWaitBase& operator=(const DelegateMemberAsyncWaitBase& rhs) {
 		if (&rhs != this) {
-			DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>::operator=(rhs);
+			BaseType::operator=(rhs);
 			Swap(rhs);
 		}
 		return *this;
@@ -1451,6 +1483,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1, Param2, Param3, Param4, Param5);
 	typedef RetType (TClass::*ConstMemberFunc)(Param1, Param2, Param3, Param4, Param5) const;
+    using ClassType = DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>;
+    using BaseType = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>;
 	
 	DelegateMemberAsyncWait(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>(object, func, thread, timeout) { }
@@ -1464,7 +1498,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
 		if (this->m_thread == 0)
-			return DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>::operator()(p1, p2, p3, p4, p5);
+			return BaseType::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -1523,7 +1557,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				m_retVal = DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>::operator()(param1, param2, param3, param4, param5);
+				m_retVal = BaseType::operator()(param1, param2, param3, param4, param5);
 				this->m_sema.Signal();
 			}
 
@@ -1539,7 +1573,7 @@ public:
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
-		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 
@@ -1555,6 +1589,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef void (TClass::*MemberFunc)(Param1, Param2, Param3, Param4, Param5);
 	typedef void (TClass::*ConstMemberFunc)(Param1, Param2, Param3, Param4, Param5) const;
+    using ClassType = DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3, Param4, Param5))>;
+    using BaseType = DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4, Param5))>;
 	
 	DelegateMemberAsyncWait(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4, Param5))>(object, func, thread, timeout) { }
@@ -1568,7 +1604,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override {
 		if (this->m_thread == 0)
-			DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4, Param5))>::operator()(p1, p2, p3, p4, p5);
+			BaseType::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -1625,7 +1661,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4, Param5))>::operator()(param1, param2, param3, param4, param5);
+				BaseType::operator()(param1, param2, param3, param4, param5);
 				this->m_sema.Signal();
 			}
 
@@ -1641,7 +1677,7 @@ public:
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
-		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4, Param5))>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 };
@@ -1661,13 +1697,15 @@ template <class RetType>
 class DelegateFreeAsyncWaitBase<RetType(void)> : public DelegateFree<RetType(void)>, public IDelegateInvoker {
 public:
 	typedef RetType (*FreeFunc)();
+    using ClassType = DelegateFreeAsyncWaitBase<RetType(void)>;
+    using BaseType = DelegateFree<RetType(void)>;
 
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(func, thread); 
 		LockGuard::Create(&m_lock);
 	}
-	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : DelegateFree<RetType(void)>(rhs), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
 		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
@@ -1677,19 +1715,19 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(FreeFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateFree<RetType(void)>::Bind(func);
+		BaseType::Bind(func);
 	}
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateFreeAsyncWaitBase<RetType(void)>* derivedRhs = dynamic_cast<const DelegateFreeAsyncWaitBase<RetType(void)>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateFree<RetType(void)>::operator==(rhs);
+			BaseType::operator==(rhs);
 	}
 
 	DelegateFreeAsyncWaitBase& operator=(const DelegateFreeAsyncWaitBase& rhs) {
 		if (&rhs != this) {
-			DelegateFree<RetType(void)>::operator=(rhs);
+			BaseType::operator=(rhs);
 			Swap(rhs);
 		}
 		return *this;
@@ -1719,6 +1757,8 @@ template <class RetType>
 class DelegateFreeAsyncWait<RetType(void)> : public DelegateFreeAsyncWaitBase<RetType(void)> {
 public:
 	typedef RetType (*FreeFunc)();
+    using ClassType = DelegateFreeAsyncWait<RetType(void)>;
+    using BaseType = DelegateFreeAsyncWaitBase<RetType(void)>;
 
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<RetType(void)>(func, thread, timeout) { }
@@ -1729,7 +1769,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()() {
 		if (this->m_thread == 0)
-			return DelegateFreeAsyncWaitBase<RetType(void)>::operator()();
+			return BaseType::operator()();
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -1778,7 +1818,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				m_retVal = DelegateFreeAsyncWaitBase<RetType(void)>::operator()();
+				m_retVal = BaseType::operator()();
 				this->m_sema.Signal();
 			}
 
@@ -1794,7 +1834,7 @@ public:
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
-		DelegateFreeAsyncWaitBase<RetType(void)>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 
@@ -1808,6 +1848,8 @@ template <>
 class DelegateFreeAsyncWait<void(void)> : public DelegateFreeAsyncWaitBase<void(void)> {
 public:
 	typedef void (*FreeFunc)();
+    using ClassType = DelegateFreeAsyncWait<void(void)>;
+    using BaseType = DelegateFreeAsyncWaitBase<void(void)>;
 
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase(func, thread, timeout) { }
@@ -1818,7 +1860,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual void operator()() override {
 		if (this->m_thread == 0)
-			return DelegateFreeAsyncWaitBase::operator()();
+			return BaseType::operator()();
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -1893,13 +1935,15 @@ template <class RetType, class Param1>
 class DelegateFreeAsyncWaitBase<RetType(Param1)> : public DelegateFree<RetType(Param1)>, public IDelegateInvoker {
 public:
 	typedef RetType (*FreeFunc)(Param1);
+    using ClassType = DelegateFreeAsyncWaitBase<RetType(Param1)>;
+    using BaseType = DelegateFree<RetType(Param1)>;
 
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(func, thread);
 		LockGuard::Create(&m_lock);
 	}
-	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : DelegateFree<RetType(Param1)>(rhs), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
 		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
@@ -1909,19 +1953,19 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(FreeFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateFree<RetType(Param1)>::Bind(func);
+		BaseType::Bind(func);
 	}
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateFreeAsyncWaitBase<RetType(Param1)>* derivedRhs = dynamic_cast<const DelegateFreeAsyncWaitBase<RetType(Param1)>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateFree<RetType(Param1)>::operator==(rhs);
+			BaseType::operator==(rhs);
 	}
 
 	DelegateFreeAsyncWaitBase& operator=(const DelegateFreeAsyncWaitBase& rhs) {
 		if (&rhs != this) {
-			DelegateFree<RetType(Param1)>::operator=(rhs);
+			BaseType::operator=(rhs);
 			Swap(rhs);
 		}
 		return *this;
@@ -1951,6 +1995,8 @@ template <class RetType, class Param1>
 class DelegateFreeAsyncWait<RetType(Param1)> : public DelegateFreeAsyncWaitBase<RetType(Param1)> {
 public:
 	typedef RetType (*FreeFunc)(Param1);
+    using ClassType = DelegateFreeAsyncWait<RetType(Param1)>;
+    using BaseType = DelegateFreeAsyncWaitBase<RetType(Param1)>;
 
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<RetType(Param1)>(func, thread, timeout) { }
@@ -1962,7 +2008,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1) {
 		if (this->m_thread == 0)
-			return DelegateFreeAsyncWaitBase<RetType(Param1)>::operator()(p1);
+			return BaseType::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -2017,7 +2063,7 @@ public:
 
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				m_retVal = DelegateFreeAsyncWaitBase<RetType(Param1)>::operator()(param1);
+				m_retVal = BaseType::operator()(param1);
 				this->m_sema.Signal();
 			}
 
@@ -2033,7 +2079,7 @@ public:
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
-		DelegateFreeAsyncWaitBase<RetType(Param1)>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 
@@ -2047,6 +2093,8 @@ template <class Param1>
 class DelegateFreeAsyncWait<void(Param1)> : public DelegateFreeAsyncWaitBase<void(Param1)> {
 public:
 	typedef void (*FreeFunc)(Param1);
+    using ClassType = DelegateFreeAsyncWait<void(Param1)>;
+    using BaseType = DelegateFreeAsyncWaitBase<void(Param1)>;
 
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<void(Param1)>(func, thread, timeout) { }
@@ -2058,7 +2106,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1) override {
 		if (this->m_thread == 0)
-			DelegateFreeAsyncWaitBase<void(Param1)>::operator()(p1);
+			BaseType::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -2111,7 +2159,7 @@ public:
 
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				DelegateFreeAsyncWaitBase<void(Param1)>::operator()(param1);
+				BaseType::operator()(param1);
 				this->m_sema.Signal();
 			}
 
@@ -2137,13 +2185,15 @@ template <class RetType, class Param1, class Param2>
 class DelegateFreeAsyncWaitBase<RetType(Param1, Param2)> : public DelegateFree<RetType(Param1, Param2)>, public IDelegateInvoker {
 public:
 	typedef RetType (*FreeFunc)(Param1, Param2);
+    using ClassType = DelegateFreeAsyncWaitBase<RetType(Param1, Param2)>;
+    using BaseType = DelegateFree<RetType(Param1, Param2)>;
 
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(func, thread);
 		LockGuard::Create(&m_lock);
 	}
-	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : DelegateFree<RetType(Param1, Param2)>(rhs), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
 		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
@@ -2153,19 +2203,19 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(FreeFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateFree<RetType(Param1, Param2)>::Bind(func);
+		BaseType::Bind(func);
 	}
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateFreeAsyncWaitBase<RetType(Param1, Param2)>* derivedRhs = dynamic_cast<const DelegateFreeAsyncWaitBase<RetType(Param1, Param2)>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateFree<RetType(Param1, Param2)>::operator==(rhs);
+			BaseType::operator==(rhs);
 	}
 
 	DelegateFreeAsyncWaitBase& operator=(const DelegateFreeAsyncWaitBase& rhs) {
 		if (&rhs != this) {
-			DelegateFree<RetType(Param1, Param2)>::operator=(rhs);
+			BaseType::operator=(rhs);
 			Swap(rhs);
 		}
 		return *this;
@@ -2195,6 +2245,8 @@ template <class RetType, class Param1, class Param2>
 class DelegateFreeAsyncWait<RetType(Param1, Param2)> : public DelegateFreeAsyncWaitBase<RetType(Param1, Param2)> {
 public:
 	typedef RetType (*FreeFunc)(Param1, Param2);
+    using ClassType = DelegateFreeAsyncWait<RetType(Param1, Param2)>;
+    using BaseType = DelegateFreeAsyncWaitBase<RetType(Param1, Param2)>;
 
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<RetType(Param1, Param2)>(func, thread, timeout) { }
@@ -2206,7 +2258,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2) {
 		if (this->m_thread == 0)
-			return DelegateFreeAsyncWaitBase<RetType(Param1, Param2)>::operator()(p1, p2);
+			return BaseType::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -2262,7 +2314,7 @@ public:
 
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				m_retVal = DelegateFreeAsyncWaitBase<RetType(Param1, Param2)>::operator()(param1, param2);
+				m_retVal = BaseType::operator()(param1, param2);
 				this->m_sema.Signal();
 			}
 
@@ -2278,7 +2330,7 @@ public:
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
-		DelegateFreeAsyncWaitBase<RetType(Param1, Param2)>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 
@@ -2292,6 +2344,8 @@ template <class Param1, class Param2>
 class DelegateFreeAsyncWait<void(Param1, Param2)> : public DelegateFreeAsyncWaitBase<void(Param1, Param2)> {
 public:
 	typedef void (*FreeFunc)(Param1, Param2);
+    using ClassType = DelegateFreeAsyncWait<void(Param1, Param2)>;
+    using BaseType = DelegateFreeAsyncWaitBase<void(Param1, Param2)>;
 
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<void(Param1, Param2)>(func, thread, timeout) { }
@@ -2303,7 +2357,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2) override {
 		if (this->m_thread == 0)
-			DelegateFreeAsyncWaitBase<void(Param1, Param2)>::operator()(p1, p2);
+			BaseType::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -2357,7 +2411,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				DelegateFreeAsyncWaitBase<void(Param1, Param2)>::operator()(param1, param2);
+				BaseType::operator()(param1, param2);
 				this->m_sema.Signal();
 			}
 
@@ -2373,7 +2427,7 @@ public:
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
-		DelegateFreeAsyncWaitBase<void(Param1, Param2)>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 };
@@ -2383,13 +2437,15 @@ template <class RetType, class Param1, class Param2, class Param3>
 class DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)> : public DelegateFree<RetType(Param1, Param2, Param3)>, public IDelegateInvoker {
 public:
 	typedef RetType (*FreeFunc)(Param1, Param2, Param3);
+    using ClassType = DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)>;
+    using BaseType = DelegateFree<RetType(Param1, Param2, Param3)>;
 
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(func, thread);
 		LockGuard::Create(&m_lock);
 	}
-	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : DelegateFree<RetType(Param1, Param2, Param3)>(rhs), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
 		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
@@ -2399,19 +2455,19 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(FreeFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateFree<RetType(Param1, Param2, Param3)>::Bind(func);
+		BaseType::Bind(func);
 	}
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)>* derivedRhs = dynamic_cast<const DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateFree<RetType(Param1, Param2, Param3)>::operator==(rhs);
+			BaseType::operator==(rhs);
 	}
 
 	DelegateFreeAsyncWaitBase& operator=(const DelegateFreeAsyncWaitBase& rhs) {
 		if (&rhs != this) {
-			DelegateFree<RetType(Param1, Param2, Param3)>::operator=(rhs);
+			BaseType::operator=(rhs);
 			Swap(rhs);
 		}
 		return *this;
@@ -2441,6 +2497,8 @@ template <class RetType, class Param1, class Param2, class Param3>
 class DelegateFreeAsyncWait<RetType(Param1, Param2, Param3)> : public DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)> {
 public:
 	typedef RetType (*FreeFunc)(Param1, Param2, Param3);
+    using ClassType = DelegateFreeAsyncWait<RetType(Param1, Param2, Param3)>;
+    using BaseType = DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)>;
 
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)>(func, thread, timeout) { }
@@ -2452,7 +2510,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3) {
 		if (this->m_thread == 0)
-			return DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)>::operator()(p1, p2, p3);
+			return BaseType::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -2509,7 +2567,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				m_retVal = DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)>::operator()(param1, param2, param3);
+				m_retVal = BaseType::operator()(param1, param2, param3);
 				this->m_sema.Signal();
 			}
 
@@ -2525,7 +2583,7 @@ public:
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
-		DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3)>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 
@@ -2539,6 +2597,8 @@ template <class Param1, class Param2, class Param3>
 class DelegateFreeAsyncWait<void(Param1, Param2, Param3)> : public DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3)> {
 public:
 	typedef void (*FreeFunc)(Param1, Param2, Param3);
+    using ClassType = DelegateFreeAsyncWait<void(Param1, Param2, Param3)>;
+    using BaseType = DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3)>;
 
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3)>(func, thread, timeout) { }
@@ -2550,7 +2610,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3) override {
 		if (this->m_thread == 0)
-			DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3)>::operator()(p1, p2, p3);
+			BaseType::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -2605,7 +2665,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3)>::operator()(param1, param2, param3);
+				BaseType::operator()(param1, param2, param3);
 				this->m_sema.Signal();
 			}
 
@@ -2621,7 +2681,7 @@ public:
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
-		DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3)>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 };
@@ -2631,13 +2691,15 @@ template <class RetType, class Param1, class Param2, class Param3, class Param4>
 class DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)> : public DelegateFree<RetType(Param1, Param2, Param3, Param4)>, public IDelegateInvoker {
 public:
 	typedef RetType (*FreeFunc)(Param1, Param2, Param3, Param4);
+    using ClassType = DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)>;
+    using BaseType = DelegateFree<RetType(Param1, Param2, Param3, Param4)>;
 
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(func, thread);
 		LockGuard::Create(&m_lock);
 	}
-	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : DelegateFree<RetType(Param1, Param2, Param3, Param4)>(rhs), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
 		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
@@ -2647,19 +2709,19 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(FreeFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateFree<RetType(Param1, Param2, Param3, Param4)>::Bind(func);
+		BaseType::Bind(func);
 	}
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)>* derivedRhs = dynamic_cast<const DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateFree<RetType(Param1, Param2, Param3, Param4)>::operator==(rhs);
+			BaseType::operator==(rhs);
 	}
 
 	DelegateFreeAsyncWaitBase& operator=(const DelegateFreeAsyncWaitBase& rhs) {
 		if (&rhs != this) {
-			DelegateFree<RetType(Param1, Param2, Param3, Param4)>::operator=(rhs);
+			BaseType::operator=(rhs);
 			Swap(rhs);
 		}
 		return *this;
@@ -2689,6 +2751,8 @@ template <class RetType, class Param1, class Param2, class Param3, class Param4>
 class DelegateFreeAsyncWait<RetType(Param1, Param2, Param3, Param4)> : public DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)> {
 public:
 	typedef RetType (*FreeFunc)(Param1, Param2, Param3, Param4);
+    using ClassType = DelegateFreeAsyncWait<RetType(Param1, Param2, Param3, Param4)>;
+    using BaseType = DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)>;
 
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)>(func, thread, timeout) { }
@@ -2700,7 +2764,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
 		if (this->m_thread == 0)
-			return DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)>::operator()(p1, p2, p3, p4);
+			return BaseType::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -2758,7 +2822,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				m_retVal = DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)>::operator()(param1, param2, param3, param4);
+				m_retVal = BaseType::operator()(param1, param2, param3, param4);
 				this->m_sema.Signal();
 			}
 
@@ -2774,7 +2838,7 @@ public:
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
-		DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4)>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 
@@ -2788,6 +2852,8 @@ template <class Param1, class Param2, class Param3, class Param4>
 class DelegateFreeAsyncWait<void(Param1, Param2, Param3, Param4)> : public DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4)> {
 public:
 	typedef void (*FreeFunc)(Param1, Param2, Param3, Param4);
+    using ClassType = DelegateFreeAsyncWait<void(Param1, Param2, Param3, Param4)>;
+    using BaseType = DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4)>;
 
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4)>(func, thread, timeout) { }
@@ -2799,7 +2865,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override {
 		if (this->m_thread == 0)
-			DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4)>::operator()(p1, p2, p3, p4);
+			BaseType::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -2855,7 +2921,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4)>::operator()(param1, param2, param3, param4);
+				BaseType::operator()(param1, param2, param3, param4);
 				this->m_sema.Signal();
 			}
 
@@ -2871,7 +2937,7 @@ public:
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
-		DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4)>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 };
@@ -2881,13 +2947,15 @@ template <class RetType, class Param1, class Param2, class Param3, class Param4,
 class DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)> : public DelegateFree<RetType(Param1, Param2, Param3, Param4, Param5)>, public IDelegateInvoker {
 public:
 	typedef RetType (*FreeFunc)(Param1, Param2, Param3, Param4, Param5);
+    using ClassType = DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)>;
+    using BaseType = DelegateFree<RetType(Param1, Param2, Param3, Param4, Param5)>;
 
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(func, thread);
 		LockGuard::Create(&m_lock);
 	}
-	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : DelegateFree<RetType(Param1, Param2, Param3, Param4, Param5)>(rhs), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
 		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
@@ -2897,19 +2965,19 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(FreeFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateFree<RetType(Param1, Param2, Param3, Param4, Param5)>::Bind(func);
+		BaseType::Bind(func);
 	}
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)>* derivedRhs = dynamic_cast<const DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateFree<RetType(Param1, Param2, Param3, Param4, Param5)>::operator==(rhs);
+			BaseType::operator==(rhs);
 	}
 
 	DelegateFreeAsyncWaitBase& operator=(const DelegateFreeAsyncWaitBase& rhs) {
 		if (&rhs != this) {
-			DelegateFree<RetType(Param1, Param2, Param3, Param4, Param5)>::operator=(rhs);
+			BaseType::operator=(rhs);
 			Swap(rhs);
 		}
 		return *this;
@@ -2939,6 +3007,8 @@ template <class RetType, class Param1, class Param2, class Param3, class Param4,
 class DelegateFreeAsyncWait<RetType(Param1, Param2, Param3, Param4, Param5)> : public DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)> {
 public:
 	typedef RetType (*FreeFunc)(Param1, Param2, Param3, Param4, Param5);
+    using ClassType = DelegateFreeAsyncWait<RetType(Param1, Param2, Param3, Param4, Param5)>;
+    using BaseType = DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)>;
 
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)>(func, thread, timeout) { }
@@ -2950,7 +3020,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
 		if (this->m_thread == 0)
-			return DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)>::operator()(p1, p2, p3, p4, p5);
+			return BaseType::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -3009,7 +3079,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				m_retVal = DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)>::operator()(param1, param2, param3, param4, param5);
+				m_retVal = BaseType::operator()(param1, param2, param3, param4, param5);
 				this->m_sema.Signal();
 			}
 
@@ -3025,7 +3095,7 @@ public:
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
-		DelegateFreeAsyncWaitBase<RetType(Param1, Param2, Param3, Param4, Param5)>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 
@@ -3039,6 +3109,8 @@ template <class Param1, class Param2, class Param3, class Param4, class Param5>
 class DelegateFreeAsyncWait<void(Param1, Param2, Param3, Param4, Param5)> : public DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4, Param5)> {
 public:
 	typedef void (*FreeFunc)(Param1, Param2, Param3, Param4, Param5);
+    using ClassType = DelegateFreeAsyncWait<void(Param1, Param2, Param3, Param4, Param5)>;
+    using BaseType = DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4, Param5)>;
 
 	DelegateFreeAsyncWait(FreeFunc func, DelegateThread* thread, int timeout) :
 		DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4, Param5)>(func, thread, timeout) { }
@@ -3050,7 +3122,7 @@ public:
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override {
 		if (this->m_thread == 0)
-			DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4, Param5)>::operator()(p1, p2, p3, p4, p5);
+			BaseType::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = Clone();
@@ -3107,7 +3179,7 @@ public:
 			LockGuard lockGuard(&this->m_lock);
 			if (this->m_refCnt == 2) {
 				// Invoke the delegate function then signal the waiting thread
-				DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4, Param5)>::operator()(param1, param2, param3, param4, param5);
+				BaseType::operator()(param1, param2, param3, param4, param5);
 				this->m_sema.Signal();
 			}
 
@@ -3123,7 +3195,7 @@ public:
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
-		DelegateFreeAsyncWaitBase<void(Param1, Param2, Param3, Param4, Param5)>::operator=(rhs);
+		BaseType::operator=(rhs);
 		return *this;
 	}
 };

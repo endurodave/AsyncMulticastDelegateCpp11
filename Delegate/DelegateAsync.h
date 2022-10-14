@@ -118,6 +118,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef void (TClass::*MemberFunc)();
 	typedef void (TClass::*ConstMemberFunc)() const;
+    using ClassType = DelegateMemberAsync<void(TClass(void))>;
+    using BaseType = DelegateMember<void(TClass(void))>;
 
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateMemberAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
@@ -127,26 +129,25 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
 		m_thread = thread; 
-		DelegateMember<void(TClass(void))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<void(TClass(void))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
-	virtual DelegateMemberAsync<void(TClass(void))>* Clone() const override {
-		return new DelegateMemberAsync<void(TClass(void))>(*this); }
+	virtual ClassType* Clone() const override {	return new ClassType(*this); }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberAsync<void(TClass(void))>* derivedRhs = dynamic_cast<const DelegateMemberAsync<void(TClass(void))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
-			DelegateMember<void(TClass(void))>::operator == (rhs); }
+			BaseType::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()() override {
 		if (m_thread == 0)
-			DelegateMember<void(TClass(void))>::operator()();
+			BaseType::operator()();
 		else
 		{
 			// Create a clone instance of this delegate 
@@ -164,7 +165,7 @@ public:
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		// Invoke the delegate function
-		DelegateMember<void(TClass(void))>::operator()();
+		BaseType::operator()();
 
 		// Delete heap data created inside operator()
 		delete *msg;
@@ -185,6 +186,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef void (TClass::*MemberFunc)(Param1);
 	typedef void (TClass::*ConstMemberFunc)(Param1) const;
+    using ClassType = DelegateMemberAsync<void(TClass(Param1))>;
+    using BaseType = DelegateMember<void(TClass(Param1))>;
 
 	// Contructors take a class instance, member function, and callback thread
 	DelegateMemberAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
@@ -194,26 +197,25 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
 		m_thread = thread; 
-		DelegateMember<void(TClass(Param1))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<void(TClass(Param1))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
-	virtual DelegateMemberAsync<void(TClass(Param1))>* Clone() const override {
-		return new DelegateMemberAsync<void(TClass(Param1))>(*this); }
+	virtual ClassType* Clone() const override {	return new ClassType(*this); }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberAsync<void(TClass(Param1))>* derivedRhs = dynamic_cast<const DelegateMemberAsync<void(TClass(Param1))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
-			DelegateMember<void(TClass(Param1))>::operator == (rhs); }
+			BaseType::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1) override {
 		if (m_thread == 0)
-			DelegateMember<void(TClass(Param1))>::operator()(p1);
+			BaseType::operator()(p1);
 		else
 		{
 			// Create a new instance of the function argument data and copy
@@ -240,7 +242,7 @@ public:
 		Param1 param1 = delegateMsg->GetParam1();
 
 		// Invoke the delegate function
-		DelegateMember<void(TClass(Param1))>::operator()(param1);
+		BaseType::operator()(param1);
 
 		// Delete heap data created inside operator()
 		DelegateParam<Param1>::Delete(param1);
@@ -262,6 +264,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef void (TClass::*MemberFunc)(Param1, Param2);
 	typedef void (TClass::*ConstMemberFunc)(Param1, Param2) const;
+    using ClassType = DelegateMemberAsync<void(TClass(Param1, Param2))>;
+    using BaseType = DelegateMember<void(TClass(Param1, Param2))>;
 
 	// Contructors take a class instance, member function, and callback thread
 	DelegateMemberAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
@@ -271,26 +275,25 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
 		m_thread = thread; 
-		DelegateMember<void(TClass(Param1, Param2))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<void(TClass(Param1, Param2))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
-	virtual DelegateMemberAsync<void(TClass(Param1, Param2))>* Clone() const override {
-		return new DelegateMemberAsync<void(TClass(Param1, Param2))>(*this); }
+	virtual ClassType* Clone() const override {	return new ClassType(*this); }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberAsync<void(TClass(Param1, Param2))>* derivedRhs = dynamic_cast<const DelegateMemberAsync<void(TClass(Param1, Param2))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
-			DelegateMember<void(TClass(Param1, Param2))>::operator == (rhs); }
+			BaseType::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2) override {
 		if (m_thread == 0)
-			DelegateMember<void(TClass(Param1, Param2))>::operator()(p1, p2);
+			BaseType::operator()(p1, p2);
 		else
 		{
 			// Create a new instance of the function argument data and copy
@@ -319,7 +322,7 @@ public:
 		Param2 param2 = delegateMsg->GetParam2();
 
 		// Invoke the delegate function
-		DelegateMember<void(TClass(Param1, Param2))>::operator()(param1, param2);
+		BaseType::operator()(param1, param2);
 
 		// Delete heap data created inside operator()
 		DelegateParam<Param1>::Delete(param1);
@@ -342,6 +345,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef void (TClass::*MemberFunc)(Param1, Param2, Param3);
 	typedef void (TClass::*ConstMemberFunc)(Param1, Param2, Param3) const;
+    using ClassType = DelegateMemberAsync<void(TClass(Param1, Param2, Param3))>;
+    using BaseType = DelegateMember<void(TClass(Param1, Param2, Param3))>;
 
 	// Contructors take a class instance, member function, and callback thread
 	DelegateMemberAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
@@ -351,26 +356,25 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
 		m_thread = thread; 
-		DelegateMember<void(TClass(Param1, Param2, Param3))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<void(TClass(Param1, Param2, Param3))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
-	virtual DelegateMemberAsync<void(TClass(Param1, Param2, Param3))>* Clone() const override {
-		return new DelegateMemberAsync<void(TClass(Param1, Param2, Param3))>(*this); }
+	virtual ClassType* Clone() const override {	return new ClassType(*this); }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberAsync<void(TClass(Param1, Param2, Param3))>* derivedRhs = dynamic_cast<const DelegateMemberAsync<void(TClass(Param1, Param2, Param3))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
-			DelegateMember<void(TClass(Param1, Param2, Param3))>::operator == (rhs); }
+			BaseType::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3) override {
 		if (m_thread == 0)
-			DelegateMember<void(TClass(Param1, Param2, Param3))>::operator()(p1, p2, p3);
+			BaseType::operator()(p1, p2, p3);
 		else
 		{
 			// Create a new instance of the function argument data and copy
@@ -401,7 +405,7 @@ public:
 		Param3 param3 = delegateMsg->GetParam3();
 
 		// Invoke the delegate function
-		DelegateMember<void(TClass(Param1, Param2, Param3))>::operator()(param1, param2, param3);
+		BaseType::operator()(param1, param2, param3);
 
 		// Delete heap data created inside operator()
 		DelegateParam<Param1>::Delete(param1);
@@ -425,6 +429,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef void (TClass::*MemberFunc)(Param1, Param2, Param3, Param4);
 	typedef void (TClass::*ConstMemberFunc)(Param1, Param2, Param3, Param4) const;
+    using ClassType = DelegateMemberAsync<void(TClass(Param1, Param2, Param3, Param4))>;
+    using BaseType = DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>;
 
 	// Contructors take a class instance, member function, and callback thread
 	DelegateMemberAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
@@ -434,26 +440,25 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
 		m_thread = thread; 
-		DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
-	virtual DelegateMemberAsync<void(TClass(Param1, Param2, Param3, Param4))>* Clone() const override {
-		return new DelegateMemberAsync<void(TClass(Param1, Param2, Param3, Param4))>(*this); }
+	virtual ClassType* Clone() const override {	return new ClassType(*this); }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberAsync<void(TClass(Param1, Param2, Param3, Param4))>* derivedRhs = dynamic_cast<const DelegateMemberAsync<void(TClass(Param1, Param2, Param3, Param4))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
-			DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>::operator == (rhs); }
+			BaseType::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override {
 		if (m_thread == 0)
-			DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>::operator()(p1, p2, p3, p4);
+			BaseType::operator()(p1, p2, p3, p4);
 		else
 		{
 			// Create a new instance of the function argument data and copy
@@ -486,7 +491,7 @@ public:
 		Param4 param4 = delegateMsg->GetParam4();
 
 		// Invoke the delegate function
-		DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>::operator()(param1, param2, param3, param4);
+		BaseType::operator()(param1, param2, param3, param4);
 
 		// Delete heap data created inside operator()
 		DelegateParam<Param1>::Delete(param1);
@@ -511,6 +516,8 @@ public:
 	typedef TClass* ObjectPtr;
 	typedef void (TClass::*MemberFunc)(Param1, Param2, Param3, Param4, Param5);
 	typedef void (TClass::*ConstMemberFunc)(Param1, Param2, Param3, Param4, Param5) const;
+    using ClassType = DelegateMemberAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))>;
+    using BaseType = DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>;
 
 	// Contructors take a class instance, member function, and callback thread
 	DelegateMemberAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
@@ -520,26 +527,25 @@ public:
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
 		m_thread = thread; 
-		DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread)	{
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
 		m_thread = thread;
-		DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>::Bind(object, func); }
+		BaseType::Bind(object, func); }
 
-	virtual DelegateMemberAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const override {
-		return new DelegateMemberAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))>(*this); }
+	virtual ClassType* Clone() const override {	return new ClassType(*this); }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))>* derivedRhs = dynamic_cast<const DelegateMemberAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread && 
-			DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>::operator == (rhs); }
+			BaseType::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override {
 		if (m_thread == 0)
-			DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>::operator()(p1, p2, p3, p4, p5);
+			BaseType::operator()(p1, p2, p3, p4, p5);
 		else
 		{
 			// Create a new instance of the function argument data and copy
@@ -574,7 +580,7 @@ public:
 		Param5 param5 = delegateMsg->GetParam5();
 
 		// Invoke the delegate function
-		DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>::operator()(param1, param2, param3, param4, param5);
+		BaseType::operator()(param1, param2, param3, param4, param5);
 
 		// Delete heap data created inside operator()
 		DelegateParam<Param1>::Delete(param1);
@@ -599,6 +605,8 @@ template <class Signature>
 class DelegateFreeAsync : public DelegateFree<void(void)>, public IDelegateInvoker {
 public:
 	typedef void (*FreeFunc)();
+    using ClassType = DelegateFreeAsync<void(void)>;
+    using BaseType = DelegateFree<void(void)>;
 
 	DelegateFreeAsync(FreeFunc func, DelegateThread* thread) { Bind(func, thread); }
 	DelegateFreeAsync() : m_thread(0) { }
@@ -606,21 +614,20 @@ public:
 	/// Bind a free function to the delegate.
 	void Bind(FreeFunc func, DelegateThread* thread) {
 		m_thread = thread; 
-		DelegateFree<void(void)>::Bind(func);	}
+		BaseType::Bind(func);	}
 
-	virtual DelegateFreeAsync* Clone() const override {
-		return new DelegateFreeAsync(*this); }
+	virtual ClassType* Clone() const override {	return new ClassType(*this); }
 
 	virtual bool operator==(const DelegateBase& rhs) const {
-		const DelegateFreeAsync* derivedRhs = dynamic_cast<const DelegateFreeAsync*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateFree<void(void)>::operator == (rhs); }
+			BaseType::operator == (rhs); }
 
 	// Invoke delegate function asynchronously
 	virtual void operator()() override {
 		if (m_thread == 0)
-			DelegateFree<void(void)>::operator()();
+			BaseType::operator()();
 		else
 		{
 			// Create a clone instance of this delegate 
@@ -638,7 +645,7 @@ public:
 	// Called to invoke the delegate function on the target thread of control
 	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
 		// Invoke the delegate function
-		DelegateFree<void(void)>::operator()();
+		BaseType::operator()();
 
 		delete *msg;
 		*msg = 0;
@@ -655,6 +662,8 @@ template <class Param1>
 class DelegateFreeAsync<void(Param1)> : public DelegateFree<void(Param1)>, public IDelegateInvoker {
 public:
 	typedef void (*FreeFunc)(Param1);
+    using ClassType = DelegateFreeAsync<void(Param1)>;
+    using BaseType = DelegateFree<void(Param1)>;
 
 	DelegateFreeAsync(FreeFunc func, DelegateThread* thread) { Bind(func, thread); }
 	DelegateFreeAsync() : m_thread(0) { }
@@ -662,21 +671,20 @@ public:
 	/// Bind a free function to the delegate.
 	void Bind(FreeFunc func, DelegateThread* thread) {
 		m_thread = thread; 
-		DelegateFree<void(Param1)>::Bind(func);	}
+		BaseType::Bind(func);	}
 
-	virtual DelegateFreeAsync<void(Param1)>* Clone() const override {
-		return new DelegateFreeAsync<void(Param1)>(*this); }
+	virtual ClassType* Clone() const override {	return new ClassType(*this); }
 
 	virtual bool operator==(const DelegateBase& rhs) const {
-		const DelegateFreeAsync<void(Param1)>* derivedRhs = dynamic_cast<const DelegateFreeAsync<void(Param1)>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateFree<void(Param1)>::operator == (rhs); }
+			BaseType::operator == (rhs); }
 
 	// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1) override {
 		if (m_thread == 0)
-			DelegateFree<void(Param1)>::operator()(p1);
+			BaseType::operator()(p1);
 		else
 		{
 			// Create a new instance of the function argument data and copy
@@ -703,7 +711,7 @@ public:
 		Param1 param1 = delegateMsg->GetParam1();
 
 		// Invoke the delegate function
-		DelegateFree<void(Param1)>::operator()(param1);
+		BaseType::operator()(param1);
 
 		// Delete heap data created inside operator()
 		DelegateParam<Param1>::Delete(param1);
@@ -722,6 +730,8 @@ template <class Param1, class Param2>
 class DelegateFreeAsync<void(Param1, Param2)> : public DelegateFree<void(Param1, Param2)>, public IDelegateInvoker {
 public:
 	typedef void (*FreeFunc)(Param1, Param2);
+    using ClassType = DelegateFreeAsync<void(Param1, Param2)>;
+    using BaseType = DelegateFree<void(Param1, Param2)>;
 
 	DelegateFreeAsync(FreeFunc func, DelegateThread* thread) { Bind(func, thread); }
 	DelegateFreeAsync() : m_thread(0) { }
@@ -729,21 +739,20 @@ public:
 	/// Bind a free function to the delegate.
 	void Bind(FreeFunc func, DelegateThread* thread) {
 		m_thread = thread; 
-		DelegateFree<void(Param1, Param2)>::Bind(func);	}
+		BaseType::Bind(func);	}
 
-	virtual DelegateFreeAsync<void(Param1, Param2)>* Clone() const override {
-		return new DelegateFreeAsync<void(Param1, Param2)>(*this); }
+	virtual ClassType* Clone() const override {	return new ClassType(*this); }
 
 	virtual bool operator==(const DelegateBase& rhs) const {
-		const DelegateFreeAsync<void(Param1, Param2)>* derivedRhs = dynamic_cast<const DelegateFreeAsync<void(Param1, Param2)>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateFree<void(Param1, Param2)>::operator == (rhs); }
+			BaseType::operator == (rhs); }
 
 	// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2) override {
 		if (m_thread == 0)
-			DelegateFree<void(Param1, Param2)>::operator()(p1, p2);
+			BaseType::operator()(p1, p2);
 		else
 		{
 			// Create a new instance of the function argument data and copy
@@ -772,7 +781,7 @@ public:
 		Param2 param2 = delegateMsg->GetParam2();
 
 		// Invoke the delegate function
-		DelegateFree<void(Param1, Param2)>::operator()(param1, param2);
+		BaseType::operator()(param1, param2);
 
 		// Delete heap data created inside operator()
 		DelegateParam<Param1>::Delete(param1);
@@ -792,6 +801,8 @@ template <class Param1, class Param2, class Param3>
 class DelegateFreeAsync<void(Param1, Param2, Param3)> : public DelegateFree<void(Param1, Param2, Param3)>, public IDelegateInvoker {
 public:
 	typedef void (*FreeFunc)(Param1, Param2, Param3);
+    using ClassType = DelegateFreeAsync<void(Param1, Param2, Param3)>;
+    using BaseType = DelegateFree<void(Param1, Param2, Param3)>;
 
 	DelegateFreeAsync(FreeFunc func, DelegateThread* thread) { Bind(func, thread); }
 	DelegateFreeAsync() : m_thread(0) { }
@@ -799,21 +810,20 @@ public:
 	/// Bind a free function to the delegate.
 	void Bind(FreeFunc func, DelegateThread* thread) {
 		m_thread = thread; 
-		DelegateFree<void(Param1, Param2, Param3)>::Bind(func);	}
+		BaseType::Bind(func);	}
 
-	virtual DelegateFreeAsync<void(Param1, Param2, Param3)>* Clone() const override {
-		return new DelegateFreeAsync<void(Param1, Param2, Param3)>(*this); }
+	virtual ClassType* Clone() const override { return new ClassType(*this); }
 
 	virtual bool operator==(const DelegateBase& rhs) const {
-		const DelegateFreeAsync<void(Param1, Param2, Param3)>* derivedRhs = dynamic_cast<const DelegateFreeAsync<void(Param1, Param2, Param3)>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateFree<void(Param1, Param2, Param3)>::operator == (rhs); }
+			BaseType::operator == (rhs); }
 
 	// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3) override {
 		if (m_thread == 0)
-			DelegateFree<void(Param1, Param2, Param3)>::operator()(p1, p2, p3);
+			BaseType::operator()(p1, p2, p3);
 		else
 		{
 			// Create a new instance of the function argument data and copy
@@ -844,7 +854,7 @@ public:
 		Param3 param3 = delegateMsg->GetParam3();
 
 		// Invoke the delegate function
-		DelegateFree<void(Param1, Param2, Param3)>::operator()(param1, param2, param3);
+		BaseType::operator()(param1, param2, param3);
 
 		// Delete heap data created inside operator()
 		DelegateParam<Param1>::Delete(param1);
@@ -865,6 +875,8 @@ template <class Param1, class Param2, class Param3, class Param4>
 class DelegateFreeAsync<void(Param1, Param2, Param3, Param4)> : public DelegateFree<void(Param1, Param2, Param3, Param4)>, public IDelegateInvoker {
 public:
 	typedef void (*FreeFunc)(Param1, Param2, Param3, Param4);
+    using ClassType = DelegateFreeAsync<void(Param1, Param2, Param3, Param4)>;
+    using BaseType = DelegateFree<void(Param1, Param2, Param3, Param4)>;
 
 	DelegateFreeAsync(FreeFunc func, DelegateThread* thread) { Bind(func, thread); }
 	DelegateFreeAsync() : m_thread(0) { }
@@ -872,21 +884,20 @@ public:
 	/// Bind a free function to the delegate.
 	void Bind(FreeFunc func, DelegateThread* thread) {
 		m_thread = thread; 
-		DelegateFree<void(Param1, Param2, Param3, Param4)>::Bind(func);	}
+		BaseType::Bind(func);	}
 
-	virtual DelegateFreeAsync<void(Param1, Param2, Param3, Param4)>* Clone() const override {
-		return new DelegateFreeAsync<void(Param1, Param2, Param3, Param4)>(*this); }
+	virtual ClassType* Clone() const override { return new ClassType(*this); }
 
 	virtual bool operator==(const DelegateBase& rhs) const {
-		const DelegateFreeAsync<void(Param1, Param2, Param3, Param4)>* derivedRhs = dynamic_cast<const DelegateFreeAsync<void(Param1, Param2, Param3, Param4)>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateFree<void(Param1, Param2, Param3, Param4)>::operator == (rhs); }
+			BaseType::operator == (rhs); }
 
 	// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override {
 		if (m_thread == 0)
-			DelegateFree<void(Param1, Param2, Param3, Param4)>::operator()(p1, p2, p3, p4);
+			BaseType::operator()(p1, p2, p3, p4);
 		else
 		{
 			// Create a new instance of the function argument data and copy
@@ -919,7 +930,7 @@ public:
 		Param4 param4 = delegateMsg->GetParam4();
 
 		// Invoke the delegate function
-		DelegateFree<void(Param1, Param2, Param3, Param4)>::operator()(param1, param2, param3, param4);
+		BaseType::operator()(param1, param2, param3, param4);
 
 		// Delete heap data created inside operator()
 		DelegateParam<Param1>::Delete(param1);
@@ -941,6 +952,8 @@ template <class Param1, class Param2, class Param3, class Param4, class Param5>
 class DelegateFreeAsync<void(Param1, Param2, Param3, Param4, Param5)> : public DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>, public IDelegateInvoker {
 public:
 	typedef void (*FreeFunc)(Param1, Param2, Param3, Param4, Param5);
+    using ClassType = DelegateFreeAsync<void(Param1, Param2, Param3, Param4, Param5)>;
+    using BaseType = DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>;
 
 	DelegateFreeAsync(FreeFunc func, DelegateThread* thread) { Bind(func, thread); }
 	DelegateFreeAsync() : m_thread(0) { }
@@ -948,21 +961,20 @@ public:
 	/// Bind a free function to the delegate.
 	void Bind(FreeFunc func, DelegateThread* thread) {
 		m_thread = thread; 
-		DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>::Bind(func);	}
+		BaseType::Bind(func);	}
 
-	virtual DelegateFreeAsync<void(Param1, Param2, Param3, Param4, Param5)>* Clone() const override {
-		return new DelegateFreeAsync<void(Param1, Param2, Param3, Param4, Param5)>(*this); }
+	virtual ClassType* Clone() const override {	return new ClassType(*this); }
 
 	virtual bool operator==(const DelegateBase& rhs) const {
-		const DelegateFreeAsync<void(Param1, Param2, Param3, Param4, Param5)>* derivedRhs = dynamic_cast<const DelegateFreeAsync<void(Param1, Param2, Param3, Param4, Param5)>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_thread == derivedRhs->m_thread &&
-			DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>::operator == (rhs); }
+			BaseType::operator == (rhs); }
 
 	// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override {
 		if (m_thread == 0)
-			DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>::operator()(p1, p2, p3, p4, p5);
+			BaseType::operator()(p1, p2, p3, p4, p5);
 		else
 		{
 			// Create a new instance of the function argument data and copy
@@ -997,7 +1009,7 @@ public:
 		Param5 param5 = delegateMsg->GetParam5();
 
 		// Invoke the delegate function
-		DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>::operator()(param1, param2, param3, param4, param5);
+		BaseType::operator()(param1, param2, param3, param4, param5);
 
 		// Delete heap data created inside operator()
 		DelegateParam<Param1>::Delete(param1);

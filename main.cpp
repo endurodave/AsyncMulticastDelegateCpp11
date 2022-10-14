@@ -152,7 +152,7 @@ public:
 	int MemberFuncStdStringRetInt(std::string& s)
 	{
 		s = "Hello world";
-		return 2016;
+		return 2022;
 	}
 
 	static void StaticFunc(TestStruct* value)
@@ -348,7 +348,7 @@ int main(void)
 	// invoke on a member function
 	MulticastDelegateSafe<void(const std::string&, int)> delegateH;
 	delegateH += MakeDelegate(&testClass, &TestClass::MemberFuncStdString, &workerThread1);
-	delegateH("Hello world", 2016);
+	delegateH("Hello world", 2022);
 	delegateH.Clear();
 
 	// Create a asynchronous blocking delegate and invoke. This thread will block until the 
@@ -362,14 +362,14 @@ int main(void)
 	// Create a shared_ptr, create a delegate, then synchronously invoke delegate function
 	std::shared_ptr<TestClass> spObject(new TestClass());
 	auto delegateMemberSp = MakeDelegate(spObject, &TestClass::MemberFuncStdString);
-	delegateMemberSp("Hello world using shared_ptr", 2016);
+	delegateMemberSp("Hello world using shared_ptr", 2022);
 
 	// Example of a bug where the testClassHeap is deleted before the asychronous delegate 
 	// is invoked on the workerThread1. In other words, by the time workerThread1 calls
 	// the bound delegate function the testClassHeap instance is deleted and no longer valid.
 	TestClass* testClassHeap = new TestClass();
 	auto delegateMemberAsync = MakeDelegate(testClassHeap, &TestClass::MemberFuncStdString, &workerThread1);
-	delegateMemberAsync("Function async invoked on deleted object. Bug!", 2016);
+	delegateMemberAsync("Function async invoked on deleted object. Bug!", 2022);
 	delegateMemberAsync.Clear();
 	delete testClassHeap;
 
@@ -377,7 +377,7 @@ int main(void)
 	// is only deleted after workerThread1 invokes the callback function thus solving the bug.
 	std::shared_ptr<TestClass> testClassSp(new TestClass());
 	auto delegateMemberSpAsync = MakeDelegate(testClassSp, &TestClass::MemberFuncStdString, &workerThread1);
-	delegateMemberSpAsync("Function async invoked using smart pointer. Bug solved!", 2016);
+	delegateMemberSpAsync("Function async invoked using smart pointer. Bug solved!", 2022);
 	delegateMemberSpAsync.Clear();
 	testClassSp.reset();
 

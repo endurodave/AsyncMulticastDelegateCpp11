@@ -24,6 +24,8 @@ public:
 	typedef std::shared_ptr<TClass> ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(); 
 	typedef RetType (TClass::*ConstMemberFunc)() const; 
+    using ClassType = DelegateMemberSp<RetType(TClass(void))>;
+    using BaseType = Delegate<RetType(void)>;
 
 	DelegateMemberSp(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMemberSp(ObjectPtr object, ConstMemberFunc func) { Bind(object, func); }
@@ -39,8 +41,7 @@ public:
 		m_object = object;
 		m_func = reinterpret_cast<MemberFunc>(func); }
 
-	virtual DelegateMemberSp<RetType(TClass(void))>* Clone() const override {
-		return new DelegateMemberSp<RetType(TClass(void))>(*this); }
+	virtual ClassType* Clone() const override { return new ClassType(*this); }
 
 	// Invoke the bound delegate function
     virtual RetType operator()() override
@@ -52,7 +53,7 @@ public:
     }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberSp<RetType(TClass(void))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(void))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_func == derivedRhs->m_func && 
 			m_object == derivedRhs->m_object; }
@@ -72,6 +73,8 @@ public:
 	typedef std::shared_ptr<TClass> ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1); 
 	typedef RetType (TClass::*ConstMemberFunc)(Param1) const; 
+    using ClassType = DelegateMemberSp<RetType(TClass(Param1))>;
+    using BaseType = Delegate<RetType(Param1)>;
 
 	DelegateMemberSp(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMemberSp(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
@@ -87,8 +90,7 @@ public:
 		m_object = object;
 		m_func = reinterpret_cast<MemberFunc>(func); }
 
-	virtual DelegateMemberSp<RetType(TClass(Param1))>* Clone() const override {
-		return new DelegateMemberSp<RetType(TClass(Param1))>(*this); }
+	virtual ClassType* Clone() const override { return new ClassType(*this); }
 
 	// Invoke the bound delegate function
     virtual RetType operator()(Param1 p1) override
@@ -100,7 +102,7 @@ public:
     }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberSp<RetType(TClass(Param1))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_func == derivedRhs->m_func && 
 			m_object == derivedRhs->m_object; }
@@ -120,6 +122,8 @@ public:
 	typedef std::shared_ptr<TClass> ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1, Param2); 
 	typedef RetType (TClass::*ConstMemberFunc)(Param1, Param2) const; 
+    using ClassType = DelegateMemberSp<RetType(TClass(Param1, Param2))>;
+    using BaseType = Delegate<RetType(Param1, Param2)>;
 
 	DelegateMemberSp(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMemberSp(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
@@ -135,8 +139,7 @@ public:
 		m_object = object;
 		m_func = reinterpret_cast<MemberFunc>(func); }
 
-	virtual DelegateMemberSp<RetType(TClass(Param1, Param2))>* Clone() const override {
-		return new DelegateMemberSp<RetType(TClass(Param1, Param2))>(*this); }
+	virtual ClassType* Clone() const override { return new ClassType(*this); }
 
 	// Invoke the bound delegate function
     virtual RetType operator()(Param1 p1, Param2 p2) override
@@ -148,7 +151,7 @@ public:
     }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberSp<RetType(TClass(Param1, Param2))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1, Param2))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_func == derivedRhs->m_func && 
 			m_object == derivedRhs->m_object; }
@@ -168,6 +171,8 @@ public:
 	typedef std::shared_ptr<TClass> ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1, Param2, Param3); 
 	typedef RetType (TClass::*ConstMemberFunc)(Param1, Param2, Param3) const; 
+    using ClassType = DelegateMemberSp<RetType(TClass(Param1, Param2, Param3))>;
+    using BaseType = Delegate<RetType(Param1, Param2, Param3)>;
 
 	DelegateMemberSp(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMemberSp(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
@@ -183,8 +188,7 @@ public:
 		m_object = object;
 		m_func = reinterpret_cast<MemberFunc>(func); }
 
-	virtual DelegateMemberSp<RetType(TClass(Param1, Param2, Param3))>* Clone() const override {
-		return new DelegateMemberSp<RetType(TClass(Param1, Param2, Param3))>(*this); }
+	virtual ClassType* Clone() const override { return new ClassType(*this); }
 
 	// Invoke the bound delegate function
     virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3) override
@@ -196,7 +200,7 @@ public:
     }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_func == derivedRhs->m_func && 
 			m_object == derivedRhs->m_object; }
@@ -216,6 +220,8 @@ public:
 	typedef std::shared_ptr<TClass> ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1, Param2, Param3, Param4); 
 	typedef RetType (TClass::*ConstMemberFunc)(Param1, Param2, Param3, Param4) const; 
+    using ClassType = DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4))>;
+    using BaseType = Delegate<RetType(Param1, Param2, Param3, Param4)>;
 
 	DelegateMemberSp(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMemberSp(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
@@ -231,8 +237,7 @@ public:
 		m_object = object;
 		m_func = reinterpret_cast<MemberFunc>(func); }
 
-	virtual DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4))>* Clone() const override {
-		return new DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4))>(*this); }
+	virtual ClassType* Clone() const override { return new ClassType(*this); }
 
 	// Invoke the bound delegate function
     virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override
@@ -244,7 +249,7 @@ public:
     }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_func == derivedRhs->m_func && 
 			m_object == derivedRhs->m_object; }
@@ -264,6 +269,8 @@ public:
 	typedef std::shared_ptr<TClass> ObjectPtr;
 	typedef RetType (TClass::*MemberFunc)(Param1, Param2, Param3, Param4, Param5); 
 	typedef RetType (TClass::*ConstMemberFunc)(Param1, Param2, Param3, Param4, Param5) const; 
+    using ClassType = DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>;
+    using BaseType = Delegate<RetType(Param1, Param2, Param3, Param4, Param5)>;
 
 	DelegateMemberSp(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMemberSp(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
@@ -279,8 +286,7 @@ public:
 		m_object = object;
 		m_func = reinterpret_cast<MemberFunc>(func); }
 
-	virtual DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const override {
-		return new DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>(*this); }
+	virtual ClassType* Clone() const override { return new ClassType(*this); }
 
 	// Invoke the bound delegate function
 	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override
@@ -292,7 +298,7 @@ public:
     }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* derivedRhs = dynamic_cast<const DelegateMemberSp<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_func == derivedRhs->m_func && 
 			m_object == derivedRhs->m_object; }

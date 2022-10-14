@@ -19,10 +19,12 @@ class DelegateRemoteSend;
 template <class Param1>
 class DelegateRemoteSend<void(Param1)> : public Delegate<void(Param1)> {
 public:
+    using ClassType = DelegateRemoteSend<void(Param1)>;
+
     DelegateRemoteSend(IDelegateTransport& transport, std::iostream& stream, DelegateIdType id) : 
         m_transport(transport), m_stream(stream), m_id(id) { }
 
-	virtual DelegateRemoteSend* Clone() const override { return new DelegateRemoteSend(*this); }
+	virtual ClassType* Clone() const override { return new ClassType(*this); }
 
 	/// Invoke the bound delegate function. 
 	virtual void operator()(Param1 p1) override {
@@ -32,7 +34,7 @@ public:
     }
 
 	virtual bool operator==(const DelegateBase& rhs) const override {
-		const DelegateRemoteSend<void(Param1)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1)>*>(&rhs);
+		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
 			m_id == derivedRhs->m_id &&
             &m_transport == &derivedRhs->m_transport; }
@@ -46,10 +48,12 @@ private:
 template <class Param1, class Param2>
 class DelegateRemoteSend<void(Param1, Param2)> : public Delegate<void(Param1, Param2)> {
 public:
+    using ClassType = DelegateRemoteSend<void(Param1, Param2)>;
+
     DelegateRemoteSend(IDelegateTransport& transport, std::iostream& stream, DelegateIdType id) :
         m_transport(transport), m_stream(stream), m_id(id) { }
 
-    virtual DelegateRemoteSend* Clone() const override { return new DelegateRemoteSend(*this); }
+    virtual ClassType* Clone() const override { return new ClassType(*this); }
 
     /// Invoke the bound delegate function. 
     virtual void operator()(Param1 p1, Param2 p2) override {
@@ -60,7 +64,7 @@ public:
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateRemoteSend<void(Param1, Param2)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1, Param2)>*>(&rhs);
+        auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
             &m_transport == &derivedRhs->m_transport;
@@ -75,10 +79,12 @@ private:
 template <class Param1, class Param2, class Param3>
 class DelegateRemoteSend<void(Param1, Param2, Param3)> : public Delegate<void(Param1, Param2, Param3)> {
 public:
+    using ClassType = DelegateRemoteSend<void(Param1, Param2, Param3)>;
+
     DelegateRemoteSend(IDelegateTransport& transport, std::iostream& stream, DelegateIdType id) :
         m_transport(transport), m_stream(stream), m_id(id) { }
 
-    virtual DelegateRemoteSend* Clone() const override { return new DelegateRemoteSend(*this); }
+    virtual ClassType* Clone() const override { return new ClassType(*this); }
 
     /// Invoke the bound delegate function. 
     virtual void operator()(Param1 p1, Param2 p2, Param3 p3) override {
@@ -90,7 +96,7 @@ public:
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateRemoteSend<void(Param1, Param2, Param3)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1, Param2, Param3)>*>(&rhs);
+        auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
             &m_transport == &derivedRhs->m_transport;
@@ -105,10 +111,12 @@ private:
 template <class Param1, class Param2, class Param3, class Param4>
 class DelegateRemoteSend<void(Param1, Param2, Param3, Param4)> : public Delegate<void(Param1, Param2, Param3, Param4)> {
 public:
+    using ClassType = DelegateRemoteSend<void(Param1, Param2, Param3, Param4)>;
+
     DelegateRemoteSend(IDelegateTransport& transport, std::iostream& stream, DelegateIdType id) :
         m_transport(transport), m_stream(stream), m_id(id) { }
 
-    virtual DelegateRemoteSend* Clone() const override { return new DelegateRemoteSend(*this); }
+    virtual ClassType* Clone() const override { return new ClassType(*this); }
 
     /// Invoke the bound delegate function. 
     virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override {
@@ -121,7 +129,7 @@ public:
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateRemoteSend<void(Param1, Param2, Param3, Param4)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1, Param2, Param3, Param4)>*>(&rhs);
+        auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
             &m_transport == &derivedRhs->m_transport;
@@ -136,10 +144,12 @@ private:
 template <class Param1, class Param2, class Param3, class Param4, class Param5>
 class DelegateRemoteSend<void(Param1, Param2, Param3, Param4, Param5)> : public Delegate<void(Param1, Param2, Param3, Param4, Param5)> {
 public:
+    using ClassType = DelegateRemoteSend<void(Param1, Param2, Param3, Param4, Param5)>;
+
     DelegateRemoteSend(IDelegateTransport& transport, std::iostream& stream, DelegateIdType id) :
         m_transport(transport), m_stream(stream), m_id(id) { }
 
-    virtual DelegateRemoteSend* Clone() const override { return new DelegateRemoteSend(*this); }
+    virtual ClassType* Clone() const override { return new ClassType(*this); }
 
     /// Invoke the bound delegate function. 
     virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override {
@@ -153,7 +163,7 @@ public:
     }
 
     virtual bool operator==(const DelegateBase& rhs) const override {
-        const DelegateRemoteSend<void(Param1, Param2, Param3, Param4, Param5)>* derivedRhs = dynamic_cast<const DelegateRemoteSend<void(Param1, Param2, Param3, Param4, Param5)>*>(&rhs);
+        auto* derivedRhs = dynamic_cast<const ClassType*>(&rhs);
         return derivedRhs &&
             m_id == derivedRhs->m_id &&
             &m_transport == &derivedRhs->m_transport;
