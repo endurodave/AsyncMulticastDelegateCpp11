@@ -78,7 +78,7 @@ delegateMember(&testStruct);
 <p><strong><a href="https://www.codeproject.com/Articles/1160934/Asynchronous-Multicast-Delegates-in-Cplusplus">Asynchronous Multicast Delegates in C++</a></strong> - by David Lafreniere (CodeProject)</p>
 <p><strong><a href="https://github.com/endurodave/AsyncMulticastDelegate">Asynchronous Multicast Delegates in C++ (2016)</a></strong> - by David Lafreniere (GitHub)</p>
 
-The article that follows uses the old syntax for examples. The explainations, however, are accurate.
+<p>The article that follows uses the old syntax for examples. The explainations, however, are accurate.</p>
 
 <h2>Delegates Background</h2>
 
