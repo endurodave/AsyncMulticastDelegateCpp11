@@ -18,7 +18,7 @@ class DelegateBase {
 	XALLOCATOR
 #endif
 public:
-	virtual ~DelegateBase() {}
+    virtual ~DelegateBase() = default;
 
 	/// Derived class must implement operator== to compare objects.
 	virtual bool operator==(const DelegateBase& rhs) const = 0;

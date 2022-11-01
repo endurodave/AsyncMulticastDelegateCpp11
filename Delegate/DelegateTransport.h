@@ -12,6 +12,9 @@ namespace DelegateLib {
 class IDelegateTransport
 {
 public:
+    /// Destructor
+    virtual ~IDelegateTransport() = default;
+
 	/// Dispatch a stream of bytes to a remote system. The implementer is responsible
 	/// for sending the bytes over a communication link. Once the receiver obtains the 
 	/// bytes, the DelegateRemoteInvoker::DelegateInvoke() function must be called to 

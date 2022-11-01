@@ -14,7 +14,7 @@ template <class Signature>
 class MulticastDelegate : public MulticastDelegateBase
 {
 public:
-	MulticastDelegate() { }
+	MulticastDelegate() = default;
 	void operator()() {
 		InvocationNode* node = GetInvocationHead();
 		while (node != 0) {
@@ -36,7 +36,7 @@ template<typename Param1>
 class MulticastDelegate<void(Param1)> : public MulticastDelegateBase
 {
 public:
-	MulticastDelegate() { }
+	MulticastDelegate() = default;
 	void operator()(Param1 p1) {
 		InvocationNode* node = GetInvocationHead();
 		while (node != 0) {
@@ -58,7 +58,7 @@ template<typename Param1, class Param2>
 class MulticastDelegate<void(Param1, Param2)> : public MulticastDelegateBase
 {
 public:
-	MulticastDelegate() { }
+	MulticastDelegate() = default;
 	void operator()(Param1 p1, Param2 p2) {
 		InvocationNode* node = GetInvocationHead();
 		while (node != 0) {
@@ -80,7 +80,7 @@ template<typename Param1, class Param2, class Param3>
 class MulticastDelegate<void(Param1, Param2, Param3)> : public MulticastDelegateBase
 {
 public:
-	MulticastDelegate() { }
+	MulticastDelegate() = default;
 	void operator()(Param1 p1, Param2 p2, Param3 p3) {
 		InvocationNode* node = GetInvocationHead();
 		while (node != 0) {
@@ -102,7 +102,7 @@ template<typename Param1, class Param2, class Param3, class Param4>
 class MulticastDelegate<void(Param1, Param2, Param3, Param4)> : public MulticastDelegateBase
 {
 public:
-	MulticastDelegate() { }
+    MulticastDelegate() = default;
 	void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
 		InvocationNode* node = GetInvocationHead();
 		while (node != 0) {
@@ -124,7 +124,7 @@ template<typename Param1, class Param2, class Param3, class Param4, class Param5
 class MulticastDelegate<void(Param1, Param2, Param3, Param4, Param5)> : public MulticastDelegateBase
 {
 public:
-	MulticastDelegate() { }
+    MulticastDelegate() = default;
 	void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
 		InvocationNode* node = GetInvocationHead();
 		while (node != 0) {

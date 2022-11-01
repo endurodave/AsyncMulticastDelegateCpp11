@@ -140,7 +140,7 @@ public:
 		DelegateMemberAsyncWaitBase<RetType(TClass(void))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : 
 		DelegateMemberAsyncWaitBase<RetType(TClass(void))>(object, func, thread, timeout) { }
-	DelegateMemberAsyncWait() { }
+    DelegateMemberAsyncWait() = default;
 	virtual DelegateMemberAsyncWait<RetType(TClass(void))>* Clone() const override {	
 		return new DelegateMemberAsyncWait<RetType(TClass(void))>(*this); }
 	
@@ -235,7 +235,7 @@ public:
 		DelegateMemberAsyncWaitBase<void(TClass(void))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(void))>(object, func, thread, timeout) { }
-	DelegateMemberAsyncWait() { }
+    DelegateMemberAsyncWait() = default;
 	virtual DelegateMemberAsyncWait<void(TClass(void))>* Clone() const override {
 		return new DelegateMemberAsyncWait<void(TClass(void))>(*this); }
 
@@ -398,7 +398,7 @@ public:
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait<RetType(TClass(Param1))>(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1))>(object, func, thread, timeout) { }
-	DelegateMemberAsyncWait() { }
+	DelegateMemberAsyncWait() = default;
 	virtual DelegateMemberAsyncWait<RetType(TClass(Param1))>* Clone() const override {
 		return new DelegateMemberAsyncWait<RetType(TClass(Param1))>(*this);
 	}
@@ -500,7 +500,7 @@ public:
 		DelegateMemberAsyncWaitBase<void(TClass(Param1))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1))>(object, func, thread, timeout) { }
-	DelegateMemberAsyncWait() { }
+	DelegateMemberAsyncWait() = default;
 	virtual DelegateMemberAsyncWait<void(TClass(Param1))>* Clone() const override {
 		return new DelegateMemberAsyncWait<void(TClass(Param1))>(*this);
 	}
@@ -668,7 +668,7 @@ public:
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2))>(object, func, thread, timeout) { }
-	DelegateMemberAsyncWait() { }
+	DelegateMemberAsyncWait() = default;
 	virtual DelegateMemberAsyncWait<RetType(TClass(Param1, Param2))>* Clone() const override {
 		return new DelegateMemberAsyncWait<RetType(TClass(Param1, Param2))>(*this);
 	}
@@ -771,7 +771,7 @@ public:
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2))>(object, func, thread, timeout) { }
-	DelegateMemberAsyncWait() { }
+	DelegateMemberAsyncWait() = default;
 	virtual DelegateMemberAsyncWait<void(TClass(Param1, Param2))>* Clone() const override {
 		return new DelegateMemberAsyncWait<void(TClass(Param1, Param2))>(*this);
 	}
@@ -940,7 +940,7 @@ public:
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3))>(object, func, thread, timeout) { }
-	DelegateMemberAsyncWait() { }
+	DelegateMemberAsyncWait() = default;
 	virtual DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3))>* Clone() const override {
 		return new DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3))>(*this);
 	}
@@ -1044,7 +1044,7 @@ public:
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3))>(object, func, thread, timeout) { }
-	DelegateMemberAsyncWait() { }
+	DelegateMemberAsyncWait() = default;
 	virtual DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3))>* Clone() const override {
 		return new DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3))>(*this);
 	}
@@ -1214,7 +1214,7 @@ public:
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4))>(object, func, thread, timeout) { }
-	DelegateMemberAsyncWait() { }
+	DelegateMemberAsyncWait() = default;
 	virtual DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4))>* Clone() const override {
 		return new DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4))>(*this);
 	}
@@ -1319,7 +1319,7 @@ public:
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4))>(object, func, thread, timeout) { }
-	DelegateMemberAsyncWait() { }
+	DelegateMemberAsyncWait() = default;
 	virtual DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3, Param4))>* Clone() const override {
 		return new DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3, Param4))>(*this);
 	}
@@ -1490,7 +1490,7 @@ public:
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>(object, func, thread, timeout) { }
-	DelegateMemberAsyncWait() { }
+	DelegateMemberAsyncWait() = default;
 	virtual DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const override {
 		return new DelegateMemberAsyncWait<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>(*this);
 	}
@@ -1596,7 +1596,7 @@ public:
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4, Param5))>(object, func, thread, timeout) { }
 	DelegateMemberAsyncWait(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) :
 		DelegateMemberAsyncWaitBase<void(TClass(Param1, Param2, Param3, Param4, Param5))>(object, func, thread, timeout) { }
-	DelegateMemberAsyncWait() { }
+	DelegateMemberAsyncWait() = default;
 	virtual DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3, Param4, Param5))>* Clone() const override {
 		return new DelegateMemberAsyncWait<void(TClass(Param1, Param2, Param3, Param4, Param5))>(*this);
 	}
