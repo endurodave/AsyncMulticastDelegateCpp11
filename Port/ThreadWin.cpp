@@ -59,7 +59,7 @@ void ThreadWin::PostThreadMessage(UINT msg, void* data)
 //----------------------------------------------------------------------------
 // DispatchDelegate
 //----------------------------------------------------------------------------
-void ThreadWin::DispatchDelegate(DelegateLib::DelegateMsgBase* msg)
+void ThreadWin::DispatchDelegate(std::shared_ptr<DelegateLib::DelegateMsgBase> msg)
 {
 	// Create a new ThreadMsg
 	ThreadMsg* threadMsg = new ThreadMsg(WM_DISPATCH_DELEGATE, msg);

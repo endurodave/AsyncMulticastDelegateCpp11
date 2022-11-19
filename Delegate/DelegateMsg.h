@@ -3,6 +3,7 @@
 
 #include "Fault.h"
 #include "DelegateInvoker.h"
+#include <memory>
 #if USE_XALLOCATOR
 	#include "xallocator.h"
 #endif
@@ -20,7 +21,7 @@ public:
 	/// Constructor
 	/// @param[in] invoker - the invoker instance the delegate is registered with.
 	/// @param[in] delegate - the delegate instance. 
-	DelegateMsgBase(IDelegateInvoker* invoker) :
+	DelegateMsgBase(std::shared_ptr<IDelegateInvoker> invoker) :
 		m_invoker(invoker)
 	{
 		ASSERT_TRUE(m_invoker != 0);
@@ -28,11 +29,11 @@ public:
 
 	/// Get the delegate invoker instance the delegate is registered with.
 	/// @return The invoker instance. 
-	IDelegateInvoker* GetDelegateInvoker() const { return m_invoker; }
+    std::shared_ptr<IDelegateInvoker> GetDelegateInvoker() const { return m_invoker; }
 	
 private:
-	/// The IDelegateInvoker instance 
-	IDelegateInvoker* m_invoker;
+    /// The IDelegateInvoker instance 
+    std::shared_ptr<IDelegateInvoker> m_invoker;
 };
 
 /// @brief A class containing the delegate information passed through 
@@ -44,7 +45,7 @@ public:
 	/// Constructor
 	/// @param[in] invoker - the invoker instance the delegate is registered with.
 	/// @param[in] param1 - the data sent as delegate function argument.
-	DelegateMsg1(IDelegateInvoker* invoker, Param1 param1) :
+	DelegateMsg1(std::shared_ptr<IDelegateInvoker> invoker, Param1 param1) :
 		DelegateMsgBase(invoker),
 		m_param1(param1)
 	{
@@ -66,7 +67,7 @@ public:
 	/// Constructor
 	/// @param[in] invoker - the invoker instance the delegate is registered with.
 	/// @param[in] param1 - the data sent as delegate function argument.
-	DelegateMsg2(IDelegateInvoker* invoker, Param1 param1, Param2 param2) :
+	DelegateMsg2(std::shared_ptr<IDelegateInvoker> invoker, Param1 param1, Param2 param2) :
 		DelegateMsgBase(invoker),
 		m_param1(param1),
 		m_param2(param2)
@@ -91,7 +92,7 @@ public:
 	/// Constructor
 	/// @param[in] invoker - the invoker instance the delegate is registered with.
 	/// @param[in] param1 - the data sent as delegate function argument.
-	DelegateMsg3(IDelegateInvoker* invoker, Param1 param1, Param2 param2, Param3 param3) :
+	DelegateMsg3(std::shared_ptr<IDelegateInvoker> invoker, Param1 param1, Param2 param2, Param3 param3) :
 		DelegateMsgBase(invoker),
 		m_param1(param1),
 		m_param2(param2),
@@ -119,7 +120,7 @@ public:
 	/// Constructor
 	/// @param[in] invoker - the invoker instance the delegate is registered with.
 	/// @param[in] param1 - the data sent as delegate function argument.
-	DelegateMsg4(IDelegateInvoker* invoker, Param1 param1, Param2 param2, Param3 param3, Param4 param4) :
+	DelegateMsg4(std::shared_ptr<IDelegateInvoker> invoker, Param1 param1, Param2 param2, Param3 param3, Param4 param4) :
 		DelegateMsgBase(invoker),
 		m_param1(param1),
 		m_param2(param2),
@@ -150,7 +151,7 @@ public:
 	/// Constructor
 	/// @param[in] invoker - the invoker instance the delegate is registered with.
 	/// @param[in] param1 - the data sent as delegate function argument.
-	DelegateMsg5(IDelegateInvoker* invoker, Param1 param1, Param2 param2, Param3 param3, Param4 param4, Param5 param5) :
+	DelegateMsg5(std::shared_ptr<IDelegateInvoker> invoker, Param1 param1, Param2 param2, Param3 param3, Param4 param4, Param5 param5) :
 		DelegateMsgBase(invoker),
 		m_param1(param1),
 		m_param2(param2),

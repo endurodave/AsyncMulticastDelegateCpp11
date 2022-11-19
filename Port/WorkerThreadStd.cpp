@@ -81,7 +81,7 @@ void WorkerThread::ExitThread()
 //----------------------------------------------------------------------------
 // DispatchDelegate
 //----------------------------------------------------------------------------
-void WorkerThread::DispatchDelegate(DelegateLib::DelegateMsgBase* msg)
+void WorkerThread::DispatchDelegate(std::shared_ptr<DelegateLib::DelegateMsgBase> msg)
 {
 	ASSERT_TRUE(m_thread);
 
@@ -143,10 +143,10 @@ void WorkerThread::Process()
 				ASSERT_TRUE(msg->GetData() != NULL);
 
 				// Convert the ThreadMsg void* data back to a DelegateMsg* 
-                auto delegateMsg = static_cast<DelegateMsgBase*>(msg->GetData());
+                auto delegateMsg = msg->GetData();
 
 				// Invoke the callback on the target thread
-				delegateMsg->GetDelegateInvoker()->DelegateInvoke(&delegateMsg);
+				delegateMsg->GetDelegateInvoker()->DelegateInvoke(delegateMsg);
 				break;
 			}
 

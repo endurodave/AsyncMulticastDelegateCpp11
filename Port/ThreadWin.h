@@ -86,7 +86,7 @@ private:
 	ThreadWin& operator=(const ThreadWin&);
 
 	/// @see DelegateThread::DispatchDelegate
-	virtual void DispatchDelegate(DelegateLib::DelegateMsgBase* msg);
+	virtual void DispatchDelegate(std::shared_ptr<DelegateLib::DelegateMsgBase> msg);
 
 	/// The thread start routine. 
 	/// @param[in] threadParam - the thread data passed into the function. 

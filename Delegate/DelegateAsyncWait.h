@@ -9,6 +9,7 @@
 #include "IDelegateThread.h"
 #include "DelegateInvoker.h"
 #include "Semaphore.h"
+#include <memory>
 
 /// @brief Asynchronous member delegate that invokes the target function on the specified thread of control
 /// and waits for the function to be executed or a timeout occurs. Use IsSuccess() to determine if asynchronous 
@@ -150,13 +151,13 @@ public:
 			return BaseType::operator()();
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsgBase* msg = new DelegateMsgBase(delegate);
+			auto msg = std::make_shared<DelegateMsgBase>(delegate);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -166,49 +167,30 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
-			return m_retVal;
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
+    		return m_retVal;
 		}
 	}
 
 	/// Invoke delegate function asynchronously
-	AsyncRet<RetType> AsyncInvoke()
+	std::pair<RetType, bool> AsyncInvoke()
 	{
-		AsyncRet<RetType> waitRetVal;
-		waitRetVal.retVal = operator()();
-		waitRetVal.success = BaseType::IsSuccess();
-		return waitRetVal;
+		RetType retVal = operator()();
+		bool success = BaseType::IsSuccess();
+		return std::make_pair<RetType, bool>(retVal, success);
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				m_retVal = BaseType::operator()();
-				this->m_sema.Signal();
-			}
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			m_retVal = BaseType::operator()();
+			this->m_sema.Signal();
+		}
 
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
-		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+        this->m_refCnt--;
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -245,13 +227,13 @@ public:
 			BaseType::operator()();
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsgBase* msg = new DelegateMsgBase(delegate);
+			auto msg = std::make_shared<DelegateMsgBase>(delegate);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -262,16 +244,8 @@ public:
 				// No return or param arguments
 			}
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 		}
 	}
 
@@ -285,25 +259,15 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				BaseType::operator()();
-				this->m_sema.Signal();
-			}
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			BaseType::operator()();
+			this->m_sema.Signal();
+		}
 
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
-		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+        this->m_refCnt--;
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -409,13 +373,13 @@ public:
 			return BaseType::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg1<Param1>* msg = new DelegateMsg1<Param1>(delegate, p1);
+			auto msg = std::make_shared<DelegateMsg1<Param1>>(delegate, p1);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -425,16 +389,8 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -449,31 +405,21 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				m_retVal = BaseType::operator()(param1);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			m_retVal = BaseType::operator()(param1);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -511,13 +457,13 @@ public:
 			BaseType::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg1<Param1>* msg = new DelegateMsg1<Param1>(delegate, p1);
+			auto msg = std::make_shared<DelegateMsg1<Param1>>(delegate, p1);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -526,16 +472,8 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 		}
 	}
 
@@ -549,31 +487,21 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				BaseType::operator()(param1);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			BaseType::operator()(param1);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -679,13 +607,13 @@ public:
 			return BaseType::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg2<Param1, Param2>* msg = new DelegateMsg2<Param1, Param2>(delegate, p1, p2);
+			auto msg = std::make_shared<DelegateMsg2<Param1, Param2>>(delegate, p1, p2);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -695,16 +623,8 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -719,32 +639,22 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				m_retVal = BaseType::operator()(param1, param2);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			m_retVal = BaseType::operator()(param1, param2);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -782,13 +692,13 @@ public:
 			BaseType::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg2<Param1, Param2>* msg = new DelegateMsg2<Param1, Param2>(delegate, p1, p2);
+			auto msg = std::make_shared<DelegateMsg2<Param1, Param2>>(delegate, p1, p2);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -797,16 +707,8 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+    		LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 		}
 	}
 
@@ -820,32 +722,22 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				BaseType::operator()(param1, param2);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			BaseType::operator()(param1, param2);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -951,13 +843,13 @@ public:
 			return BaseType::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg3<Param1, Param2, Param3>* msg = new DelegateMsg3<Param1, Param2, Param3>(delegate, p1, p2, p3);
+			auto msg = std::make_shared<DelegateMsg3<Param1, Param2, Param3>>(delegate, p1, p2, p3);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -967,16 +859,8 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -991,33 +875,23 @@ public:
 	}	
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg3<Param1, Param2, Param3>* delegateMsg = static_cast<DelegateMsg3<Param1, Param2, Param3>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg3<Param1, Param2, Param3>* delegateMsg = static_cast<DelegateMsg3<Param1, Param2, Param3>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
-			Param3 param3 = delegateMsg->GetParam3();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
+		Param3 param3 = delegateMsg->GetParam3();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				m_retVal = BaseType::operator()(param1, param2, param3);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			m_retVal = BaseType::operator()(param1, param2, param3);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -1055,13 +929,13 @@ public:
 			BaseType::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg3<Param1, Param2, Param3>* msg = new DelegateMsg3<Param1, Param2, Param3>(delegate, p1, p2, p3);
+			auto msg = std::make_shared<DelegateMsg3<Param1, Param2, Param3>>(delegate, p1, p2, p3);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -1070,16 +944,8 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 		}
 	}
 
@@ -1093,33 +959,23 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg3<Param1, Param2, Param3>* delegateMsg = static_cast<DelegateMsg3<Param1, Param2, Param3>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg3<Param1, Param2, Param3>* delegateMsg = static_cast<DelegateMsg3<Param1, Param2, Param3>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
-			Param3 param3 = delegateMsg->GetParam3();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
+		Param3 param3 = delegateMsg->GetParam3();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				BaseType::operator()(param1, param2, param3);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			BaseType::operator()(param1, param2, param3);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -1225,13 +1081,13 @@ public:
 			return BaseType::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg4<Param1, Param2, Param3, Param4>* msg = new DelegateMsg4<Param1, Param2, Param3, Param4>(delegate, p1, p2, p3, p4);
+			auto msg = std::make_shared<DelegateMsg4<Param1, Param2, Param3, Param4>>(delegate, p1, p2, p3, p4);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -1241,16 +1097,8 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -1265,34 +1113,24 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg4<Param1, Param2, Param3, Param4>* delegateMsg = static_cast<DelegateMsg4<Param1, Param2, Param3, Param4>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg4<Param1, Param2, Param3, Param4>* delegateMsg = static_cast<DelegateMsg4<Param1, Param2, Param3, Param4>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
-			Param3 param3 = delegateMsg->GetParam3();
-			Param4 param4 = delegateMsg->GetParam4();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
+		Param3 param3 = delegateMsg->GetParam3();
+		Param4 param4 = delegateMsg->GetParam4();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				m_retVal = BaseType::operator()(param1, param2, param3, param4);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			m_retVal = BaseType::operator()(param1, param2, param3, param4);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -1330,13 +1168,13 @@ public:
 			BaseType::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg4<Param1, Param2, Param3, Param4>* msg = new DelegateMsg4<Param1, Param2, Param3, Param4>(delegate, p1, p2, p3, p4);
+			auto msg = std::make_shared<DelegateMsg4<Param1, Param2, Param3, Param4>>(delegate, p1, p2, p3, p4);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -1345,16 +1183,8 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 		}
 	}
 
@@ -1368,34 +1198,24 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg4<Param1, Param2, Param3, Param4>* delegateMsg = static_cast<DelegateMsg4<Param1, Param2, Param3, Param4>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg4<Param1, Param2, Param3, Param4>* delegateMsg = static_cast<DelegateMsg4<Param1, Param2, Param3, Param4>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
-			Param3 param3 = delegateMsg->GetParam3();
-			Param4 param4 = delegateMsg->GetParam4();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
+		Param3 param3 = delegateMsg->GetParam3();
+		Param4 param4 = delegateMsg->GetParam4();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				BaseType::operator()(param1, param2, param3, param4);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			BaseType::operator()(param1, param2, param3, param4);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -1501,13 +1321,13 @@ public:
 			return BaseType::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* msg = new DelegateMsg5<Param1, Param2, Param3, Param4, Param5>(delegate, p1, p2, p3, p4, p5);
+			auto msg = std::make_shared<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>>(delegate, p1, p2, p3, p4, p5);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -1517,16 +1337,8 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -1541,35 +1353,25 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* delegateMsg = static_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* delegateMsg = static_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
-			Param3 param3 = delegateMsg->GetParam3();
-			Param4 param4 = delegateMsg->GetParam4();
-			Param4 param5 = delegateMsg->GetParam5();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
+		Param3 param3 = delegateMsg->GetParam3();
+		Param4 param4 = delegateMsg->GetParam4();
+		Param4 param5 = delegateMsg->GetParam5();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				m_retVal = BaseType::operator()(param1, param2, param3, param4, param5);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			m_retVal = BaseType::operator()(param1, param2, param3, param4, param5);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -1607,13 +1409,13 @@ public:
 			BaseType::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* msg = new DelegateMsg5<Param1, Param2, Param3, Param4, Param5>(delegate, p1, p2, p3, p4, p5);
+			auto msg = std::make_shared<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>>(delegate, p1, p2, p3, p4, p5);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -1622,16 +1424,8 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 		}
 	}
 
@@ -1645,35 +1439,25 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* delegateMsg = static_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* delegateMsg = static_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
-			Param3 param3 = delegateMsg->GetParam3();
-			Param4 param4 = delegateMsg->GetParam4();
-			Param5 param5 = delegateMsg->GetParam5();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
+		Param3 param3 = delegateMsg->GetParam3();
+		Param4 param4 = delegateMsg->GetParam4();
+		Param5 param5 = delegateMsg->GetParam5();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				BaseType::operator()(param1, param2, param3, param4, param5);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			BaseType::operator()(param1, param2, param3, param4, param5);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -1772,13 +1556,13 @@ public:
 			return BaseType::operator()();
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsgBase* msg = new DelegateMsgBase(delegate);
+			auto msg = std::make_shared<DelegateMsgBase>(delegate);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -1788,16 +1572,8 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -1812,25 +1588,15 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				m_retVal = BaseType::operator()();
-				this->m_sema.Signal();
-			}
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			m_retVal = BaseType::operator()();
+			this->m_sema.Signal();
+		}
 
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
-		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+        this->m_refCnt--;
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -1863,13 +1629,13 @@ public:
 			return BaseType::operator()();
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsgBase* msg = new DelegateMsgBase(delegate);
+			auto msg = std::make_shared<DelegateMsgBase>(delegate);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -1880,16 +1646,8 @@ public:
 				// No return or param arguments
 			}
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+            LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 		}
 	}
 
@@ -1903,25 +1661,15 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				DelegateFreeAsyncWaitBase<void(void)>::operator()();
-				this->m_sema.Signal();
-			}
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			DelegateFreeAsyncWaitBase<void(void)>::operator()();
+			this->m_sema.Signal();
+		}
 
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
-		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+        this->m_refCnt--;
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2011,13 +1759,13 @@ public:
 			return BaseType::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg1<Param1>* msg = new DelegateMsg1<Param1>(delegate, p1);
+			auto msg = std::make_shared<DelegateMsg1<Param1>>(delegate, p1);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -2027,16 +1775,8 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+    		LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -2051,31 +1791,21 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			LockGuard lockGuard(&this->m_lock);
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		LockGuard lockGuard(&this->m_lock);
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
 
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				m_retVal = BaseType::operator()(param1);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			m_retVal = BaseType::operator()(param1);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2109,13 +1839,13 @@ public:
 			BaseType::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg1<Param1>* msg = new DelegateMsg1<Param1>(delegate, p1);
+			auto msg = std::make_shared<DelegateMsg1<Param1>>(delegate, p1);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -2124,16 +1854,8 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 		}
 	}
 
@@ -2147,31 +1869,21 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			LockGuard lockGuard(&this->m_lock);
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		LockGuard lockGuard(&this->m_lock);
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
 
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				BaseType::operator()(param1);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			BaseType::operator()(param1);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2261,13 +1973,13 @@ public:
 			return BaseType::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg2<Param1, Param2>* msg = new DelegateMsg2<Param1, Param2>(delegate, p1, p2);
+			auto msg = std::make_shared<DelegateMsg2<Param1, Param2>>(delegate, p1, p2);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -2277,16 +1989,8 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -2301,32 +2005,23 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			LockGuard lockGuard(&this->m_lock);
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		LockGuard lockGuard(&this->m_lock);
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
 
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				m_retVal = BaseType::operator()(param1, param2);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			m_retVal = BaseType::operator()(param1, param2);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+		// If waiting thread is no longer waiting then delete heap data
+        this->m_refCnt--;
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2360,13 +2055,13 @@ public:
 			BaseType::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg2<Param1, Param2>* msg = new DelegateMsg2<Param1, Param2>(delegate, p1, p2);
+			auto msg = std::make_shared<DelegateMsg2<Param1, Param2>>(delegate, p1, p2);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -2375,16 +2070,8 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 		}
 	}
 
@@ -2398,32 +2085,22 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				BaseType::operator()(param1, param2);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			BaseType::operator()(param1, param2);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2513,13 +2190,13 @@ public:
 			return BaseType::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg3<Param1, Param2, Param3>* msg = new DelegateMsg3<Param1, Param2, Param3>(delegate, p1, p2, p3);
+			auto msg = std::make_shared<DelegateMsg3<Param1, Param2, Param3>>(delegate, p1, p2, p3);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -2529,16 +2206,8 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -2553,33 +2222,23 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg3<Param1, Param2, Param3>* delegateMsg = static_cast<DelegateMsg3<Param1, Param2, Param3>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg3<Param1, Param2, Param3>* delegateMsg = static_cast<DelegateMsg3<Param1, Param2, Param3>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
-			Param3 param3 = delegateMsg->GetParam3();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
+		Param3 param3 = delegateMsg->GetParam3();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				m_retVal = BaseType::operator()(param1, param2, param3);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			m_retVal = BaseType::operator()(param1, param2, param3);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2613,13 +2272,13 @@ public:
 			BaseType::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg3<Param1, Param2, Param3>* msg = new DelegateMsg3<Param1, Param2, Param3>(delegate, p1, p2, p3);
+			auto msg = std::make_shared<DelegateMsg3<Param1, Param2, Param3>>(delegate, p1, p2, p3);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -2628,16 +2287,8 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 		}
 	}
 
@@ -2651,33 +2302,23 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg3<Param1, Param2, Param3>* delegateMsg = static_cast<DelegateMsg3<Param1, Param2, Param3>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg3<Param1, Param2, Param3>* delegateMsg = static_cast<DelegateMsg3<Param1, Param2, Param3>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
-			Param3 param3 = delegateMsg->GetParam3();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
+		Param3 param3 = delegateMsg->GetParam3();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				BaseType::operator()(param1, param2, param3);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			BaseType::operator()(param1, param2, param3);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2767,13 +2408,13 @@ public:
 			return BaseType::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg4<Param1, Param2, Param3, Param4>* msg = new DelegateMsg4<Param1, Param2, Param3, Param4>(delegate, p1, p2, p3, p4);
+			auto msg = std::make_shared<DelegateMsg4<Param1, Param2, Param3, Param4>>(delegate, p1, p2, p3, p4);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -2783,16 +2424,8 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -2807,34 +2440,24 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg4<Param1, Param2, Param3, Param4>* delegateMsg = static_cast<DelegateMsg4<Param1, Param2, Param3, Param4>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg4<Param1, Param2, Param3, Param4>* delegateMsg = static_cast<DelegateMsg4<Param1, Param2, Param3, Param4>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
-			Param3 param3 = delegateMsg->GetParam3();
-			Param4 param4 = delegateMsg->GetParam4();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
+		Param3 param3 = delegateMsg->GetParam3();
+		Param4 param4 = delegateMsg->GetParam4();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				m_retVal = BaseType::operator()(param1, param2, param3, param4);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			m_retVal = BaseType::operator()(param1, param2, param3, param4);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2868,13 +2491,13 @@ public:
 			BaseType::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg4<Param1, Param2, Param3, Param4>* msg = new DelegateMsg4<Param1, Param2, Param3, Param4>(delegate, p1, p2, p3, p4);
+			auto msg = std::make_shared<DelegateMsg4<Param1, Param2, Param3, Param4>>(delegate, p1, p2, p3, p4);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -2883,16 +2506,8 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 		}
 	}
 
@@ -2906,34 +2521,24 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg4<Param1, Param2, Param3, Param4>* delegateMsg = static_cast<DelegateMsg4<Param1, Param2, Param3, Param4>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg4<Param1, Param2, Param3, Param4>* delegateMsg = static_cast<DelegateMsg4<Param1, Param2, Param3, Param4>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
-			Param3 param3 = delegateMsg->GetParam3();
-			Param4 param4 = delegateMsg->GetParam4();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
+		Param3 param3 = delegateMsg->GetParam3();
+		Param4 param4 = delegateMsg->GetParam4();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				BaseType::operator()(param1, param2, param3, param4);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			BaseType::operator()(param1, param2, param3, param4);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -3023,13 +2628,13 @@ public:
 			return BaseType::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* msg = new DelegateMsg5<Param1, Param2, Param3, Param4, Param5>(delegate, p1, p2, p3, p4, p5);
+			auto msg = std::make_shared<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>>(delegate, p1, p2, p3, p4, p5);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -3039,16 +2644,8 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -3063,35 +2660,25 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* delegateMsg = static_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* delegateMsg = static_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
-			Param3 param3 = delegateMsg->GetParam3();
-			Param4 param4 = delegateMsg->GetParam4();
-			Param5 param5 = delegateMsg->GetParam5();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
+		Param3 param3 = delegateMsg->GetParam3();
+		Param4 param4 = delegateMsg->GetParam4();
+		Param5 param5 = delegateMsg->GetParam5();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				m_retVal = BaseType::operator()(param1, param2, param3, param4, param5);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			m_retVal = BaseType::operator()(param1, param2, param3, param4, param5);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -3125,13 +2712,13 @@ public:
 			BaseType::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
 			// Create a new message instance 
-			DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* msg = new DelegateMsg5<Param1, Param2, Param3, Param4, Param5>(delegate, p1, p2, p3, p4, p5);
+			auto msg = std::make_shared<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>>(delegate, p1, p2, p3, p4, p5);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -3140,16 +2727,8 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			bool deleteData = false;
-			{
-				LockGuard lockGuard(&delegate->m_lock);
-				if (--delegate->m_refCnt == 0)
-					deleteData = true;
-			}
-			if (deleteData) {
-				delete msg;
-				delete delegate;
-			}
+			LockGuard lockGuard(&delegate->m_lock);
+            delegate->m_refCnt--;
 		}
 	}
 
@@ -3163,35 +2742,25 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
-		bool deleteData = false;
-		{
-			// Typecast the base pointer to back to the templatized instance
-			DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* delegateMsg = static_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>*>(*msg);
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
+		// Typecast the base pointer to back to the templatized instance
+		DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* delegateMsg = static_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>*>(msg.get());
 
-			// Get the function parameter data
-			Param1 param1 = delegateMsg->GetParam1();
-			Param2 param2 = delegateMsg->GetParam2();
-			Param3 param3 = delegateMsg->GetParam3();
-			Param4 param4 = delegateMsg->GetParam4();
-			Param5 param5 = delegateMsg->GetParam5();
+		// Get the function parameter data
+		Param1 param1 = delegateMsg->GetParam1();
+		Param2 param2 = delegateMsg->GetParam2();
+		Param3 param3 = delegateMsg->GetParam3();
+		Param4 param4 = delegateMsg->GetParam4();
+		Param5 param5 = delegateMsg->GetParam5();
 
-			LockGuard lockGuard(&this->m_lock);
-			if (this->m_refCnt == 2) {
-				// Invoke the delegate function then signal the waiting thread
-				BaseType::operator()(param1, param2, param3, param4, param5);
-				this->m_sema.Signal();
-			}
-
-			// If waiting thread is no longer waiting then delete heap data
-			if (--this->m_refCnt == 0)
-				deleteData = true;
+		LockGuard lockGuard(&this->m_lock);
+		if (this->m_refCnt == 2) {
+			// Invoke the delegate function then signal the waiting thread
+			BaseType::operator()(param1, param2, param3, param4, param5);
+			this->m_sema.Signal();
 		}
-		if (deleteData) {
-			delete *msg;
-			*msg = 0;
-			delete this;
-		}
+
+        this->m_refCnt--;
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {

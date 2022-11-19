@@ -58,10 +58,10 @@ public:
 		else
 		{
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 
 			// Create a new message instance 
-			DelegateMsgBase* msg = new DelegateMsgBase(delegate);
+			auto msg = std::make_shared<DelegateMsgBase>(delegate);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -70,16 +70,9 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Invoke the delegate function
 		BaseType::operator()();
-
-		// Delete heap data created inside operator()
-		delete *msg;
-		*msg = 0;
-
-		// Do this last before returning!
-		delete this;
 	}
 
 private:
@@ -129,10 +122,10 @@ public:
 			Param1 heapParam1 = DelegateParam<Param1>::New(p1);
 
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 
 			// Create a new message instance 
-			DelegateMsg1<Param1>* msg = new DelegateMsg1<Param1>(delegate, heapParam1);
+			auto msg = std::make_shared<DelegateMsg1<Param1>>(delegate, heapParam1);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -141,9 +134,9 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(*msg);
+		DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(msg.get());
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
@@ -153,11 +146,6 @@ public:
 
 		// Delete heap data created inside operator()
 		DelegateParam<Param1>::Delete(param1);
-		delete *msg;
-		*msg = 0;
-
-		// Do this last before returning!
-		delete this;
 	}
 
 private:
@@ -208,10 +196,10 @@ public:
 			Param2 heapParam2 = DelegateParam<Param2>::New(p2);
 
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 
 			// Create a new message instance 
-			DelegateMsg2<Param1, Param2>* msg = new DelegateMsg2<Param1, Param2>(delegate, heapParam1, heapParam2);
+			auto msg = std::make_shared<DelegateMsg2<Param1, Param2>>(delegate, heapParam1, heapParam2);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -220,9 +208,9 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(*msg);
+		DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(msg.get());
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
@@ -234,11 +222,6 @@ public:
 		// Delete heap data created inside operator()
 		DelegateParam<Param1>::Delete(param1);
 		DelegateParam<Param2>::Delete(param2);
-		delete *msg;
-		*msg = 0;
-
-		// Do this last before returning!
-		delete this;
 	}
 
 private:
@@ -290,10 +273,10 @@ public:
 			Param3 heapParam3 = DelegateParam<Param3>::New(p3);
 
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 
 			// Create a new message instance 
-			DelegateMsg3<Param1, Param2, Param3>* msg = new DelegateMsg3<Param1, Param2, Param3>(delegate, heapParam1, heapParam2, heapParam3);
+			auto msg = std::make_shared<DelegateMsg3<Param1, Param2, Param3>>(delegate, heapParam1, heapParam2, heapParam3);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -302,9 +285,9 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg3<Param1, Param2, Param3>* delegateMsg = static_cast<DelegateMsg3<Param1, Param2, Param3>*>(*msg);
+		DelegateMsg3<Param1, Param2, Param3>* delegateMsg = static_cast<DelegateMsg3<Param1, Param2, Param3>*>(msg.get());
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
@@ -318,11 +301,6 @@ public:
 		DelegateParam<Param1>::Delete(param1);
 		DelegateParam<Param2>::Delete(param2);
 		DelegateParam<Param3>::Delete(param3);
-		delete *msg;
-		*msg = 0;
-
-		// Do this last before returning!
-		delete this;
 	}
 
 private:
@@ -375,10 +353,10 @@ public:
 			Param4 heapParam4 = DelegateParam<Param4>::New(p4);
 
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 
 			// Create a new message instance 
-			DelegateMsg4<Param1, Param2, Param3, Param4>* msg = new DelegateMsg4<Param1, Param2, Param3, Param4>(delegate, heapParam1, heapParam2, heapParam3, heapParam4);
+			auto msg = std::make_shared<DelegateMsg4<Param1, Param2, Param3, Param4>>(delegate, heapParam1, heapParam2, heapParam3, heapParam4);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -387,9 +365,9 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg4<Param1, Param2, Param3, Param4>* delegateMsg = static_cast<DelegateMsg4<Param1, Param2, Param3, Param4>*>(*msg);
+		DelegateMsg4<Param1, Param2, Param3, Param4>* delegateMsg = static_cast<DelegateMsg4<Param1, Param2, Param3, Param4>*>(msg.get());
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
@@ -405,11 +383,6 @@ public:
 		DelegateParam<Param2>::Delete(param2);
 		DelegateParam<Param3>::Delete(param3);
 		DelegateParam<Param4>::Delete(param4);
-		delete *msg;
-		*msg = 0;
-
-		// Do this last before returning!
-		delete this;
 	}
 
 private:
@@ -463,10 +436,10 @@ public:
 			Param5 heapParam5 = DelegateParam<Param5>::New(p5);
 
 			// Create a clone instance of this delegate 
-			auto delegate = Clone();
+			auto delegate = std::shared_ptr<ClassType>(Clone());
 
 			// Create a new message instance 
-			DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* msg = new DelegateMsg5<Param1, Param2, Param3, Param4, Param5>(delegate, heapParam1, heapParam2, heapParam3, heapParam4, heapParam5);
+			auto msg = std::make_shared<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>>(delegate, heapParam1, heapParam2, heapParam3, heapParam4, heapParam5);
 
 			// Dispatch message onto the callback destination thread. DelegateInvoke()
 			// will be called by the target thread. 
@@ -475,9 +448,9 @@ public:
 	}
 
 	/// Called by the target thread to invoke the delegate function 
-	virtual void DelegateInvoke(DelegateMsgBase** msg) override {
+	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* delegateMsg = static_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>*>(*msg);
+		DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* delegateMsg = static_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>*>(msg.get());
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
@@ -495,11 +468,6 @@ public:
 		DelegateParam<Param3>::Delete(param3);
 		DelegateParam<Param4>::Delete(param4);
 		DelegateParam<Param5>::Delete(param5);
-		delete *msg;
-		*msg = 0;
-
-		// Do this last before returning!
-		delete this;
 	}
 
 private:
