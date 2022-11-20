@@ -46,14 +46,13 @@ unsigned long WorkerThread::Process(void* parameter)
 				// Get the ThreadMsg from the wParam value
 				ThreadMsg* threadMsg = reinterpret_cast<ThreadMsg*>(msg.wParam);
 
-				// Convert the ThreadMsg void* data back to a DelegateMsg* 
-				DelegateMsgBase* delegateMsg = static_cast<DelegateMsgBase*>(threadMsg->GetData()); 
+                ASSERT_TRUE(threadMsg->GetData() != NULL);
 
-				// Invoke the callback on the target thread
-				delegateMsg->GetDelegateInvoker()->DelegateInvoke(&delegateMsg);
+                // Convert the ThreadMsg void* data back to a DelegateMsg* 
+                auto delegateMsg = threadMsg->GetData();
 
-				// Delete dynamic data passed through message queue
-				delete threadMsg;
+                // Invoke the callback on the target thread
+                delegateMsg->GetDelegateInvoker()->DelegateInvoke(delegateMsg);
 				break;
 			}
 
