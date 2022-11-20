@@ -10,6 +10,7 @@
 #include "DelegateInvoker.h"
 #include "Semaphore.h"
 #include <memory>
+#include <atomic>
 
 /// @brief Asynchronous member delegate that invokes the target function on the specified thread of control
 /// and waits for the function to be executed or a timeout occurs. Use IsSuccess() to determine if asynchronous 
@@ -71,18 +72,15 @@ public:
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(object, func, thread); 
-		LockGuard::Create(&m_lock);
 	}
 	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(object, func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
-		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
-	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { LockGuard::Create(&m_lock); }
-	virtual ~DelegateMemberAsyncWaitBase() { LockGuard::Destroy(&m_lock); }
+	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	virtual ~DelegateMemberAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
@@ -116,8 +114,7 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	LOCK m_lock;					// Lock to synchronize threads
-	int m_refCnt;					// Ref count to determine when to delete objects
+	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateMemberAsyncWaitBase& s) {
@@ -167,7 +164,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
     		return m_retVal;
 		}
@@ -183,7 +179,6 @@ public:
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			m_retVal = BaseType::operator()();
@@ -244,7 +239,6 @@ public:
 				// No return or param arguments
 			}
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 		}
 	}
@@ -260,7 +254,6 @@ public:
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			BaseType::operator()();
@@ -289,18 +282,15 @@ public:
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(object, func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(object, func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
-		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
-	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { LockGuard::Create(&m_lock); }
-	virtual ~DelegateMemberAsyncWaitBase() { LockGuard::Destroy(&m_lock); }
+	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	virtual ~DelegateMemberAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
@@ -337,8 +327,7 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	LOCK m_lock;					// Lock to synchronize threads
-	int m_refCnt;					// Ref count to determine when to delete objects
+    std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateMemberAsyncWaitBase& s) {
@@ -389,7 +378,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 			return m_retVal;
 		}
@@ -412,7 +400,6 @@ public:
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			m_retVal = BaseType::operator()(param1);
@@ -472,7 +459,6 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 		}
 	}
@@ -482,7 +468,7 @@ public:
 	{
 		AsyncRet<void> waitRetVal;
 		operator()(p1);
-		waitRetVal.success = DelegateMemberAsyncWaitBase<void (TClass(Param1))>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -494,7 +480,6 @@ public:
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			BaseType::operator()(param1);
@@ -523,18 +508,15 @@ public:
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(object, func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(object, func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
-		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
-	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { LockGuard::Create(&m_lock); }
-	virtual ~DelegateMemberAsyncWaitBase() { LockGuard::Destroy(&m_lock); }
+	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	virtual ~DelegateMemberAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
@@ -571,8 +553,7 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	LOCK m_lock;					// Lock to synchronize threads
-	int m_refCnt;					// Ref count to determine when to delete objects
+    std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateMemberAsyncWaitBase& s) {
@@ -623,7 +604,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 			return m_retVal;
 		}
@@ -647,7 +627,6 @@ public:
 		Param1 param1 = delegateMsg->GetParam1();
 		Param2 param2 = delegateMsg->GetParam2();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			m_retVal = BaseType::operator()(param1, param2);
@@ -707,7 +686,6 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-    		LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 		}
 	}
@@ -717,7 +695,7 @@ public:
 	{
 		AsyncRet<void> waitRetVal;
 		operator()(p1, p2);
-		waitRetVal.success = DelegateMemberAsyncWaitBase<void (TClass(Param1, Param2))>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -730,7 +708,6 @@ public:
 		Param1 param1 = delegateMsg->GetParam1();
 		Param2 param2 = delegateMsg->GetParam2();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			BaseType::operator()(param1, param2);
@@ -759,18 +736,15 @@ public:
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(object, func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(object, func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
-		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
-	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { LockGuard::Create(&m_lock); }
-	virtual ~DelegateMemberAsyncWaitBase() { LockGuard::Destroy(&m_lock); }
+	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	virtual ~DelegateMemberAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
@@ -807,8 +781,7 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	LOCK m_lock;					// Lock to synchronize threads
-	int m_refCnt;					// Ref count to determine when to delete objects
+	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateMemberAsyncWaitBase& s) {
@@ -859,7 +832,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 			return m_retVal;
 		}
@@ -870,7 +842,7 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()(p1, p2, p3);
-		waitRetVal.success = DelegateMemberAsyncWaitBase<RetType (TClass(Param1, Param2, Param3))>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}	
 
@@ -884,7 +856,6 @@ public:
 		Param2 param2 = delegateMsg->GetParam2();
 		Param3 param3 = delegateMsg->GetParam3();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			m_retVal = BaseType::operator()(param1, param2, param3);
@@ -944,7 +915,6 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 		}
 	}
@@ -954,7 +924,7 @@ public:
 	{
 		AsyncRet<void> waitRetVal;
 		operator()(p1, p2, p3);
-		waitRetVal.success = DelegateMemberAsyncWaitBase<void (TClass(Param1, Param2, Param3))>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -968,7 +938,6 @@ public:
 		Param2 param2 = delegateMsg->GetParam2();
 		Param3 param3 = delegateMsg->GetParam3();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			BaseType::operator()(param1, param2, param3);
@@ -997,18 +966,15 @@ public:
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(object, func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(object, func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
-		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
-	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { LockGuard::Create(&m_lock); }
-	virtual ~DelegateMemberAsyncWaitBase() { LockGuard::Destroy(&m_lock); }
+	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	virtual ~DelegateMemberAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
@@ -1045,8 +1011,7 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	LOCK m_lock;					// Lock to synchronize threads
-	int m_refCnt;					// Ref count to determine when to delete objects
+	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateMemberAsyncWaitBase& s) {
@@ -1097,7 +1062,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 			return m_retVal;
 		}
@@ -1108,7 +1072,7 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()(p1, p2, p3, p4);
-		waitRetVal.success = DelegateMemberAsyncWaitBase<RetType (TClass(Param1, Param2, Param3, Param4))>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -1123,7 +1087,6 @@ public:
 		Param3 param3 = delegateMsg->GetParam3();
 		Param4 param4 = delegateMsg->GetParam4();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			m_retVal = BaseType::operator()(param1, param2, param3, param4);
@@ -1183,7 +1146,6 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 		}
 	}
@@ -1193,7 +1155,7 @@ public:
 	{
 		AsyncRet<void> waitRetVal;
 		operator()(p1, p2, p3, p4);
-		waitRetVal.success = DelegateMemberAsyncWaitBase<void (TClass(Param1, Param2, Param3, Param4))>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -1208,7 +1170,6 @@ public:
 		Param3 param3 = delegateMsg->GetParam3();
 		Param4 param4 = delegateMsg->GetParam4();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			BaseType::operator()(param1, param2, param3, param4);
@@ -1237,18 +1198,15 @@ public:
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(object, func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(object, func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
-		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
-	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { LockGuard::Create(&m_lock); }
-	virtual ~DelegateMemberAsyncWaitBase() { LockGuard::Destroy(&m_lock); }
+	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	virtual ~DelegateMemberAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
@@ -1285,8 +1243,7 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	LOCK m_lock;					// Lock to synchronize threads
-	int m_refCnt;					// Ref count to determine when to delete objects
+	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateMemberAsyncWaitBase& s) {
@@ -1337,7 +1294,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 			return m_retVal;
 		}
@@ -1348,7 +1304,7 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()(p1, p2, p3, p4, p5);
-		waitRetVal.success = DelegateMemberAsyncWaitBase<RetType (TClass(Param1, Param2, Param3, Param4, Param5))>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -1364,7 +1320,6 @@ public:
 		Param4 param4 = delegateMsg->GetParam4();
 		Param4 param5 = delegateMsg->GetParam5();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			m_retVal = BaseType::operator()(param1, param2, param3, param4, param5);
@@ -1424,7 +1379,6 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 		}
 	}
@@ -1434,7 +1388,7 @@ public:
 	{
 		AsyncRet<void> waitRetVal;
 		operator()(p1, p2, p3, p4, p5);
-		waitRetVal.success = DelegateMemberAsyncWaitBase<void (TClass(Param1, Param2, Param3, Param4, Param5))>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -1450,7 +1404,6 @@ public:
 		Param4 param4 = delegateMsg->GetParam4();
 		Param5 param5 = delegateMsg->GetParam5();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			BaseType::operator()(param1, param2, param3, param4, param5);
@@ -1487,14 +1440,12 @@ public:
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(func, thread); 
-		LockGuard::Create(&m_lock);
 	}
 	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
-		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
-	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { LockGuard::Create(&m_lock); }
-	virtual ~DelegateFreeAsyncWaitBase() { LockGuard::Destroy(&m_lock); }
+	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	virtual ~DelegateFreeAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
 	void Bind(FreeFunc func, DelegateThread* thread) {
@@ -1525,8 +1476,7 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	LOCK m_lock;					// Lock to synchronize threads
-	int m_refCnt;					// Ref count to determine when to delete objects
+	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateFreeAsyncWaitBase& s) {
@@ -1572,7 +1522,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 			return m_retVal;
 		}
@@ -1583,13 +1532,12 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()();
-		waitRetVal.success = DelegateFreeAsyncWaitBase<RetType (void)>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			m_retVal = BaseType::operator()();
@@ -1646,7 +1594,6 @@ public:
 				// No return or param arguments
 			}
 
-            LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 		}
 	}
@@ -1656,13 +1603,12 @@ public:
 	{
 		AsyncRet<void> waitRetVal;
 		operator()();
-		waitRetVal.success = DelegateFreeAsyncWaitBase<void(void)>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			DelegateFreeAsyncWaitBase<void(void)>::operator()();
@@ -1689,14 +1635,12 @@ public:
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
-		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
-	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { LockGuard::Create(&m_lock); }
-	virtual ~DelegateFreeAsyncWaitBase() { LockGuard::Destroy(&m_lock); }
+	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	virtual ~DelegateFreeAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
 	void Bind(FreeFunc func, DelegateThread* thread) {
@@ -1727,8 +1671,7 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	LOCK m_lock;					// Lock to synchronize threads
-	int m_refCnt;					// Ref count to determine when to delete objects
+	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateFreeAsyncWaitBase& s) {
@@ -1775,7 +1718,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-    		LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 			return m_retVal;
 		}
@@ -1786,13 +1728,12 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()(p1);
-		waitRetVal.success = DelegateFreeAsyncWaitBase<RetType (Param1)>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
-		LockGuard lockGuard(&this->m_lock);
 		// Typecast the base pointer to back to the templatized instance
 		DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(msg.get());
 
@@ -1854,7 +1795,6 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 		}
 	}
@@ -1864,13 +1804,12 @@ public:
 	{
 		AsyncRet<void> waitRetVal;
 		operator()(p1);
-		waitRetVal.success = DelegateFreeAsyncWaitBase<void (Param1)>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
-		LockGuard lockGuard(&this->m_lock);
 		// Typecast the base pointer to back to the templatized instance
 		DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(msg.get());
 
@@ -1903,14 +1842,12 @@ public:
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
-		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
-	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { LockGuard::Create(&m_lock); }
-	virtual ~DelegateFreeAsyncWaitBase() { LockGuard::Destroy(&m_lock); }
+	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	virtual ~DelegateFreeAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
 	void Bind(FreeFunc func, DelegateThread* thread) {
@@ -1941,8 +1878,7 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	LOCK m_lock;					// Lock to synchronize threads
-	int m_refCnt;					// Ref count to determine when to delete objects
+	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateFreeAsyncWaitBase& s) {
@@ -1989,7 +1925,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 			return m_retVal;
 		}
@@ -2000,13 +1935,12 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()(p1, p2);
-		waitRetVal.success = DelegateFreeAsyncWaitBase<RetType (Param1, Param2)>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
-		LockGuard lockGuard(&this->m_lock);
 		// Typecast the base pointer to back to the templatized instance
 		DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(msg.get());
 
@@ -2020,7 +1954,6 @@ public:
 			this->m_sema.Signal();
 		}
 
-		// If waiting thread is no longer waiting then delete heap data
         this->m_refCnt--;
 	}
 
@@ -2070,7 +2003,6 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 		}
 	}
@@ -2080,7 +2012,7 @@ public:
 	{
 		AsyncRet<void> waitRetVal;
 		operator()(p1, p2);
-		waitRetVal.success = DelegateFreeAsyncWaitBase<void (Param1, Param2)>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -2093,7 +2025,6 @@ public:
 		Param1 param1 = delegateMsg->GetParam1();
 		Param2 param2 = delegateMsg->GetParam2();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			BaseType::operator()(param1, param2);
@@ -2120,14 +2051,12 @@ public:
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
-		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
-	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { LockGuard::Create(&m_lock); }
-	virtual ~DelegateFreeAsyncWaitBase() { LockGuard::Destroy(&m_lock); }
+	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	virtual ~DelegateFreeAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
 	void Bind(FreeFunc func, DelegateThread* thread) {
@@ -2158,8 +2087,7 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	LOCK m_lock;					// Lock to synchronize threads
-	int m_refCnt;					// Ref count to determine when to delete objects
+	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateFreeAsyncWaitBase& s) {
@@ -2206,7 +2134,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 			return m_retVal;
 		}
@@ -2217,7 +2144,7 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()(p1, p2, p3);
-		waitRetVal.success = DelegateFreeAsyncWaitBase<RetType (Param1, Param2, Param3)>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -2231,7 +2158,6 @@ public:
 		Param2 param2 = delegateMsg->GetParam2();
 		Param3 param3 = delegateMsg->GetParam3();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			m_retVal = BaseType::operator()(param1, param2, param3);
@@ -2287,7 +2213,6 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 		}
 	}
@@ -2297,7 +2222,7 @@ public:
 	{
 		AsyncRet<void> waitRetVal;
 		operator()(p1, p2, p3);
-		waitRetVal.success = DelegateFreeAsyncWaitBase<void (Param1, Param2, Param3)>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -2311,7 +2236,6 @@ public:
 		Param2 param2 = delegateMsg->GetParam2();
 		Param3 param3 = delegateMsg->GetParam3();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			BaseType::operator()(param1, param2, param3);
@@ -2338,14 +2262,12 @@ public:
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
-		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
-	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { LockGuard::Create(&m_lock); }
-	virtual ~DelegateFreeAsyncWaitBase() { LockGuard::Destroy(&m_lock); }
+	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	virtual ~DelegateFreeAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
 	void Bind(FreeFunc func, DelegateThread* thread) {
@@ -2376,8 +2298,7 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	LOCK m_lock;					// Lock to synchronize threads
-	int m_refCnt;					// Ref count to determine when to delete objects
+	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateFreeAsyncWaitBase& s) {
@@ -2424,7 +2345,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 			return m_retVal;
 		}
@@ -2435,7 +2355,7 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()(p1, p2, p3, p4);
-		waitRetVal.success = DelegateFreeAsyncWaitBase<RetType (Param1, Param2, Param3, Param4)>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -2450,7 +2370,6 @@ public:
 		Param3 param3 = delegateMsg->GetParam3();
 		Param4 param4 = delegateMsg->GetParam4();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			m_retVal = BaseType::operator()(param1, param2, param3, param4);
@@ -2506,7 +2425,6 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 		}
 	}
@@ -2516,7 +2434,7 @@ public:
 	{
 		AsyncRet<void> waitRetVal;
 		operator()(p1, p2, p3, p4);
-		waitRetVal.success = DelegateFreeAsyncWaitBase<void (Param1, Param2, Param3, Param4)>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -2531,7 +2449,6 @@ public:
 		Param3 param3 = delegateMsg->GetParam3();
 		Param4 param4 = delegateMsg->GetParam4();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			BaseType::operator()(param1, param2, param3, param4);
@@ -2558,14 +2475,12 @@ public:
 	// Contructors take a class instance, member function, and delegate thread
 	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
 		Bind(func, thread);
-		LockGuard::Create(&m_lock);
 	}
 	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
-		LockGuard::Create(&m_lock);
 		Swap(rhs);
 	}
-	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { LockGuard::Create(&m_lock); }
-	virtual ~DelegateFreeAsyncWaitBase() { LockGuard::Destroy(&m_lock); }
+	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	virtual ~DelegateFreeAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
 	void Bind(FreeFunc func, DelegateThread* thread) {
@@ -2596,8 +2511,7 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	LOCK m_lock;					// Lock to synchronize threads
-	int m_refCnt;					// Ref count to determine when to delete objects
+	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateFreeAsyncWaitBase& s) {
@@ -2644,7 +2558,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 			return m_retVal;
 		}
@@ -2655,7 +2568,7 @@ public:
 	{
 		AsyncRet<RetType> waitRetVal;
 		waitRetVal.retVal = operator()(p1, p2, p3, p4, p5);
-		waitRetVal.success = DelegateFreeAsyncWaitBase<RetType (Param1, Param2, Param3, Param4, Param5)>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -2671,7 +2584,6 @@ public:
 		Param4 param4 = delegateMsg->GetParam4();
 		Param5 param5 = delegateMsg->GetParam5();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			m_retVal = BaseType::operator()(param1, param2, param3, param4, param5);
@@ -2727,7 +2639,6 @@ public:
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
 
-			LockGuard lockGuard(&delegate->m_lock);
             delegate->m_refCnt--;
 		}
 	}
@@ -2737,7 +2648,7 @@ public:
 	{
 		AsyncRet<void> waitRetVal;
 		operator()(p1, p2, p3, p4, p5);
-		waitRetVal.success = DelegateFreeAsyncWaitBase<void (Param1, Param2, Param3, Param4, Param5)>::IsSuccess();
+		waitRetVal.success = BaseType::IsSuccess();
 		return waitRetVal;
 	}
 
@@ -2753,7 +2664,6 @@ public:
 		Param4 param4 = delegateMsg->GetParam4();
 		Param5 param5 = delegateMsg->GetParam5();
 
-		LockGuard lockGuard(&this->m_lock);
 		if (this->m_refCnt == 2) {
 			// Invoke the delegate function then signal the waiting thread
 			BaseType::operator()(param1, param2, param3, param4, param5);
