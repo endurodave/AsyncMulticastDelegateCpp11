@@ -8,7 +8,6 @@ LOCK Timer::m_lock;
 BOOL Timer::m_lockInit = FALSE;
 BOOL Timer::m_timerStopped = FALSE;
 list<Timer*> Timer::m_timers;
-const DWORD Timer::MS_PER_TICK = (1000 / CLOCKS_PER_SEC);
 
 //------------------------------------------------------------------------------
 // TimerDisabled
@@ -50,7 +49,7 @@ void Timer::Start(DWORD timeout)
 {
 	LockGuard lockGuard(&m_lock);
 
-	m_timeout = timeout / MS_PER_TICK;
+	m_timeout = timeout;
     ASSERT_TRUE(m_timeout != 0);
 	m_expireTime = GetTime();
 	m_enabled = TRUE;
@@ -133,7 +132,9 @@ void Timer::ProcessTimers()
 
 DWORD Timer::GetTime()
 {
-    auto timeStamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    return (DWORD)timeStamp;
+    unsigned long milliseconds_since_epoch =
+        std::chrono::duration_cast<std::chrono::milliseconds>
+        (std::chrono::system_clock::now().time_since_epoch()).count();
+    return (DWORD)milliseconds_since_epoch;
 }
 

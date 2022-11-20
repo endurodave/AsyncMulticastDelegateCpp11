@@ -12,8 +12,6 @@ using namespace DelegateLib;
 class Timer 
 {
 public:
-	static const DWORD MS_PER_TICK;
-
 	/// Client's register with Expired to get timer callbacks
 	SinglecastDelegate<void(void)> Expired;
 
