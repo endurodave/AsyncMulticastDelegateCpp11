@@ -240,7 +240,7 @@ int main(void)
 	DelegateMember<void (TestClass(TestStruct*))> delegateMember2 = MakeDelegate(&testClass, &TestClass::MemberFunc);
 	delegateMember2(&testStruct);
 
-	// Create a multicast delegate container that accepts Delegate1<int> delegates.
+	// Create a multicast delegate container that accepts Delegate<void (int)> delegates.
 	// Any function with the signature "void Func(int)".
 	MulticastDelegate<void (int)> delegateA;
 
@@ -254,11 +254,11 @@ int main(void)
 	// Remove the delegate from the container
 	delegateA -= MakeDelegate(&FreeFuncInt);
 
-	// Create a multicast delegate container that accepts Delegate<TestStruct*> delegates
+	// Create a multicast delegate container that accepts Delegate<void (TestStruct*)> delegates
 	// Any function with the signature "void Func(TestStruct*)".
 	MulticastDelegate<void(TestStruct*)> delegateB;
 
-	// Add a DelegateMember1<TestStruct*> delegate to the container
+	// Add a DelegateMember<TestStruct*> delegate to the container
 	delegateB += MakeDelegate(&testClass, &TestClass::MemberFunc);
 
 	// Invoke the delegate target member function TestClass::MemberFunc()
@@ -268,11 +268,11 @@ int main(void)
 	// Remove the delegate from the container
 	delegateB -= MakeDelegate(&testClass, &TestClass::MemberFunc);
 
-	// Create a thread-safe multicast delegate container that accepts Delegate<TestStruct*> delegates
+	// Create a thread-safe multicast delegate container that accepts Delegate<void (TestStruct*)> delegates
 	// Any function with the signature "void Func(TestStruct*)".
 	MulticastDelegateSafe<void (TestStruct*)> delegateC;
 
-	// Add a DelegateMember1<TestStruct*> delegate to the container that will invoke on workerThread1
+	// Add a DelegateMember<TestStruct*> delegate to the container that will invoke on workerThread1
 	delegateC += MakeDelegate(&testClass, &TestClass::MemberFunc, &workerThread1);
 
 	// Asynchronously invoke the delegate target member function TestClass::MemberFunc()
@@ -282,7 +282,7 @@ int main(void)
 	// Remove the delegate from the container
 	delegateC -= MakeDelegate(&testClass, &TestClass::MemberFunc, &workerThread1);
 
-	// Create a thread-safe multicast delegate container that accepts Delegate<TestStruct&, float, int**> delegates
+	// Create a thread-safe multicast delegate container that accepts Delegate<void (TestStruct&, float, int**)> delegates
 	// Any function with the signature "void Func(const TestStruct&, float, int**)".
 	MulticastDelegateSafe<void (const TestStruct&, float, int**)> delegateD;
 
@@ -300,11 +300,11 @@ int main(void)
 	// Remove the delegate from the container
 	delegateD -= MakeDelegate(&testClass, &TestClass::MemberFuncThreeArgs, &workerThread1);
 
-	// Create a thread-safe multicast delegate container that accepts Delegate<TestStructNoCopy*> delegates
+	// Create a thread-safe multicast delegate container that accepts Delegate<void (TestStructNoCopy*)> delegates
 	// Any function with the signature "void Func(TestStructNoCopy*)".
 	MulticastDelegateSafe<void (TestStructNoCopy*)> delegateE;
 
-	// Add a DelegateMember1<TestStructNoCopy*> delegate to the container that will invoke on workerThread1
+	// Add a DelegateMember<TestStructNoCopy*> delegate to the container that will invoke on workerThread1
 	delegateE += MakeDelegate(&testClass, &TestClass::MemberFuncNoCopy, &workerThread1);
 
 	// Asynchronously invoke the delegate target member function TestClass::MemberFuncNoCopy().
@@ -316,7 +316,7 @@ int main(void)
 	// Remove the delegate from the container
 	delegateE -= MakeDelegate(&testClass, &TestClass::MemberFuncNoCopy, &workerThread1);
 
-	// Create a singlecast delegate container that accepts Delegate1<int, int> delegates.
+	// Create a singlecast delegate container that accepts Delegate<int (int)> delegates.
 	// Any function with the signature "int Func(int)".
 	SinglecastDelegate<int (int)> delegateF;
 
