@@ -10,7 +10,6 @@
 #include "DelegateInvoker.h"
 #include "Semaphore.h"
 #include <memory>
-#include <atomic>
 
 /// @brief Asynchronous member delegate that invokes the target function on the specified thread of control
 /// and waits for the function to be executed or a timeout occurs. Use IsSuccess() to determine if asynchronous 
@@ -70,16 +69,16 @@ public:
     using BaseType = DelegateMember<RetType(TClass(void))>;
 	
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(object, func, thread); 
 	}
-	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(object, func, thread);
 	}
-	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs) {
 		Swap(rhs);
 	}
-	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0) { }
 	virtual ~DelegateMemberAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
@@ -114,7 +113,6 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateMemberAsyncWaitBase& s) {
@@ -149,7 +147,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -164,7 +161,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-            delegate->m_refCnt--;
     		return m_retVal;
 		}
 	}
@@ -179,13 +175,9 @@ public:
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			m_retVal = BaseType::operator()();
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		m_retVal = BaseType::operator()();
+		this->m_sema.Signal();
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -223,7 +215,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -238,8 +229,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout))) {
 				// No return or param arguments
 			}
-
-            delegate->m_refCnt--;
 		}
 	}
 
@@ -254,13 +243,9 @@ public:
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			BaseType::operator()();
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		BaseType::operator()();
+		this->m_sema.Signal();
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -280,16 +265,16 @@ public:
     using BaseType = DelegateMember<RetType(TClass(Param1))>;
 	
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(object, func, thread);
 	}
-	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(object, func, thread);
 	}
-	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs) {
 		Swap(rhs);
 	}
-	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0) { }
 	virtual ~DelegateMemberAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
@@ -327,7 +312,6 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-    std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateMemberAsyncWaitBase& s) {
@@ -363,7 +347,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -378,7 +361,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -400,13 +382,9 @@ public:
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			m_retVal = BaseType::operator()(param1);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		m_retVal = BaseType::operator()(param1);
+		this->m_sema.Signal();
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -445,7 +423,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -458,8 +435,6 @@ public:
 
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
-
-            delegate->m_refCnt--;
 		}
 	}
 
@@ -480,13 +455,9 @@ public:
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			BaseType::operator()(param1);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		BaseType::operator()(param1);
+		this->m_sema.Signal();
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -506,16 +477,16 @@ public:
     using BaseType = DelegateMember<RetType(TClass(Param1, Param2))>;
 	
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(object, func, thread);
 	}
-	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(object, func, thread);
 	}
-	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs) {
 		Swap(rhs);
 	}
-	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0) { }
 	virtual ~DelegateMemberAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
@@ -553,7 +524,6 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-    std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateMemberAsyncWaitBase& s) {
@@ -589,7 +559,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -604,7 +573,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -627,13 +595,9 @@ public:
 		Param1 param1 = delegateMsg->GetParam1();
 		Param2 param2 = delegateMsg->GetParam2();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			m_retVal = BaseType::operator()(param1, param2);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		m_retVal = BaseType::operator()(param1, param2);
+		this->m_sema.Signal();
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -672,7 +636,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -685,8 +648,6 @@ public:
 
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
-
-            delegate->m_refCnt--;
 		}
 	}
 
@@ -708,13 +669,9 @@ public:
 		Param1 param1 = delegateMsg->GetParam1();
 		Param2 param2 = delegateMsg->GetParam2();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			BaseType::operator()(param1, param2);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		BaseType::operator()(param1, param2);
+		this->m_sema.Signal();
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -734,16 +691,16 @@ public:
     using BaseType = DelegateMember<RetType(TClass(Param1, Param2, Param3))>;
 	
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(object, func, thread);
 	}
-	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(object, func, thread);
 	}
-	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs) {
 		Swap(rhs);
 	}
-	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0) { }
 	virtual ~DelegateMemberAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
@@ -781,7 +738,6 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateMemberAsyncWaitBase& s) {
@@ -817,7 +773,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -832,7 +787,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -856,13 +810,9 @@ public:
 		Param2 param2 = delegateMsg->GetParam2();
 		Param3 param3 = delegateMsg->GetParam3();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			m_retVal = BaseType::operator()(param1, param2, param3);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		m_retVal = BaseType::operator()(param1, param2, param3);
+		this->m_sema.Signal();
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -901,7 +851,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -914,8 +863,6 @@ public:
 
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
-
-            delegate->m_refCnt--;
 		}
 	}
 
@@ -938,13 +885,9 @@ public:
 		Param2 param2 = delegateMsg->GetParam2();
 		Param3 param3 = delegateMsg->GetParam3();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			BaseType::operator()(param1, param2, param3);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		BaseType::operator()(param1, param2, param3);
+		this->m_sema.Signal();
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -964,16 +907,16 @@ public:
     using BaseType = DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4))>;
 
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(object, func, thread);
 	}
-	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(object, func, thread);
 	}
-	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs) {
 		Swap(rhs);
 	}
-	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0) { }
 	virtual ~DelegateMemberAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
@@ -1011,7 +954,6 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateMemberAsyncWaitBase& s) {
@@ -1047,7 +989,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -1062,7 +1003,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -1087,13 +1027,9 @@ public:
 		Param3 param3 = delegateMsg->GetParam3();
 		Param4 param4 = delegateMsg->GetParam4();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			m_retVal = BaseType::operator()(param1, param2, param3, param4);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		m_retVal = BaseType::operator()(param1, param2, param3, param4);
+		this->m_sema.Signal();
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -1132,7 +1068,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -1145,8 +1080,6 @@ public:
 
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
-
-            delegate->m_refCnt--;
 		}
 	}
 
@@ -1170,13 +1103,9 @@ public:
 		Param3 param3 = delegateMsg->GetParam3();
 		Param4 param4 = delegateMsg->GetParam4();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			BaseType::operator()(param1, param2, param3, param4);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		BaseType::operator()(param1, param2, param3, param4);
+		this->m_sema.Signal();
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -1196,16 +1125,16 @@ public:
     using BaseType = DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>;
 	
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(ObjectPtr object, MemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(object, func, thread);
 	}
-	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(object, func, thread);
 	}
-	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
+	DelegateMemberAsyncWaitBase(const DelegateMemberAsyncWaitBase& rhs) : BaseType(rhs) {
 		Swap(rhs);
 	}
-	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	DelegateMemberAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0) { }
 	virtual ~DelegateMemberAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
@@ -1243,7 +1172,6 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateMemberAsyncWaitBase& s) {
@@ -1279,7 +1207,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -1294,7 +1221,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -1320,13 +1246,9 @@ public:
 		Param4 param4 = delegateMsg->GetParam4();
 		Param4 param5 = delegateMsg->GetParam5();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			m_retVal = BaseType::operator()(param1, param2, param3, param4, param5);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		m_retVal = BaseType::operator()(param1, param2, param3, param4, param5);
+		this->m_sema.Signal();
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -1365,7 +1287,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -1378,8 +1299,6 @@ public:
 
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
-
-            delegate->m_refCnt--;
 		}
 	}
 
@@ -1404,13 +1323,9 @@ public:
 		Param4 param4 = delegateMsg->GetParam4();
 		Param5 param5 = delegateMsg->GetParam5();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			BaseType::operator()(param1, param2, param3, param4, param5);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		BaseType::operator()(param1, param2, param3, param4, param5);
+		this->m_sema.Signal();
 	}
 
 	DelegateMemberAsyncWait& operator=(const DelegateMemberAsyncWait& rhs) {
@@ -1438,13 +1353,13 @@ public:
     using BaseType = DelegateFree<RetType(void)>;
 
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(func, thread); 
 	}
-	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs) {
 		Swap(rhs);
 	}
-	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0) { }
 	virtual ~DelegateFreeAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
@@ -1476,7 +1391,6 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateFreeAsyncWaitBase& s) {
@@ -1507,7 +1421,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -1522,7 +1435,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -1538,13 +1450,9 @@ public:
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			m_retVal = BaseType::operator()();
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		m_retVal = BaseType::operator()();
+		this->m_sema.Signal();
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -1578,7 +1486,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -1593,8 +1500,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout))) {
 				// No return or param arguments
 			}
-
-            delegate->m_refCnt--;
 		}
 	}
 
@@ -1609,13 +1514,9 @@ public:
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			DelegateFreeAsyncWaitBase<void(void)>::operator()();
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		DelegateFreeAsyncWaitBase<void(void)>::operator()();
+		this->m_sema.Signal();
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -1633,13 +1534,13 @@ public:
     using BaseType = DelegateFree<RetType(Param1)>;
 
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(func, thread);
 	}
-	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs) {
 		Swap(rhs);
 	}
-	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0) { }
 	virtual ~DelegateFreeAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
@@ -1671,7 +1572,6 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateFreeAsyncWaitBase& s) {
@@ -1703,7 +1603,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -1718,7 +1617,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -1740,13 +1638,9 @@ public:
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			m_retVal = BaseType::operator()(param1);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		m_retVal = BaseType::operator()(param1);
+		this->m_sema.Signal();
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -1781,7 +1675,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -1794,8 +1687,6 @@ public:
 
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
-
-            delegate->m_refCnt--;
 		}
 	}
 
@@ -1816,13 +1707,9 @@ public:
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			BaseType::operator()(param1);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		BaseType::operator()(param1);
+		this->m_sema.Signal();
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -1840,13 +1727,13 @@ public:
     using BaseType = DelegateFree<RetType(Param1, Param2)>;
 
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(func, thread);
 	}
-	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs) {
 		Swap(rhs);
 	}
-	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0) { }
 	virtual ~DelegateFreeAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
@@ -1878,7 +1765,6 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateFreeAsyncWaitBase& s) {
@@ -1910,7 +1796,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -1925,7 +1810,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -1948,13 +1832,9 @@ public:
 		Param1 param1 = delegateMsg->GetParam1();
 		Param2 param2 = delegateMsg->GetParam2();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			m_retVal = BaseType::operator()(param1, param2);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		m_retVal = BaseType::operator()(param1, param2);
+		this->m_sema.Signal();
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -1989,7 +1869,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -2002,8 +1881,6 @@ public:
 
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
-
-            delegate->m_refCnt--;
 		}
 	}
 
@@ -2025,13 +1902,9 @@ public:
 		Param1 param1 = delegateMsg->GetParam1();
 		Param2 param2 = delegateMsg->GetParam2();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			BaseType::operator()(param1, param2);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		BaseType::operator()(param1, param2);
+		this->m_sema.Signal();
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2049,13 +1922,13 @@ public:
     using BaseType = DelegateFree<RetType(Param1, Param2, Param3)>;
 
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(func, thread);
 	}
-	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs) {
 		Swap(rhs);
 	}
-	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0) { }
 	virtual ~DelegateFreeAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
@@ -2087,7 +1960,6 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateFreeAsyncWaitBase& s) {
@@ -2119,7 +1991,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -2134,7 +2005,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -2158,13 +2028,9 @@ public:
 		Param2 param2 = delegateMsg->GetParam2();
 		Param3 param3 = delegateMsg->GetParam3();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			m_retVal = BaseType::operator()(param1, param2, param3);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		m_retVal = BaseType::operator()(param1, param2, param3);
+		this->m_sema.Signal();
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2199,7 +2065,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -2212,8 +2077,6 @@ public:
 
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
-
-            delegate->m_refCnt--;
 		}
 	}
 
@@ -2236,13 +2099,9 @@ public:
 		Param2 param2 = delegateMsg->GetParam2();
 		Param3 param3 = delegateMsg->GetParam3();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			BaseType::operator()(param1, param2, param3);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		BaseType::operator()(param1, param2, param3);
+		this->m_sema.Signal();
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2260,13 +2119,13 @@ public:
     using BaseType = DelegateFree<RetType(Param1, Param2, Param3, Param4)>;
 
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(func, thread);
 	}
-	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs) {
 		Swap(rhs);
 	}
-	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0) { }
 	virtual ~DelegateFreeAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
@@ -2298,7 +2157,6 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateFreeAsyncWaitBase& s) {
@@ -2330,7 +2188,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -2345,7 +2202,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -2370,13 +2226,9 @@ public:
 		Param3 param3 = delegateMsg->GetParam3();
 		Param4 param4 = delegateMsg->GetParam4();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			m_retVal = BaseType::operator()(param1, param2, param3, param4);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		m_retVal = BaseType::operator()(param1, param2, param3, param4);
+		this->m_sema.Signal();
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2411,7 +2263,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -2424,8 +2275,6 @@ public:
 
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
-
-            delegate->m_refCnt--;
 		}
 	}
 
@@ -2449,13 +2298,9 @@ public:
 		Param3 param3 = delegateMsg->GetParam3();
 		Param4 param4 = delegateMsg->GetParam4();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			BaseType::operator()(param1, param2, param3, param4);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		BaseType::operator()(param1, param2, param3, param4);
+		this->m_sema.Signal();
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2473,13 +2318,13 @@ public:
     using BaseType = DelegateFree<RetType(Param1, Param2, Param3, Param4, Param5)>;
 
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(FreeFunc func, DelegateThread* thread, int timeout) : m_success(false), m_timeout(timeout) {
 		Bind(func, thread);
 	}
-	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs), m_refCnt(0) {
+	DelegateFreeAsyncWaitBase(const DelegateFreeAsyncWaitBase& rhs) : BaseType(rhs) {
 		Swap(rhs);
 	}
-	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0), m_refCnt(0) { }
+	DelegateFreeAsyncWaitBase() : m_thread(0), m_success(false), m_timeout(0) { }
 	virtual ~DelegateFreeAsyncWaitBase() { }
 
 	/// Bind a member function to a delegate. 
@@ -2511,7 +2356,6 @@ protected:
 	bool m_success;					// Set to true if async function succeeds
 	int m_timeout;					// Time in mS to wait for async function to invoke
 	Semaphore m_sema;				// Semaphore to signal waiting thread
-	std::atomic_int m_refCnt;		// Ref count to determine when to delete objects
 
 private:
 	void Swap(const DelegateFreeAsyncWaitBase& s) {
@@ -2543,7 +2387,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -2558,7 +2401,6 @@ public:
 			if ((this->m_success = delegate->m_sema.Wait(this->m_timeout)))
 				m_retVal = delegate->m_retVal;
 
-            delegate->m_refCnt--;
 			return m_retVal;
 		}
 	}
@@ -2584,13 +2426,9 @@ public:
 		Param4 param4 = delegateMsg->GetParam4();
 		Param5 param5 = delegateMsg->GetParam5();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			m_retVal = BaseType::operator()(param1, param2, param3, param4, param5);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		m_retVal = BaseType::operator()(param1, param2, param3, param4, param5);
+		this->m_sema.Signal();
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {
@@ -2625,7 +2463,6 @@ public:
 		else {
 			// Create a clone instance of this delegate 
 			auto delegate = std::shared_ptr<ClassType>(Clone());
-			delegate->m_refCnt = 2;
 			delegate->m_sema.Create();
 			delegate->m_sema.Reset();
 
@@ -2638,8 +2475,6 @@ public:
 
 			// Wait for target thread to execute the delegate function
 			this->m_success = delegate->m_sema.Wait(this->m_timeout);
-
-            delegate->m_refCnt--;
 		}
 	}
 
@@ -2664,13 +2499,9 @@ public:
 		Param4 param4 = delegateMsg->GetParam4();
 		Param5 param5 = delegateMsg->GetParam5();
 
-		if (this->m_refCnt == 2) {
-			// Invoke the delegate function then signal the waiting thread
-			BaseType::operator()(param1, param2, param3, param4, param5);
-			this->m_sema.Signal();
-		}
-
-        this->m_refCnt--;
+		// Invoke the delegate function then signal the waiting thread
+		BaseType::operator()(param1, param2, param3, param4, param5);
+		this->m_sema.Signal();
 	}
 
 	DelegateFreeAsyncWait& operator=(const DelegateFreeAsyncWait& rhs) {

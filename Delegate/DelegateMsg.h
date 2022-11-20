@@ -27,6 +27,8 @@ public:
 		ASSERT_TRUE(m_invoker != 0);
 	}
 
+    virtual ~DelegateMsgBase() {}
+
 	/// Get the delegate invoker instance the delegate is registered with.
 	/// @return The invoker instance. 
     std::shared_ptr<IDelegateInvoker> GetDelegateInvoker() const { return m_invoker; }
