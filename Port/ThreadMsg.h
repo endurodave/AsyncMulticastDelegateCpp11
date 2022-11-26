@@ -1,7 +1,6 @@
 #ifndef _THREAD_MSG_H
 #define _THREAD_MSG_H
 
-#include "DataTypes.h"
 #if USE_XALLOCATOR
 	#include "xallocator.h"
 #endif
