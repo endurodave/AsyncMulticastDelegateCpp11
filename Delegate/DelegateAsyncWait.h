@@ -142,7 +142,7 @@ public:
 	
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()() {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			return BaseType::operator()();
 		else {
 			// Create a clone instance of this delegate 
@@ -210,7 +210,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()() override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			BaseType::operator()();
 		else {
 			// Create a clone instance of this delegate 
@@ -342,7 +342,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1) override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			return BaseType::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
@@ -418,7 +418,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1) override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			BaseType::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
@@ -554,7 +554,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2) override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			return BaseType::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
@@ -631,7 +631,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2) override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			BaseType::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
@@ -768,7 +768,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3) {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			return BaseType::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
@@ -846,7 +846,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3) override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			BaseType::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
@@ -984,7 +984,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			return BaseType::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
@@ -1063,7 +1063,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			BaseType::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
@@ -1202,7 +1202,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			return BaseType::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
@@ -1282,7 +1282,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			BaseType::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
@@ -1416,7 +1416,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()() {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			return BaseType::operator()();
 		else {
 			// Create a clone instance of this delegate 
@@ -1481,7 +1481,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()() override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			return BaseType::operator()();
 		else {
 			// Create a clone instance of this delegate 
@@ -1598,7 +1598,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1) {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			return BaseType::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
@@ -1670,7 +1670,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1) override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			BaseType::operator()(p1);
 		else {
 			// Create a clone instance of this delegate 
@@ -1791,7 +1791,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2) {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			return BaseType::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
@@ -1864,7 +1864,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2) override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			BaseType::operator()(p1, p2);
 		else {
 			// Create a clone instance of this delegate 
@@ -1986,7 +1986,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3) {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			return BaseType::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
@@ -2060,7 +2060,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3) override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			BaseType::operator()(p1, p2, p3);
 		else {
 			// Create a clone instance of this delegate 
@@ -2183,7 +2183,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			return BaseType::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
@@ -2258,7 +2258,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			BaseType::operator()(p1, p2, p3, p4);
 		else {
 			// Create a clone instance of this delegate 
@@ -2382,7 +2382,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual RetType operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			return BaseType::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
@@ -2458,7 +2458,7 @@ public:
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override {
-		if (this->m_thread == 0)
+		if (this->m_thread == nullptr)
 			BaseType::operator()(p1, p2, p3, p4, p5);
 		else {
 			// Create a clone instance of this delegate 
