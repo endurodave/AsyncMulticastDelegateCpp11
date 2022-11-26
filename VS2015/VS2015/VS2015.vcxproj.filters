@@ -35,9 +35,6 @@
     <ClInclude Include="..\..\Delegate\DelegateMsg.h">
       <Filter>Delegate</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Delegate\DelegateThread.h">
-      <Filter>Delegate</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Delegate\MulticastDelegate.h">
       <Filter>Delegate</Filter>
     </ClInclude>
@@ -112,6 +109,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Port\Timer.h">
       <Filter>Port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Delegate\IDelegateThread.h">
+      <Filter>Delegate</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

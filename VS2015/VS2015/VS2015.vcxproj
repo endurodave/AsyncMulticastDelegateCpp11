@@ -157,8 +157,8 @@
     <ClInclude Include="..\..\Delegate\DelegateLib.h" />
     <ClInclude Include="..\..\Delegate\DelegateMsg.h" />
     <ClInclude Include="..\..\Delegate\DelegateSp.h" />
-    <ClInclude Include="..\..\Delegate\DelegateThread.h" />
     <ClInclude Include="..\..\Delegate\DelegateTransport.h" />
+    <ClInclude Include="..\..\Delegate\IDelegateThread.h" />
     <ClInclude Include="..\..\Delegate\LockGuard.h" />
     <ClInclude Include="..\..\Delegate\MulticastDelegate.h" />
     <ClInclude Include="..\..\Delegate\MulticastDelegateBase.h" />
