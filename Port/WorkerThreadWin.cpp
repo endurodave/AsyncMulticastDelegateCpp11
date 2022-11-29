@@ -53,6 +53,8 @@ unsigned long WorkerThread::Process(void* parameter)
 
                 // Invoke the callback on the target thread
                 delegateMsg->GetDelegateInvoker()->DelegateInvoke(delegateMsg);
+
+                delete threadMsg;
 				break;
 			}
 
