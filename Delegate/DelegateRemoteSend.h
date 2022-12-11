@@ -42,7 +42,7 @@ public:
 private:
 	IDelegateTransport& m_transport;    // Object sends data to remote
     std::iostream& m_stream;            // Storage for remote message 
-    DelegateIdType m_id;                // Remote delegate identifier
+    DelegateIdType m_id = 0;                // Remote delegate identifier
 };
 
 template <class Param1, class Param2>
@@ -73,7 +73,7 @@ public:
 private:
     IDelegateTransport & m_transport;   // Object sends data to remote
     std::iostream& m_stream;            // Storage for remote message 
-    DelegateIdType m_id;                // Remote delegate identifier
+    DelegateIdType m_id = 0;                // Remote delegate identifier
 };
 
 template <class Param1, class Param2, class Param3>
@@ -105,7 +105,7 @@ public:
 private:
     IDelegateTransport & m_transport;   // Object sends data to remote
     std::iostream& m_stream;            // Storage for remote message 
-    DelegateIdType m_id;                // Remote delegate identifier
+    DelegateIdType m_id = 0;                // Remote delegate identifier
 };
 
 template <class Param1, class Param2, class Param3, class Param4>
@@ -138,7 +138,7 @@ public:
 private:
     IDelegateTransport & m_transport;   // Object sends data to remote
     std::iostream& m_stream;            // Storage for remote message 
-    DelegateIdType m_id;                // Remote delegate identifier
+    DelegateIdType m_id = 0;                // Remote delegate identifier
 };
 
 template <class Param1, class Param2, class Param3, class Param4, class Param5>
@@ -172,7 +172,7 @@ public:
 private:
     IDelegateTransport & m_transport;   // Object sends data to remote
     std::iostream& m_stream;            // Storage for remote message 
-    DelegateIdType m_id;                // Remote delegate identifier
+    DelegateIdType m_id = 0;                // Remote delegate identifier
 };
 
 //N=1

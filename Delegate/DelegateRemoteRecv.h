@@ -105,7 +105,7 @@ public:
     }
 
     private:
-        DelegateIdType m_id;               // Remote delegate identifier
+        DelegateIdType m_id = 0;               // Remote delegate identifier
 };
 
 template <class TClass, class Param1, class Param2>
@@ -167,7 +167,7 @@ public:
     }
 
 private:
-    DelegateIdType m_id;               // Remote delegate identifier
+    DelegateIdType m_id = 0;               // Remote delegate identifier
 };
 
 template <class TClass, class Param1, class Param2, class Param3>
@@ -234,7 +234,7 @@ public:
     }
 
 private:
-    DelegateIdType m_id;               // Remote delegate identifier
+    DelegateIdType m_id = 0;               // Remote delegate identifier
 };
 
 template <class TClass, class Param1, class Param2, class Param3, class Param4>
@@ -304,7 +304,7 @@ public:
     }
 
 private:
-    DelegateIdType m_id;               // Remote delegate identifier
+    DelegateIdType m_id = 0;               // Remote delegate identifier
 };
 
 template <class TClass, class Param1, class Param2, class Param3, class Param4, class Param5>
@@ -379,7 +379,7 @@ public:
     }
 
 private:
-    DelegateIdType m_id;               // Remote delegate identifier
+    DelegateIdType m_id = 0;               // Remote delegate identifier
 };
 
 // Declare DelegateFreeRemoteRecv as a class template. It will be specialized for all number of arguments.
@@ -426,7 +426,7 @@ public:
     }
 
 private:
-    DelegateIdType m_id;               // Remote delegate identifier
+    DelegateIdType m_id = 0;               // Remote delegate identifier
 };
 
 template <class Param1, class Param2>
@@ -473,7 +473,7 @@ public:
     }
 
 private:
-    DelegateIdType m_id;               // Remote delegate identifier
+    DelegateIdType m_id = 0;               // Remote delegate identifier
 };
 
 template <class Param1, class Param2, class Param3>
@@ -524,7 +524,7 @@ public:
     }
 
 private:
-    DelegateIdType m_id;               // Remote delegate identifier
+    DelegateIdType m_id = 0;               // Remote delegate identifier
 };
 
 template <class Param1, class Param2, class Param3, class Param4>
@@ -579,7 +579,7 @@ public:
     }
 
 private:
-    DelegateIdType m_id;               // Remote delegate identifier
+    DelegateIdType m_id = 0;               // Remote delegate identifier
 };
 
 template <class Param1, class Param2, class Param3, class Param4, class Param5>
@@ -638,7 +638,7 @@ public:
     }
 
 private:
-    DelegateIdType m_id;               // Remote delegate identifier
+    DelegateIdType m_id = 0;               // Remote delegate identifier
 };
 
 //N=1

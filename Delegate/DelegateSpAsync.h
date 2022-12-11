@@ -29,9 +29,9 @@ public:
     using BaseType = DelegateMemberSp<void(TClass(void))>;
 
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
-	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
-	DelegateMemberSpAsync() : m_thread(0) { }
+	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
@@ -77,7 +77,7 @@ public:
 
 private:
 	/// Target thread to invoke the delegate function
-	DelegateThread* m_thread;
+	DelegateThread* m_thread = nullptr;
 };
 
 template <class TClass, class Param1> 
@@ -90,9 +90,9 @@ public:
     using BaseType = DelegateMemberSp<void(TClass(Param1))>;
 
 	// Contructors take a class instance, member function, and callback thread
-	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
-	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
-	DelegateMemberSpAsync() : m_thread(0) { }
+	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
@@ -150,7 +150,7 @@ public:
 
 private:
 	/// Target thread to invoke the delegate function
-	DelegateThread* m_thread;
+	DelegateThread* m_thread = nullptr;
 };
 
 template <class TClass, class Param1, class Param2> 
@@ -163,9 +163,9 @@ public:
     using BaseType = DelegateMemberSp<void(TClass(Param1, Param2))>;
 
 	// Contructors take a class instance, member function, and callback thread
-	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
-	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
-	DelegateMemberSpAsync() : m_thread(0) { }
+	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
@@ -226,7 +226,7 @@ public:
 
 private:
 	/// Target thread to invoke the delegate function
-	DelegateThread* m_thread;
+	DelegateThread* m_thread = nullptr;
 };
 
 template <class TClass, class Param1, class Param2, class Param3> 
@@ -239,9 +239,9 @@ public:
     using BaseType = DelegateMemberSp<void(TClass(Param1, Param2, Param3))>;
 
 	// Contructors take a class instance, member function, and callback thread
-	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
-	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
-	DelegateMemberSpAsync() : m_thread(0) { }
+	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
@@ -305,7 +305,7 @@ public:
 
 private:
 	/// Target thread to invoke the delegate function
-	DelegateThread* m_thread;
+	DelegateThread* m_thread = nullptr;
 };
 
 template <class TClass, class Param1, class Param2, class Param3, class Param4> 
@@ -318,9 +318,9 @@ public:
     using BaseType = DelegateMemberSp<void(TClass(Param1, Param2, Param3, Param4))>;
 
 	// Contructors take a class instance, member function, and callback thread
-	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
-	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
-	DelegateMemberSpAsync() : m_thread(0) { }
+	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
@@ -387,7 +387,7 @@ public:
 
 private:
 	/// Target thread to invoke the delegate function
-	DelegateThread* m_thread;
+	DelegateThread* m_thread = nullptr;
 };
 
 template <class TClass, class Param1, class Param2, class Param3, class Param4, class Param5> 
@@ -400,9 +400,9 @@ public:
     using BaseType = DelegateMemberSp<void(TClass(Param1, Param2, Param3, Param4, Param5))>;
 
 	// Contructors take a class instance, member function, and callback thread
-	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
-	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) { Bind(object, func, thread); }
-	DelegateMemberSpAsync() : m_thread(0) { }
+	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
@@ -472,7 +472,7 @@ public:
 
 private:
 	/// Target thread to invoke the delegate function
-	DelegateThread* m_thread;
+	DelegateThread* m_thread = nullptr;
 };
 
 //N=0

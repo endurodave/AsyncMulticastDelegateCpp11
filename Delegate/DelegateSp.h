@@ -29,7 +29,7 @@ public:
 
 	DelegateMemberSp(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMemberSp(ObjectPtr object, ConstMemberFunc func) { Bind(object, func); }
-	DelegateMemberSp() : m_object(0), m_func(0) { }
+	DelegateMemberSp() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func) {
@@ -63,8 +63,8 @@ public:
 	explicit operator bool() const { return !Empty();  }
 
 private:
-	ObjectPtr m_object;		// Pointer to a class object
-	MemberFunc m_func;   	// Pointer to an instance member function
+	ObjectPtr m_object = nullptr;		// Pointer to a class object
+	MemberFunc m_func = nullptr;   	// Pointer to an instance member function
 };
 
 template <class TClass, class RetType, class Param1> 
@@ -78,7 +78,7 @@ public:
 
 	DelegateMemberSp(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMemberSp(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
-	DelegateMemberSp() : m_object(0), m_func(0) { }
+	DelegateMemberSp() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func) {
@@ -112,8 +112,8 @@ public:
 	explicit operator bool() const { return !Empty();  }
 
 private:
-	ObjectPtr m_object;		// Pointer to a class object
-	MemberFunc m_func;   	// Pointer to an instance member function
+	ObjectPtr m_object = nullptr;		// Pointer to a class object
+	MemberFunc m_func = nullptr;   	// Pointer to an instance member function
 };
 
 template <class TClass, class RetType, class Param1, class Param2> 
@@ -127,7 +127,7 @@ public:
 
 	DelegateMemberSp(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMemberSp(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
-	DelegateMemberSp() : m_object(0), m_func(0) { }
+	DelegateMemberSp() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func) {
@@ -161,8 +161,8 @@ public:
 	explicit operator bool() const { return !Empty();  }
 
 private:
-	ObjectPtr m_object;		// Pointer to a class object
-	MemberFunc m_func;   	// Pointer to an instance member function
+	ObjectPtr m_object = nullptr;		// Pointer to a class object
+	MemberFunc m_func = nullptr;   	// Pointer to an instance member function
 };
 
 template <class TClass, class RetType, class Param1, class Param2, class Param3> 
@@ -176,7 +176,7 @@ public:
 
 	DelegateMemberSp(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMemberSp(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
-	DelegateMemberSp() : m_object(0), m_func(0) { }
+	DelegateMemberSp() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func) {
@@ -210,8 +210,8 @@ public:
 	explicit operator bool() const { return !Empty();  }
 
 private:
-	ObjectPtr m_object;		// Pointer to a class object
-	MemberFunc m_func;   	// Pointer to an instance member function
+	ObjectPtr m_object = nullptr;		// Pointer to a class object
+	MemberFunc m_func = nullptr;   	// Pointer to an instance member function
 };
 
 template <class TClass, class RetType, class Param1, class Param2, class Param3, class Param4> 
@@ -225,7 +225,7 @@ public:
 
 	DelegateMemberSp(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMemberSp(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
-	DelegateMemberSp() : m_object(0), m_func(0) { }
+	DelegateMemberSp() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func) {
@@ -259,8 +259,8 @@ public:
 	explicit operator bool() const { return !Empty();  }
 
 private:
-	ObjectPtr m_object;		// Pointer to a class object
-	MemberFunc m_func;   	// Pointer to an instance member function
+	ObjectPtr m_object = nullptr;		// Pointer to a class object
+	MemberFunc m_func = nullptr;   	// Pointer to an instance member function
 };
 
 template <class TClass, class RetType, class Param1, class Param2, class Param3, class Param4, class Param5> 
@@ -274,7 +274,7 @@ public:
 
 	DelegateMemberSp(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMemberSp(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
-	DelegateMemberSp() : m_object(0), m_func(0) { }
+	DelegateMemberSp() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func) {
@@ -308,8 +308,8 @@ public:
 	explicit operator bool() const { return !Empty();  }
 
 private:
-	ObjectPtr m_object;		// Pointer to a class object
-	MemberFunc m_func;   	// Pointer to an instance member function
+	ObjectPtr m_object = nullptr;		// Pointer to a class object
+	MemberFunc m_func = nullptr;   	// Pointer to an instance member function
 };
 
 // MakeDelegate function creates a delegate object. C++ template argument deduction

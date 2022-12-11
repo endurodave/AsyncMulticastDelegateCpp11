@@ -94,7 +94,7 @@ public:
 
 	DelegateMember(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMember(ObjectPtr object, ConstMemberFunc func) { Bind(object, func); }
-	DelegateMember() :	m_object(0), m_func(0) { }
+	DelegateMember() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func) {
@@ -127,8 +127,8 @@ public:
 	explicit operator bool() const { return !Empty(); }
 
 private:
-	ObjectPtr m_object;		// Pointer to a class object
-	MemberFunc m_func;   	// Pointer to an instance member function
+	ObjectPtr m_object = nullptr;		// Pointer to a class object
+	MemberFunc m_func = nullptr;   		// Pointer to an instance member function
 };
 
 template <class TClass, class RetType, class Param1> 
@@ -141,7 +141,7 @@ public:
 
 	DelegateMember(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMember(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
-	DelegateMember() :	m_object(0), m_func(0) { }
+	DelegateMember() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func) {
@@ -174,8 +174,8 @@ public:
 	explicit operator bool() const { return !Empty(); }
 
 private:
-	ObjectPtr m_object;		// Pointer to a class object
-	MemberFunc m_func;   	// Pointer to an instance member function
+	ObjectPtr m_object = nullptr;		// Pointer to a class object
+	MemberFunc m_func = nullptr;   		// Pointer to an instance member function
 };
 
 template <class TClass, class RetType, class Param1, class Param2> 
@@ -188,7 +188,7 @@ public:
 
 	DelegateMember(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMember(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
-	DelegateMember() :	m_object(0), m_func(0) { }
+	DelegateMember() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func) {
@@ -221,8 +221,8 @@ public:
 	explicit operator bool() const { return !Empty(); }
 
 private:
-	ObjectPtr m_object;		// Pointer to a class object
-	MemberFunc m_func;   	// Pointer to an instance member function
+	ObjectPtr m_object = nullptr;		// Pointer to a class object
+	MemberFunc m_func = nullptr;   		// Pointer to an instance member function
 };
 
 template <class TClass, class RetType, class Param1, class Param2, class Param3> 
@@ -235,7 +235,7 @@ public:
 
 	DelegateMember(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMember(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
-	DelegateMember() :	m_object(0), m_func(0) { }
+	DelegateMember() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func) {
@@ -268,8 +268,8 @@ public:
 	explicit operator bool() const { return !Empty(); }
 
 private:
-	ObjectPtr m_object;		// Pointer to a class object
-	MemberFunc m_func;   	// Pointer to an instance member function
+	ObjectPtr m_object = nullptr;		// Pointer to a class object
+	MemberFunc m_func = nullptr;   		// Pointer to an instance member function
 };
 
 template <class TClass, class RetType, class Param1, class Param2, class Param3, class Param4> 
@@ -282,7 +282,7 @@ public:
 
 	DelegateMember(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMember(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
-	DelegateMember() :	m_object(0), m_func(0) { }
+	DelegateMember() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func) {
@@ -315,8 +315,8 @@ public:
 	explicit operator bool() const { return !Empty(); }
 
 private:
-	ObjectPtr m_object;		// Pointer to a class object
-	MemberFunc m_func;   	// Pointer to an instance member function
+	ObjectPtr m_object = nullptr;		// Pointer to a class object
+	MemberFunc m_func = nullptr;   		// Pointer to an instance member function
 };
 
 template <class TClass, class RetType, class Param1, class Param2, class Param3, class Param4, class Param5> 
@@ -329,7 +329,7 @@ public:
 
 	DelegateMember(ObjectPtr object, MemberFunc func) { Bind(object, func); }
 	DelegateMember(ObjectPtr object, ConstMemberFunc func) { Bind(object, func);	}
-	DelegateMember() :	m_object(0), m_func(0) { }
+	DelegateMember() = delete;
 
 	/// Bind a member function to a delegate. 
 	void Bind(ObjectPtr object, MemberFunc func) {
@@ -362,8 +362,8 @@ public:
 	explicit operator bool() const { return !Empty(); }
 
 private:
-	ObjectPtr m_object;		// Pointer to a class object
-	MemberFunc m_func;   	// Pointer to an instance member function
+	ObjectPtr m_object = nullptr;		// Pointer to a class object
+	MemberFunc m_func = nullptr;   		// Pointer to an instance member function
 };
 
 // Declare DelegateFree as a class template. It will be specialized for all number of arguments.
@@ -379,7 +379,7 @@ public:
     using ClassType = DelegateFree<RetType(void)>;
 
 	DelegateFree(FreeFunc func) { Bind(func); }
-	DelegateFree() : m_func(0) { }
+	DelegateFree() = delete;
 
 	/// Bind a free function to the delegate.
 	void Bind(FreeFunc func) { m_func = func; }
@@ -404,7 +404,7 @@ public:
 	explicit operator bool() const { return !Empty(); }
 
 private:
-	FreeFunc m_func;		// Pointer to a free function
+	FreeFunc m_func = nullptr;		// Pointer to a free function
 };
 
 template <class RetType, class Param1> 
@@ -414,7 +414,7 @@ public:
     using ClassType = DelegateFree<RetType(Param1)>;
 
 	DelegateFree(FreeFunc func) { Bind(func); }
-	DelegateFree() : m_func(0) { }
+	DelegateFree() = delete;
 
 	/// Bind a free function to the delegate.
 	void Bind(FreeFunc func) { m_func = func; }
@@ -439,7 +439,7 @@ public:
 	explicit operator bool() const { return !Empty(); }
 
 private:
-	FreeFunc m_func;		// Pointer to a free function
+	FreeFunc m_func = nullptr;		// Pointer to a free function
 };
 
 template <class RetType, class Param1, class Param2> 
@@ -449,7 +449,7 @@ public:
     using ClassType = DelegateFree<RetType(Param1, Param2)>;
 
 	DelegateFree(FreeFunc func) { Bind(func); }
-	DelegateFree() : m_func(0) { }
+	DelegateFree() = delete;
 
 	/// Bind a free function to the delegate.
 	void Bind(FreeFunc func) {
@@ -475,7 +475,7 @@ public:
 	explicit operator bool() const { return !Empty(); }
 
 private:
-	FreeFunc m_func;		// Pointer to a free function
+	FreeFunc m_func = nullptr;		// Pointer to a free function
 };
 
 template <class RetType, class Param1, class Param2, class Param3> 
@@ -485,7 +485,7 @@ public:
     using ClassType = DelegateFree<RetType(Param1, Param2, Param3)>;
 
 	DelegateFree(FreeFunc func) { Bind(func); }
-	DelegateFree() : m_func(0) { }
+	DelegateFree() = delete;
 
 	/// Bind a free function to the delegate.
 	void Bind(FreeFunc func) {
@@ -511,7 +511,7 @@ public:
 	explicit operator bool() const { return !Empty(); }
 
 private:
-	FreeFunc m_func;		// Pointer to a free function
+	FreeFunc m_func = nullptr;		// Pointer to a free function
 };
 
 template <class RetType, class Param1, class Param2, class Param3, class Param4> 
@@ -521,7 +521,7 @@ public:
     using ClassType = DelegateFree<RetType(Param1, Param2, Param3, Param4)>;
 
 	DelegateFree(FreeFunc func) { Bind(func); }
-	DelegateFree() : m_func(0) { }
+	DelegateFree() = delete;
 
 	/// Bind a free function to the delegate.
 	void Bind(FreeFunc func) {
@@ -547,7 +547,7 @@ public:
 	explicit operator bool() const { return !Empty(); }
 
 private:
-	FreeFunc m_func;		// Pointer to a free function
+	FreeFunc m_func = nullptr;		// Pointer to a free function
 };
 
 template <class RetType, class Param1, class Param2, class Param3, class Param4, class Param5> 
@@ -557,7 +557,7 @@ public:
     using ClassType = DelegateFree<RetType(Param1, Param2, Param3, Param4, Param5)>;
 
 	DelegateFree(FreeFunc func) { Bind(func); }
-	DelegateFree() : m_func(0) { }
+	DelegateFree() = delete;
 
 	/// Bind a free function to the delegate.
 	void Bind(FreeFunc func) {
@@ -583,7 +583,7 @@ public:
 	explicit operator bool() const { return !Empty(); }
 
 private:
-	FreeFunc m_func;		// Pointer to a free function
+	FreeFunc m_func = nullptr;		// Pointer to a free function
 };
 
 // MakeDelegate function creates a delegate object. C++ template argument deduction
