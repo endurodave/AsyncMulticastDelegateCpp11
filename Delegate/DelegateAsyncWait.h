@@ -10,6 +10,9 @@
 #include "DelegateInvoker.h"
 #include "Semaphore.h"
 #include <memory>
+#ifdef USE_CXX17
+#include <optional>
+#endif
 
 /// @brief Asynchronous member delegate that invokes the target function on the specified thread of control
 /// and waits for the function to be executed or a timeout occurs. Use IsSuccess() to determine if asynchronous 
@@ -18,37 +21,6 @@
 namespace DelegateLib {
 
 const int WAIT_INFINITE = -1;
-
-template <class RetType>
-class AsyncRet {
-public:
-	AsyncRet() { success = false; }
-	RetType retVal;
-	bool success;
-};
-
-template <class RetType>
-class AsyncRet<RetType*> {
-public:
-	AsyncRet() { success = false; retVal = NULL; }
-	RetType* retVal;
-	bool success;
-};
-
-template <>
-class AsyncRet<bool> {
-public:
-	AsyncRet() { success = false; retVal = false; }
-	bool retVal;
-	bool success;
-};
-
-template <>
-class AsyncRet<void> {
-public:
-	AsyncRet() { success = false; }
-	bool success;
-};
 
 template <typename Signature>
 class DelegateMemberAsyncWaitInvoke;
@@ -451,14 +423,22 @@ public:
 		}
 	}
 
+#ifdef USE_CXX17
 	/// Invoke delegate function asynchronously
-	AsyncRet<RetType> AsyncInvoke()
+	auto AsyncInvoke()
 	{
-		AsyncRet<RetType> waitRetVal;
-		waitRetVal.retVal = operator()();
-		waitRetVal.success = IsSuccess();
-		return waitRetVal;
+		if constexpr (std::is_void<RetType>::value == true)
+		{
+			operator()();
+			return IsSuccess() ? std::optional<bool>(true) : std::optional<bool>();
+		}
+		else
+		{
+			auto retVal = operator()();
+			return IsSuccess() ? std::optional<RetType>(retVal) : std::optional<RetType>();
+		}
 	}
+#endif
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
@@ -567,14 +547,22 @@ public:
 		}
 	}
 
+#ifdef USE_CXX17
 	/// Invoke delegate function asynchronously
-	AsyncRet<RetType> AsyncInvoke(Param1 p1)
+	auto AsyncInvoke(Param1 p1)
 	{
-		AsyncRet<RetType> waitRetVal;
-		waitRetVal.retVal = operator()(p1);
-		waitRetVal.success = IsSuccess();
-		return waitRetVal;
+		if constexpr (std::is_void<RetType>::value == true)
+		{
+			operator()(p1);
+			return IsSuccess() ? std::optional<bool>(true) : std::optional<bool>();
+		}
+		else
+		{
+			auto retVal = operator()(p1);
+			return IsSuccess() ? std::optional<RetType>(retVal) : std::optional<RetType>();
+		}
 	}
+#endif
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
@@ -689,14 +677,22 @@ public:
 		}
 	}
 
+#ifdef USE_CXX17
 	/// Invoke delegate function asynchronously
-	AsyncRet<RetType> AsyncInvoke(Param1 p1, Param2 p2)
+	auto AsyncInvoke(Param1 p1, Param2 p2)
 	{
-		AsyncRet<RetType> waitRetVal;
-		waitRetVal.retVal = operator()(p1, p2);
-		waitRetVal.success = IsSuccess();
-		return waitRetVal;
+		if constexpr (std::is_void<RetType>::value == true)
+		{
+			operator()(p1, p2);
+			return IsSuccess() ? std::optional<bool>(true) : std::optional<bool>();
+		}
+		else
+		{
+			auto retVal = operator()(p1, p2);
+			return IsSuccess() ? std::optional<RetType>(retVal) : std::optional<RetType>();
+		}
 	}
+#endif
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
@@ -812,14 +808,22 @@ public:
 		}
 	}
 
+#ifdef USE_CXX17
 	/// Invoke delegate function asynchronously
-	AsyncRet<RetType> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3)
+	auto AsyncInvoke(Param1 p1, Param2 p2, Param3 p3)
 	{
-		AsyncRet<RetType> waitRetVal;
-		waitRetVal.retVal = operator()(p1, p2, p3);
-		waitRetVal.success = IsSuccess();
-		return waitRetVal;
+		if constexpr (std::is_void<RetType>::value == true)
+		{
+			operator()(p1, p2, p3);
+			return IsSuccess() ? std::optional<bool>(true) : std::optional<bool>();
+		}
+		else
+		{
+			auto retVal = operator()(p1, p2, p3);
+			return IsSuccess() ? std::optional<RetType>(retVal) : std::optional<RetType>();
+		}
 	}
+#endif
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
@@ -936,14 +940,22 @@ public:
 		}
 	}
 
+#ifdef USE_CXX17
 	/// Invoke delegate function asynchronously
-	AsyncRet<RetType> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4)
+	auto AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4)
 	{
-		AsyncRet<RetType> waitRetVal;
-		waitRetVal.retVal = operator()(p1, p2, p3, p4);
-		waitRetVal.success = IsSuccess();
-		return waitRetVal;
+		if constexpr (std::is_void<RetType>::value == true)
+		{
+			operator()(p1, p2, p3, p4);
+			return IsSuccess() ? std::optional<bool>(true) : std::optional<bool>();
+		}
+		else
+		{
+			auto retVal = operator()(p1, p2, p3, p4);
+			return IsSuccess() ? std::optional<RetType>(retVal) : std::optional<RetType>();
+		}
 	}
+#endif
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
@@ -1061,14 +1073,22 @@ public:
 		}
 	}
 
+#ifdef USE_CXX17
 	/// Invoke delegate function asynchronously
-	AsyncRet<RetType> AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)
+	auto AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)
 	{
-		AsyncRet<RetType> waitRetVal;
-		waitRetVal.retVal = operator()(p1, p2, p3, p4, p5);
-		waitRetVal.success = IsSuccess();
-		return waitRetVal;
+		if constexpr (std::is_void<RetType>::value == true)
+		{
+			operator()(p1, p2, p3, p4, p5);
+			return IsSuccess() ? std::optional<bool>(true) : std::optional<bool>();
+		}
+		else
+		{
+			auto retVal = operator()(p1, p2, p3, p4, p5);
+			return IsSuccess() ? std::optional<RetType>(retVal) : std::optional<RetType>();
+		}
 	}
+#endif
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
@@ -1185,14 +1205,22 @@ public:
 }
 	}
 
+#ifdef USE_CXX17
 	/// Invoke delegate function asynchronously
-	AsyncRet<RetType> AsyncInvoke()
+	auto AsyncInvoke()
 	{
-		AsyncRet<RetType> waitRetVal;
-		waitRetVal.retVal = operator()();
-		waitRetVal.success = IsSuccess();
-		return waitRetVal;
+		if constexpr (std::is_void<RetType>::value == true)
+		{
+			operator()();
+			return IsSuccess() ? std::optional<bool>(true) : std::optional<bool>();
+		}
+		else
+		{
+			auto retVal = operator()();
+			return IsSuccess() ? std::optional<RetType>(retVal) : std::optional<RetType>();
+		}
 	}
+#endif
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
@@ -1289,14 +1317,22 @@ public:
 		}
 	}
 
+#ifdef USE_CXX17
 	/// Invoke delegate function asynchronously
-	AsyncRet<RetType> AsyncInvoke()
+	auto AsyncInvoke(Param1 p1)
 	{
-		AsyncRet<RetType> waitRetVal;
-		waitRetVal.retVal = operator()();
-		waitRetVal.success = IsSuccess();
-		return waitRetVal;
+		if constexpr (std::is_void<RetType>::value == true)
+		{
+			operator()(p1);
+			return IsSuccess() ? std::optional<bool>(true) : std::optional<bool>();
+		}
+		else
+		{
+			auto retVal = operator()(p1);
+			return IsSuccess() ? std::optional<RetType>(retVal) : std::optional<RetType>();
+		}
 	}
+#endif
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
@@ -1400,14 +1436,22 @@ public:
 		}
 	}
 
+#ifdef USE_CXX17
 	/// Invoke delegate function asynchronously
-	AsyncRet<RetType> AsyncInvoke()
+	auto AsyncInvoke(Param1 p1, Param2 p2)
 	{
-		AsyncRet<RetType> waitRetVal;
-		waitRetVal.retVal = operator()();
-		waitRetVal.success = IsSuccess();
-		return waitRetVal;
+		if constexpr (std::is_void<RetType>::value == true)
+		{
+			operator()(p1, p2);
+			return IsSuccess() ? std::optional<bool>(true) : std::optional<bool>();
+		}
+		else
+		{
+			auto retVal = operator()(p1, p2);
+			return IsSuccess() ? std::optional<RetType>(retVal) : std::optional<RetType>();
+		}
 	}
+#endif
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
@@ -1511,14 +1555,22 @@ public:
 		}
 	}
 
+#ifdef USE_CXX17
 	/// Invoke delegate function asynchronously
-	AsyncRet<RetType> AsyncInvoke()
+	auto AsyncInvoke(Param1 p1, Param2 p2, Param3 p3)
 	{
-		AsyncRet<RetType> waitRetVal;
-		waitRetVal.retVal = operator()();
-		waitRetVal.success = IsSuccess();
-		return waitRetVal;
+		if constexpr (std::is_void<RetType>::value == true)
+		{
+			operator()(p1, p2, p3);
+			return IsSuccess() ? std::optional<bool>(true) : std::optional<bool>();
+		}
+		else
+		{
+			auto retVal = operator()(p1, p2, p3);
+			return IsSuccess() ? std::optional<RetType>(retVal) : std::optional<RetType>();
+		}
 	}
+#endif
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
@@ -1623,14 +1675,22 @@ public:
 		}
 	}
 
+#ifdef USE_CXX17
 	/// Invoke delegate function asynchronously
-	AsyncRet<RetType> AsyncInvoke()
+	auto AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4)
 	{
-		AsyncRet<RetType> waitRetVal;
-		waitRetVal.retVal = operator()();
-		waitRetVal.success = IsSuccess();
-		return waitRetVal;
+		if constexpr (std::is_void<RetType>::value == true)
+		{
+			operator()(p1, p2, p3, p4);
+			return IsSuccess() ? std::optional<bool>(true) : std::optional<bool>();
+		}
+		else
+		{
+			auto retVal = operator()(p1, p2, p3, p4);
+			return IsSuccess() ? std::optional<RetType>(retVal) : std::optional<RetType>();
+		}
 	}
+#endif
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
@@ -1736,14 +1796,22 @@ public:
 		}
 	}
 
+#ifdef USE_CXX17
 	/// Invoke delegate function asynchronously
-	AsyncRet<RetType> AsyncInvoke()
+	auto AsyncInvoke(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)
 	{
-		AsyncRet<RetType> waitRetVal;
-		waitRetVal.retVal = operator()();
-		waitRetVal.success = IsSuccess();
-		return waitRetVal;
+		if constexpr (std::is_void<RetType>::value == true)
+		{
+			operator()(p1, p2, p3, p4, p5);
+			return IsSuccess() ? std::optional<bool>(true) : std::optional<bool>();
+		}
+		else
+		{
+			auto retVal = operator()(p1, p2, p3, p4, p5);
+			return IsSuccess() ? std::optional<RetType>(retVal) : std::optional<RetType>();
+		}
 	}
+#endif
 
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {

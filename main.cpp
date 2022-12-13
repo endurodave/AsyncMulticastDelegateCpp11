@@ -160,7 +160,6 @@ public:
 		cout << "StaticFunc " << value->x << endl;
 	}
 
-
 	int TestFunc()
 	{
 		cout << "TestFunc " << endl;
@@ -169,6 +168,13 @@ public:
 	void TestFuncNoRet()
 	{
 		cout << "TestFuncNoRet " << endl;
+	}
+
+	TestStruct TestFuncUserTypeRet()
+	{
+		TestStruct t;
+		t.x = 777;
+		return t;
 	}
 };
 
@@ -359,12 +365,23 @@ int main(void)
 	if (delegateI.IsSuccess())
 		cout << msg.c_str() << " " << year << endl;
 
+#ifdef USE_CXX17
     // Alternate means to invoke a function asynchronousy using AsyncInvoke. This thread will block until the 
 	// msg and year stack values are set by MemberFuncStdStringRetInt on workerThread1.
     std::string msg2;
     auto asyncInvokeRetVal = MakeDelegate(&testClass, &TestClass::MemberFuncStdStringRetInt, &workerThread1, WAIT_INFINITE).AsyncInvoke(msg2);
-    if (asyncInvokeRetVal.success)
-        cout << msg.c_str() << " " << asyncInvokeRetVal.retVal << endl;
+    if (asyncInvokeRetVal.has_value())
+        cout << msg.c_str() << " " << asyncInvokeRetVal.value() << endl;
+
+	// Invoke function asynchronously with user defined return type
+	auto testStructRet = MakeDelegate(&testClass, &TestClass::TestFuncUserTypeRet, &workerThread1, WAIT_INFINITE).AsyncInvoke();
+
+	// Invoke functions asynchronously with no return value
+	auto noRetValRet = MakeDelegate(&testClass, &TestClass::TestFuncNoRet, &workerThread1, 10).AsyncInvoke();
+	auto noRetValRet2 = MakeDelegate(&FreeFuncInt, &workerThread1, 10).AsyncInvoke(123);
+	if (noRetValRet.has_value() && noRetValRet2.has_value())
+		cout << "Asynchronous calls with no return value succeeded!" << endl;
+#endif
 
 	// Create a shared_ptr, create a delegate, then synchronously invoke delegate function
 	std::shared_ptr<TestClass> spObject(new TestClass());
