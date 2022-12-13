@@ -209,6 +209,9 @@ public:
 	RemoteData(int x, int y) : m_x(x), m_y(y) {}
 	RemoteData() = default;
 
+	int GetX() { return m_x; }
+	int GetY() { return m_y; }
+
 private:
 	int m_x = 0;
 	int m_y = 0;
@@ -233,10 +236,7 @@ class RemoteRecv
 public:
 	void RemoteRecvMember(RemoteData& t)
 	{
-	}
-
-	static void RemoteRecvFree(RemoteData& t)
-	{
+		cout << "RemoteRecvMember: " << t.GetX() << " " << t.GetY() << endl;
 	}
 };
 
@@ -487,15 +487,18 @@ int main(void)
 	// See links below for a complete example of remote delegates:
 	// https://www.codeproject.com/Articles/5262271/Remote-Procedure-Calls-using-Cplusplus-Delegates
 	// https://github.com/endurodave/RemoteDelegate
-	RemoteRecv remoteRecv;
-	DelegateMemberRemoteRecv<void(RemoteRecv(RemoteData&))> recvData1(&remoteRecv, &RemoteRecv::RemoteRecvMember, 1);
-	DelegateFreeRemoteRecv<void(RemoteData&)> recvData2(&RemoteRecv::RemoteRecvFree, 2);
-
+	// Sender Code:
 	std::stringstream ss(ios::in | ios::out | ios::binary);
 	DelegateRemoteSend<void(const RemoteData&)> sendData(DelegateSend::GetInstance(), ss, 1);
 
 	RemoteData remoteData(11, 22);
 	sendData(remoteData);
+
+	// Receiver Code:
+	RemoteRecv remoteRecv;
+	DelegateMemberRemoteRecv<void(RemoteRecv(RemoteData&))> recvData1(&remoteRecv, &RemoteRecv::RemoteRecvMember, 1);
+
+	DelegateRemoteInvoker::Invoke(ss);
 	// End remote delegate test code
 
     timer.Stop();
