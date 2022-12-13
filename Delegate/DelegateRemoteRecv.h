@@ -65,8 +65,10 @@ public:
 
     // Contructors take a class instance, member function, and delegete id 
     DelegateMemberRemoteRecv(ObjectPtr object, MemberFunc func, DelegateIdType id) : 
+        BaseType(object, func),
         DelegateRemoteInvoker(id) { Bind(object, func, id); }
     DelegateMemberRemoteRecv(ObjectPtr object, ConstMemberFunc func, DelegateIdType id) : 
+        BaseType(object, func),
         DelegateRemoteInvoker(id) { Bind(object, func, id); }
 
     /// Bind a member function to a delegate. 
@@ -119,10 +121,12 @@ public:
 
     // Contructors take a class instance, member function, and delegete id 
     DelegateMemberRemoteRecv(ObjectPtr object, MemberFunc func, DelegateIdType id) :
+        BaseType(object, func),
         DelegateRemoteInvoker(id) {
         Bind(object, func, id);
     }
     DelegateMemberRemoteRecv(ObjectPtr object, ConstMemberFunc func, DelegateIdType id) :
+        BaseType(object, func),
         DelegateRemoteInvoker(id) {
         Bind(object, func, id);
     }
@@ -181,10 +185,12 @@ public:
 
     // Contructors take a class instance, member function, and delegete id 
     DelegateMemberRemoteRecv(ObjectPtr object, MemberFunc func, DelegateIdType id) :
+        BaseType(object, func),
         DelegateRemoteInvoker(id) {
         Bind(object, func, id);
     }
     DelegateMemberRemoteRecv(ObjectPtr object, ConstMemberFunc func, DelegateIdType id) :
+        BaseType(object, func),
         DelegateRemoteInvoker(id) {
         Bind(object, func, id);
     }
@@ -248,10 +254,12 @@ public:
 
     // Contructors take a class instance, member function, and delegete id 
     DelegateMemberRemoteRecv(ObjectPtr object, MemberFunc func, DelegateIdType id) :
+        BaseType(object, func),
         DelegateRemoteInvoker(id) {
         Bind(object, func, id);
     }
     DelegateMemberRemoteRecv(ObjectPtr object, ConstMemberFunc func, DelegateIdType id) :
+        BaseType(object, func),
         DelegateRemoteInvoker(id) {
         Bind(object, func, id);
     }
@@ -318,10 +326,12 @@ public:
 
     // Contructors take a class instance, member function, and delegete id 
     DelegateMemberRemoteRecv(ObjectPtr object, MemberFunc func, DelegateIdType id) :
+        BaseType(object, func),
         DelegateRemoteInvoker(id) {
         Bind(object, func, id);
     }
     DelegateMemberRemoteRecv(ObjectPtr object, ConstMemberFunc func, DelegateIdType id) :
+        BaseType(object, func),
         DelegateRemoteInvoker(id) {
         Bind(object, func, id);
     }
@@ -394,7 +404,9 @@ public:
     using BaseType = DelegateFree<void(Param1)>;
 
     // Contructors take a free function and delegete id 
-    DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : DelegateRemoteInvoker(id) { Bind(func, id); }
+    DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : 
+        BaseType(func), 
+        DelegateRemoteInvoker(id) { Bind(func, id); }
 
     /// Bind a free function to the delegate.
     void Bind(FreeFunc func, DelegateIdType id) {
@@ -437,7 +449,9 @@ public:
     using BaseType = DelegateFree<void(Param1, Param2)>;
 
     // Contructors take a free function and delegete id 
-    DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : DelegateRemoteInvoker(id) { Bind(func, id); }
+    DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : 
+        BaseType(func), 
+        DelegateRemoteInvoker(id) { Bind(func, id); }
 
     /// Bind a free function to the delegate.
     void Bind(FreeFunc func, DelegateIdType id) {
@@ -484,7 +498,9 @@ public:
     using BaseType = DelegateFree<void(Param1, Param2, Param3)>;
 
     // Contructors take a free function and delegete id 
-    DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : DelegateRemoteInvoker(id) { Bind(func, id); }
+    DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : 
+        BaseType(func), 
+        DelegateRemoteInvoker(id) { Bind(func, id); }
 
     /// Bind a free function to the delegate.
     void Bind(FreeFunc func, DelegateIdType id) {
@@ -535,7 +551,9 @@ public:
     using BaseType = DelegateFree<void(Param1, Param2, Param3, Param4)>;
 
     // Contructors take a free function and delegete id 
-    DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : DelegateRemoteInvoker(id) { Bind(func, id); }
+    DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : 
+        BaseType(func), 
+        DelegateRemoteInvoker(id) { Bind(func, id); }
 
     /// Bind a free function to the delegate.
     void Bind(FreeFunc func, DelegateIdType id) {
@@ -590,7 +608,9 @@ public:
     using BaseType = DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>;
 
     // Contructors take a free function and delegete id 
-    DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : DelegateRemoteInvoker(id) { Bind(func, id); }
+    DelegateFreeRemoteRecv(FreeFunc func, DelegateIdType id) : 
+        BaseType(func), 
+        DelegateRemoteInvoker(id) { Bind(func, id); }
 
     /// Bind a free function to the delegate.
     void Bind(FreeFunc func, DelegateIdType id) {

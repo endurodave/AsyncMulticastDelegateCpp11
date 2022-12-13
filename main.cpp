@@ -3,6 +3,7 @@
 #include "SysDataNoLock.h"
 #include "Timer.h"
 #include <iostream>
+#include <sstream>
 #include <thread>
 #if USE_STD_THREADS
 #include "WorkerThreadStd.h"
@@ -201,6 +202,61 @@ void TimerExpiredCb(void)
     static int count = 0;
     cout << "TimerExpiredCb " << count++ << endl;
 }
+
+class RemoteData
+{
+public:
+	RemoteData(int x, int y) : m_x(x), m_y(y) {}
+	RemoteData() = default;
+
+private:
+	int m_x = 0;
+	int m_y = 0;
+
+	friend std::ostream& operator<< (std::ostream& out, const RemoteData& data)
+	{
+		out << data.m_x << std::endl;
+		out << data.m_y << std::endl;
+		return out;
+	}
+
+	friend std::istream& operator>> (std::istream& in, RemoteData& data)
+	{
+		in >> data.m_x;
+		in >> data.m_y;
+		return in;
+	}
+};
+
+class RemoteRecv
+{
+public:
+	void RemoteRecvMember(RemoteData& t)
+	{
+	}
+
+	static void RemoteRecvFree(RemoteData& t)
+	{
+	}
+};
+
+class DelegateSend : public DelegateLib::IDelegateTransport
+ {
+  public:
+	  static DelegateSend& GetInstance()
+	  {
+		  static DelegateSend instance;
+		  return instance;
+	  }
+
+      /// Called by the delegate library to invoke a remote delegate
+      /// @param[in] s - the stream of bytes to send
+	  virtual void DispatchDelegate(std::iostream& s)
+	  {
+		  // TODO - Implement dispatching delegate here. Could be any transport, e.g. TCP, UDP, serial, etc...
+		  cout << "DelegateSend Called!" << endl;
+	  }
+};
 
 extern void DelegateUnitTests();
 
@@ -425,6 +481,22 @@ int main(void)
 	SystemMode::Type previousMode;
 	previousMode = SysDataNoLock::GetInstance().SetSystemModeAsyncWaitAPI(SystemMode::STARTING);
 	previousMode = SysDataNoLock::GetInstance().SetSystemModeAsyncWaitAPI(SystemMode::NORMAL);
+
+	// Start remote delegate test code
+	// The code below just instantiates a send/recv delegates and shows sending
+	// See links below for a complete example of remote delegates:
+	// https://www.codeproject.com/Articles/5262271/Remote-Procedure-Calls-using-Cplusplus-Delegates
+	// https://github.com/endurodave/RemoteDelegate
+	RemoteRecv remoteRecv;
+	DelegateMemberRemoteRecv<void(RemoteRecv(RemoteData&))> recvData1(&remoteRecv, &RemoteRecv::RemoteRecvMember, 1);
+	DelegateFreeRemoteRecv<void(RemoteData&)> recvData2(&RemoteRecv::RemoteRecvFree, 2);
+
+	std::stringstream ss(ios::in | ios::out | ios::binary);
+	DelegateRemoteSend<void(const RemoteData&)> sendData(DelegateSend::GetInstance(), ss, 1);
+
+	RemoteData remoteData(11, 22);
+	sendData(remoteData);
+	// End remote delegate test code
 
     timer.Stop();
     timer.Expired.Clear();
