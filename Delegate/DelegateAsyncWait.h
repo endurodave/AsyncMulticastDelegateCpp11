@@ -29,7 +29,7 @@ class DelegateMemberAsyncWaitInvoke;
 template <class TClass, class RetType>
 class DelegateMemberAsyncWaitInvoke<RetType(TClass(void))> {
 public:
-	virtual void operator()(DelegateMember<RetType(TClass(void))>* instance) {
+	void operator()(DelegateMember<RetType(TClass(void))>* instance) {
 		m_retVal = (*instance)();
 	}
 
@@ -42,7 +42,7 @@ private:
 template <class TClass>
 class DelegateMemberAsyncWaitInvoke<void(TClass(void))> {
 public:
-	virtual void operator()(DelegateMember<void(TClass(void))>* instance) {
+	void operator()(DelegateMember<void(TClass(void))>* instance) {
 		(*instance)();
 	}
 
@@ -53,7 +53,7 @@ public:
 template <class TClass, class RetType, class Param1>
 class DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1))> {
 public:
-	virtual void operator()(DelegateMember<RetType(TClass(Param1))>* instance,
+	void operator()(DelegateMember<RetType(TClass(Param1))>* instance,
 		Param1 p1) {
 		m_retVal = (*instance)(p1);
 	}
@@ -67,7 +67,7 @@ private:
 template <class TClass, class Param1>
 class DelegateMemberAsyncWaitInvoke<void(TClass(Param1))> {
 public:
-	virtual void operator()(DelegateMember<void(TClass(Param1))>* instance,
+	void operator()(DelegateMember<void(TClass(Param1))>* instance,
 		Param1 p1) {
 		(*instance)(p1);
 	}
@@ -79,7 +79,7 @@ public:
 template <class TClass, class RetType, class Param1, class Param2>
 class DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1, Param2))> {
 public:
-	virtual void operator()(DelegateMember<RetType(TClass(Param1, Param2))>* instance,
+	void operator()(DelegateMember<RetType(TClass(Param1, Param2))>* instance,
 		Param1 p1, Param2 p2) {
 		m_retVal = (*instance)(p1, p2);
 	}
@@ -93,7 +93,7 @@ private:
 template <class TClass, class Param1, class Param2>
 class DelegateMemberAsyncWaitInvoke<void(TClass(Param1, Param2))> {
 public:
-	virtual void operator()(DelegateMember<void(TClass(Param1, Param2))>* instance,
+	void operator()(DelegateMember<void(TClass(Param1, Param2))>* instance,
 		Param1 p1, Param2 p2) {
 		(*instance)(p1, p2);
 	}
@@ -105,7 +105,7 @@ public:
 template <class TClass, class RetType, class Param1, class Param2, class Param3>
 class DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1, Param2, Param3))> {
 public:
-	virtual void operator()(DelegateMember<RetType(TClass(Param1, Param2, Param3))>* instance,
+	void operator()(DelegateMember<RetType(TClass(Param1, Param2, Param3))>* instance,
 		Param1 p1, Param2 p2, Param3 p3) {
 		m_retVal = (*instance)(p1, p2, p3);
 	}
@@ -119,7 +119,7 @@ private:
 template <class TClass, class Param1, class Param2, class Param3>
 class DelegateMemberAsyncWaitInvoke<void(TClass(Param1, Param2, Param3))> {
 public:
-	virtual void operator()(DelegateMember<void(TClass(Param1, Param2, Param3))>* instance,
+	void operator()(DelegateMember<void(TClass(Param1, Param2, Param3))>* instance,
 		Param1 p1, Param2 p2, Param3 p3) {
 		(*instance)(p1, p2, p3);
 	}
@@ -131,7 +131,7 @@ public:
 template <class TClass, class RetType, class Param1, class Param2, class Param3, class Param4>
 class DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1, Param2, Param3, Param4))> {
 public:
-	virtual void operator()(DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4))>* instance,
+	void operator()(DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4))>* instance,
 		Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
 		m_retVal = (*instance)(p1, p2, p3, p4);
 	}
@@ -145,7 +145,7 @@ private:
 template <class TClass, class Param1, class Param2, class Param3, class Param4>
 class DelegateMemberAsyncWaitInvoke<void(TClass(Param1, Param2, Param3, Param4))> {
 public:
-	virtual void operator()(DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>* instance,
+	void operator()(DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>* instance,
 		Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
 		(*instance)(p1, p2, p3, p4);
 	}
@@ -157,7 +157,7 @@ public:
 template <class TClass, class RetType, class Param1, class Param2, class Param3, class Param4, class Param5>
 class DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1, Param2, Param3, Param4, Param5))> {
 public:
-	virtual void operator()(DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* instance,
+	void operator()(DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* instance,
 		Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
 		m_retVal = (*instance)(p1, p2, p3, p4, p5);
 	}
@@ -171,7 +171,7 @@ private:
 template <class TClass, class Param1, class Param2, class Param3, class Param4, class Param5>
 class DelegateMemberAsyncWaitInvoke<void(TClass(Param1, Param2, Param3, Param4, Param5))> {
 public:
-	virtual void operator()(DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>* instance,
+	void operator()(DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>* instance,
 		Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
 		(*instance)(p1, p2, p3, p4, p5);
 	}
