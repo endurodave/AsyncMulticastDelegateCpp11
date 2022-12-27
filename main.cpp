@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <thread>
+#include <algorithm>
 #if USE_STD_THREADS
 #include "WorkerThreadStd.h"
 #elif USE_WIN32_THREADS
@@ -82,8 +83,8 @@ struct TestStructNoCopy
 
 private:
 	// Prevent copying objects
-	TestStructNoCopy(const TestStructNoCopy&);
-	TestStructNoCopy& operator=(const TestStructNoCopy&);
+	TestStructNoCopy(const TestStructNoCopy&) = delete;
+	TestStructNoCopy& operator=(const TestStructNoCopy&) = delete;
 };
 
 void FreeFunc()
@@ -257,6 +258,39 @@ class DelegateSend : public DelegateLib::IDelegateTransport
 		  cout << "DelegateSend Called!" << endl;
 	  }
 };
+
+class Coordinates
+{
+public:
+	int x = 0;
+	int y = 0;
+};
+
+class CoordinatesHandler
+{
+public:
+	static MulticastDelegateSafe<void(const std::shared_ptr<const Coordinates>)> CoordinatesChanged;
+
+	void SetData(const Coordinates& data) 
+	{ 
+		m_data = data; 
+		CoordinatesChanged(std::make_shared<const Coordinates>(m_data));
+	}
+
+private:
+	Coordinates m_data;
+};
+
+MulticastDelegateSafe<void(const std::shared_ptr<const Coordinates>)> CoordinatesHandler::CoordinatesChanged;
+
+void CoordinatesChangedCallback(const std::shared_ptr<const Coordinates> c)
+{
+	cout << "New coordinates " << c->x << " " << c->y << endl;
+}
+
+// Do not allow shared_ptr references. Causes compile error if used with Async delegates.
+void CoordinatesChangedCallbackError(std::shared_ptr<const Coordinates>& c) {}
+void CoordinatesChangedCallbackError2(const std::shared_ptr<const Coordinates>& c) {}
 
 extern void DelegateUnitTests();
 
@@ -440,7 +474,7 @@ int main(void)
 #endif
 
 	// Create a shared_ptr, create a delegate, then synchronously invoke delegate function
-	std::shared_ptr<TestClass> spObject(new TestClass());
+	std::shared_ptr<TestClass> spObject = std::make_shared<TestClass>();
 	auto delegateMemberSp = MakeDelegate(spObject, &TestClass::MemberFuncStdString);
 	delegateMemberSp("Hello world using shared_ptr", 2022);
 
@@ -455,11 +489,30 @@ int main(void)
 
 	// Example of the smart pointer function version of the delegate. The testClassSp instance 
 	// is only deleted after workerThread1 invokes the callback function thus solving the bug.
-	std::shared_ptr<TestClass> testClassSp(new TestClass());
+	std::shared_ptr<TestClass> testClassSp = std::make_shared<TestClass>();
 	auto delegateMemberSpAsync = MakeDelegate(testClassSp, &TestClass::MemberFuncStdString, &workerThread1);
 	delegateMemberSpAsync("Function async invoked using smart pointer. Bug solved!", 2022);
 	delegateMemberSpAsync.Clear();
 	testClassSp.reset();
+
+	// Example of using std::shared_ptr function arguments with asynchrononous delegate. Using a 
+	// shared_ptr<T> argument ensures that the argument T is not copied for each registered client.
+	// Could be helpful if T is very large and two or more clients register to receive asynchronous
+	// callbacks.
+	CoordinatesHandler coordinatesHandler;
+	CoordinatesHandler::CoordinatesChanged += MakeDelegate(&CoordinatesChangedCallback, &workerThread1);
+
+	Coordinates coordinates;
+	coordinates.x = 11;
+	coordinates.y = 99;
+	coordinatesHandler.SetData(coordinates);
+
+#if 0
+	// Causes compiler error. shared_ptr references not allowed; undefined behavior 
+	// in multithreaded system.
+	auto errorDel = MakeDelegate(&CoordinatesChangedCallbackError, &workerThread1);
+	auto errorDel2 = MakeDelegate(&CoordinatesChangedCallbackError2, &workerThread1);
+#endif
 
 	// Begin lambda examples. Lambda captures not allowed if delegates used to invoke.
 	auto LambdaFunc1 = +[](int i) -> int
@@ -487,6 +540,7 @@ int main(void)
 	auto lambdaDelegate2 = MakeDelegate(LambdaFunc2, &workerThread1);
 	lambdaDelegate2(lambdaArg, true);
 
+#ifdef USE_CXX17
 	// Asynchronously invoke lambda on workerThread1 using AsyncInvoke
 	auto lambdaRet = MakeDelegate(LambdaFunc1, &workerThread1, 100).AsyncInvoke(543);
 	if (lambdaRet.has_value())
@@ -515,6 +569,7 @@ int main(void)
 	const auto valAsyncResult = std::count_if(v.begin(), v.end(),
 		countLambdaDelegate);
 	cout << "Asynchronous lambda result: " << valAsyncResult << endl;
+#endif // USE_CXX17
 	// End lambda examples
 
 	// Create a SysDataClient instance on the stack

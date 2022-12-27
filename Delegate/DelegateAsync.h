@@ -9,11 +9,28 @@
 #include "IDelegateThread.h"
 #include "DelegateInvoker.h"
 #include <memory>
+#include <type_traits>
 #if USE_XALLOCATOR
 	#include <new>
 #endif
 
 namespace DelegateLib {
+
+// std::shared_ptr reference arguments are not allowed with asynchronous delegates as the behavior is 
+// undefined. In other words:
+// void MyFunc(std::shared_ptr<T> data)		// Ok!
+// void MyFunc(std::shared_ptr<T>& data)	// Error if DelegateAsync or DelegateSpAsync target!
+template<class T>
+struct is_shared_ptr : std::false_type {};
+
+template<class T>
+struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {};
+
+template<class T>
+struct is_shared_ptr<std::shared_ptr<T>&> : std::true_type {};
+
+template<class T>
+struct is_shared_ptr<const std::shared_ptr<T>&> : std::true_type {};
 
 /// @brief Implements a new/delete for pass by value parameter values. Doesn't 
 /// actually create memory as pass by value already has a full copy.
@@ -225,6 +242,10 @@ public:
 			// will be called by the target thread. 
 			m_thread->DispatchDelegate(msg);
 		}
+
+		static_assert(!(
+			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true)),
+			"std::shared_ptr reference argument not allowed");
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -299,6 +320,11 @@ public:
 			// will be called by the target thread. 
 			m_thread->DispatchDelegate(msg);
 		}
+
+		static_assert(!(
+			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
+			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true)),
+			"std::shared_ptr reference argument not allowed");
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -376,6 +402,12 @@ public:
 			// will be called by the target thread. 
 			m_thread->DispatchDelegate(msg);
 		}
+
+		static_assert(!(
+			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
+			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true) ||
+			(is_shared_ptr<Param3>::value == true && std::is_lvalue_reference<Param3>::value == true)),
+			"std::shared_ptr reference argument not allowed");
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -456,6 +488,13 @@ public:
 			// will be called by the target thread. 
 			m_thread->DispatchDelegate(msg);
 		}
+
+		static_assert(!(
+			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
+			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true) ||
+			(is_shared_ptr<Param3>::value == true && std::is_lvalue_reference<Param3>::value == true) ||
+			(is_shared_ptr<Param4>::value == true && std::is_lvalue_reference<Param4>::value == true)),
+			"std::shared_ptr reference argument not allowed");
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -539,6 +578,14 @@ public:
 			// will be called by the target thread. 
 			m_thread->DispatchDelegate(msg);
 		}
+
+		static_assert(!(
+			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
+			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true) ||
+			(is_shared_ptr<Param3>::value == true && std::is_lvalue_reference<Param3>::value == true) ||
+			(is_shared_ptr<Param4>::value == true && std::is_lvalue_reference<Param4>::value == true) ||
+			(is_shared_ptr<Param5>::value == true && std::is_lvalue_reference<Param5>::value == true)),
+			"std::shared_ptr reference argument not allowed");
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -663,6 +710,10 @@ public:
 			// will be called by the target thread. 
 			m_thread->DispatchDelegate(msg);
 		}
+
+		static_assert(!(
+			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true)),
+			"std::shared_ptr reference argument not allowed");
 	}
 
 	// Called to invoke the delegate function on the target thread of control
@@ -727,6 +778,11 @@ public:
 			// will be called by the target thread. 
 			m_thread->DispatchDelegate(msg);
 		}
+
+		static_assert(!(
+			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
+			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true)),
+			"std::shared_ptr reference argument not allowed");
 	}
 
 	// Called to invoke the delegate function on the target thread of control
@@ -794,6 +850,12 @@ public:
 			// will be called by the target thread. 
 			m_thread->DispatchDelegate(msg);
 		}
+
+		static_assert(!(
+			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
+			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true) ||
+			(is_shared_ptr<Param3>::value == true && std::is_lvalue_reference<Param3>::value == true)),
+			"std::shared_ptr reference argument not allowed");
 	}
 
 	// Called to invoke the delegate function on the target thread of control
@@ -864,6 +926,13 @@ public:
 			// will be called by the target thread. 
 			m_thread->DispatchDelegate(msg);
 		}
+
+		static_assert(!(
+			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
+			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true) ||
+			(is_shared_ptr<Param3>::value == true && std::is_lvalue_reference<Param3>::value == true) ||
+			(is_shared_ptr<Param4>::value == true && std::is_lvalue_reference<Param4>::value == true)),
+			"std::shared_ptr reference argument not allowed");
 	}
 
 	// Called to invoke the delegate function on the target thread of control
@@ -937,6 +1006,14 @@ public:
 			// will be called by the target thread. 
 			m_thread->DispatchDelegate(msg);
 		}
+
+		static_assert(!(
+			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
+			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true) ||
+			(is_shared_ptr<Param3>::value == true && std::is_lvalue_reference<Param3>::value == true) ||
+			(is_shared_ptr<Param4>::value == true && std::is_lvalue_reference<Param4>::value == true) ||
+			(is_shared_ptr<Param5>::value == true && std::is_lvalue_reference<Param5>::value == true)),
+			"std::shared_ptr reference argument not allowed");
 	}
 
 	// Called to invoke the delegate function on the target thread of control
