@@ -32,6 +32,12 @@ struct is_shared_ptr<std::shared_ptr<T>&> : std::true_type {};
 template<class T>
 struct is_shared_ptr<const std::shared_ptr<T>&> : std::true_type {};
 
+template<class T>
+struct is_shared_ptr<std::shared_ptr<T>*> : std::true_type {};
+
+template<class T>
+struct is_shared_ptr<const std::shared_ptr<T>*> : std::true_type {};
+
 /// @brief Implements a new/delete for pass by value parameter values. Doesn't 
 /// actually create memory as pass by value already has a full copy.
 template <typename Param>
@@ -244,7 +250,7 @@ public:
 		}
 
 		static_assert(!(
-			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true)),
+			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference_v<Param1> || std::is_pointer_v<Param1>))),
 			"std::shared_ptr reference argument not allowed");
 	}
 
@@ -322,8 +328,8 @@ public:
 		}
 
 		static_assert(!(
-			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
-			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true)),
+			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference_v<Param1> || std::is_pointer_v<Param1>)) ||
+			(is_shared_ptr<Param2>::value && (std::is_lvalue_reference_v<Param2> || std::is_pointer_v<Param2>))),
 			"std::shared_ptr reference argument not allowed");
 	}
 
@@ -404,9 +410,9 @@ public:
 		}
 
 		static_assert(!(
-			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
-			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true) ||
-			(is_shared_ptr<Param3>::value == true && std::is_lvalue_reference<Param3>::value == true)),
+			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference_v<Param1> || std::is_pointer_v<Param1>)) ||
+			(is_shared_ptr<Param2>::value && (std::is_lvalue_reference_v<Param2> || std::is_pointer_v<Param2>)) ||
+			(is_shared_ptr<Param3>::value && (std::is_lvalue_reference_v<Param3> || std::is_pointer_v<Param3>))),
 			"std::shared_ptr reference argument not allowed");
 	}
 
@@ -490,10 +496,10 @@ public:
 		}
 
 		static_assert(!(
-			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
-			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true) ||
-			(is_shared_ptr<Param3>::value == true && std::is_lvalue_reference<Param3>::value == true) ||
-			(is_shared_ptr<Param4>::value == true && std::is_lvalue_reference<Param4>::value == true)),
+			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference_v<Param1> || std::is_pointer_v<Param1>)) ||
+			(is_shared_ptr<Param2>::value && (std::is_lvalue_reference_v<Param2> || std::is_pointer_v<Param2>)) ||
+			(is_shared_ptr<Param3>::value && (std::is_lvalue_reference_v<Param3> || std::is_pointer_v<Param3>)) ||
+			(is_shared_ptr<Param4>::value && (std::is_lvalue_reference_v<Param4> || std::is_pointer_v<Param4>))),
 			"std::shared_ptr reference argument not allowed");
 	}
 
@@ -580,11 +586,11 @@ public:
 		}
 
 		static_assert(!(
-			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
-			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true) ||
-			(is_shared_ptr<Param3>::value == true && std::is_lvalue_reference<Param3>::value == true) ||
-			(is_shared_ptr<Param4>::value == true && std::is_lvalue_reference<Param4>::value == true) ||
-			(is_shared_ptr<Param5>::value == true && std::is_lvalue_reference<Param5>::value == true)),
+			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference_v<Param1> || std::is_pointer_v<Param1>)) ||
+			(is_shared_ptr<Param2>::value && (std::is_lvalue_reference_v<Param2> || std::is_pointer_v<Param2>)) ||
+			(is_shared_ptr<Param3>::value && (std::is_lvalue_reference_v<Param3> || std::is_pointer_v<Param3>)) ||
+			(is_shared_ptr<Param4>::value && (std::is_lvalue_reference_v<Param4> || std::is_pointer_v<Param4>)) ||
+			(is_shared_ptr<Param5>::value && (std::is_lvalue_reference_v<Param5> || std::is_pointer_v<Param5>))),
 			"std::shared_ptr reference argument not allowed");
 	}
 
@@ -712,7 +718,7 @@ public:
 		}
 
 		static_assert(!(
-			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true)),
+			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference_v<Param1> || std::is_pointer_v<Param1>))),
 			"std::shared_ptr reference argument not allowed");
 	}
 
@@ -780,8 +786,8 @@ public:
 		}
 
 		static_assert(!(
-			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
-			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true)),
+			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference_v<Param1> || std::is_pointer_v<Param1>)) ||
+			(is_shared_ptr<Param2>::value && (std::is_lvalue_reference_v<Param2> || std::is_pointer_v<Param2>))),
 			"std::shared_ptr reference argument not allowed");
 	}
 
@@ -852,9 +858,9 @@ public:
 		}
 
 		static_assert(!(
-			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
-			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true) ||
-			(is_shared_ptr<Param3>::value == true && std::is_lvalue_reference<Param3>::value == true)),
+			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference_v<Param1> || std::is_pointer_v<Param1>)) ||
+			(is_shared_ptr<Param2>::value && (std::is_lvalue_reference_v<Param2> || std::is_pointer_v<Param2>)) ||
+			(is_shared_ptr<Param3>::value && (std::is_lvalue_reference_v<Param3> || std::is_pointer_v<Param3>))),
 			"std::shared_ptr reference argument not allowed");
 	}
 
@@ -928,10 +934,10 @@ public:
 		}
 
 		static_assert(!(
-			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
-			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true) ||
-			(is_shared_ptr<Param3>::value == true && std::is_lvalue_reference<Param3>::value == true) ||
-			(is_shared_ptr<Param4>::value == true && std::is_lvalue_reference<Param4>::value == true)),
+			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference_v<Param1> || std::is_pointer_v<Param1>)) ||
+			(is_shared_ptr<Param2>::value && (std::is_lvalue_reference_v<Param2> || std::is_pointer_v<Param2>)) ||
+			(is_shared_ptr<Param3>::value && (std::is_lvalue_reference_v<Param3> || std::is_pointer_v<Param3>)) ||
+			(is_shared_ptr<Param4>::value && (std::is_lvalue_reference_v<Param4> || std::is_pointer_v<Param4>))),
 			"std::shared_ptr reference argument not allowed");
 	}
 
@@ -1008,11 +1014,11 @@ public:
 		}
 
 		static_assert(!(
-			(is_shared_ptr<Param1>::value == true && std::is_lvalue_reference<Param1>::value == true) ||
-			(is_shared_ptr<Param2>::value == true && std::is_lvalue_reference<Param2>::value == true) ||
-			(is_shared_ptr<Param3>::value == true && std::is_lvalue_reference<Param3>::value == true) ||
-			(is_shared_ptr<Param4>::value == true && std::is_lvalue_reference<Param4>::value == true) ||
-			(is_shared_ptr<Param5>::value == true && std::is_lvalue_reference<Param5>::value == true)),
+			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference_v<Param1> || std::is_pointer_v<Param1>)) ||
+			(is_shared_ptr<Param2>::value && (std::is_lvalue_reference_v<Param2> || std::is_pointer_v<Param2>)) ||
+			(is_shared_ptr<Param3>::value && (std::is_lvalue_reference_v<Param3> || std::is_pointer_v<Param3>)) ||
+			(is_shared_ptr<Param4>::value && (std::is_lvalue_reference_v<Param4> || std::is_pointer_v<Param4>)) ||
+			(is_shared_ptr<Param5>::value && (std::is_lvalue_reference_v<Param5> || std::is_pointer_v<Param5>))),
 			"std::shared_ptr reference argument not allowed");
 	}
 

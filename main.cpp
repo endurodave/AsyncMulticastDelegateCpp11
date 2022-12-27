@@ -291,6 +291,8 @@ void CoordinatesChangedCallback(const std::shared_ptr<const Coordinates> c)
 // Do not allow shared_ptr references. Causes compile error if used with Async delegates.
 void CoordinatesChangedCallbackError(std::shared_ptr<const Coordinates>& c) {}
 void CoordinatesChangedCallbackError2(const std::shared_ptr<const Coordinates>& c) {}
+void CoordinatesChangedCallbackError3(std::shared_ptr<const Coordinates>* c) {}
+void CoordinatesChangedCallbackError4(const std::shared_ptr<const Coordinates>* c) {}
 
 extern void DelegateUnitTests();
 
@@ -512,6 +514,8 @@ int main(void)
 	// in multithreaded system.
 	auto errorDel = MakeDelegate(&CoordinatesChangedCallbackError, &workerThread1);
 	auto errorDel2 = MakeDelegate(&CoordinatesChangedCallbackError2, &workerThread1);
+	auto errorDel3 = MakeDelegate(&CoordinatesChangedCallbackError3, &workerThread1);
+	auto errorDel4 = MakeDelegate(&CoordinatesChangedCallbackError4, &workerThread1);
 #endif
 
 	// Begin lambda examples. Lambda captures not allowed if delegates used to invoke.
