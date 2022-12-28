@@ -146,6 +146,11 @@ public:
 		cout << "MemberFuncNoCopy " << value->x << endl;
 	}
 
+	void MemberFuncNoCopyShared(std::shared_ptr<TestStructNoCopy> value)
+	{
+		cout << "MemberFuncNoCopyShared " << value->x << endl;
+	}
+
 	void MemberFuncStdString(const std::string& s, int year)
 	{
 		cout << "MemberFuncStdString " << s.c_str() << " " << year << endl;
@@ -496,6 +501,14 @@ int main(void)
 	delegateMemberSpAsync("Function async invoked using smart pointer. Bug solved!", 2022);
 	delegateMemberSpAsync.Clear();
 	testClassSp.reset();
+
+	{
+		// Example of a shared_ptr argument that does not copy the function
+		// argument data. 
+		auto delegateJ = MakeDelegate(&testClass, &TestClass::MemberFuncNoCopyShared, &workerThread1);
+		std::shared_ptr<TestStructNoCopy> testStructNoCopy = std::make_shared<TestStructNoCopy>(987);
+		delegateJ(testStructNoCopy);
+	}
 
 	// Example of using std::shared_ptr function arguments with asynchrononous delegate. Using a 
 	// shared_ptr<T> argument ensures that the argument T is not copied for each registered client.
