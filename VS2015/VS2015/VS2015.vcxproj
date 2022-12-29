@@ -162,7 +162,6 @@
     <ClInclude Include="..\..\Delegate\IDelegateThread.h" />
     <ClInclude Include="..\..\Delegate\LockGuard.h" />
     <ClInclude Include="..\..\Delegate\MulticastDelegate.h" />
-    <ClInclude Include="..\..\Delegate\MulticastDelegateBase.h" />
     <ClInclude Include="..\..\Delegate\MulticastDelegateSafe.h" />
     <ClInclude Include="..\..\Delegate\Semaphore.h" />
     <ClInclude Include="..\..\Delegate\SinglecastDelegate.h" />
@@ -186,7 +185,6 @@
     <ClCompile Include="..\..\Delegate\DelegateRemoteInvoker.cpp" />
     <ClCompile Include="..\..\Delegate\DelegateUnitTests.cpp" />
     <ClCompile Include="..\..\Delegate\LockGuard.cpp" />
-    <ClCompile Include="..\..\Delegate\MulticastDelegateBase.cpp" />
     <ClCompile Include="..\..\Delegate\Semaphore.cpp" />
     <ClCompile Include="..\..\Delegate\xallocator.cpp" />
     <ClCompile Include="..\..\Examples\SysData.cpp" />

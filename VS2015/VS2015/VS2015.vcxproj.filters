@@ -38,9 +38,6 @@
     <ClInclude Include="..\..\Delegate\MulticastDelegate.h">
       <Filter>Delegate</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Delegate\MulticastDelegateBase.h">
-      <Filter>Delegate</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Delegate\SinglecastDelegate.h">
       <Filter>Delegate</Filter>
     </ClInclude>
@@ -123,9 +120,6 @@
     </ClCompile>
     <ClCompile Include="..\..\main.cpp" />
     <ClCompile Include="..\..\stdafx.cpp" />
-    <ClCompile Include="..\..\Delegate\MulticastDelegateBase.cpp">
-      <Filter>Delegate</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Delegate\DelegateUnitTests.cpp">
       <Filter>Delegate</Filter>
     </ClCompile>
