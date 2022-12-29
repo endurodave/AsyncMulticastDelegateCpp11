@@ -22,15 +22,28 @@ namespace DelegateLib {
 
 const int WAIT_INFINITE = -1;
 
-template <typename Signature>
-class DelegateMemberAsyncWaitInvoke;
+template <class C, class R>
+struct DelegateMemberAsyncWaitInvoke; // Not defined
 
-// N=0
-template <class TClass, class RetType>
-class DelegateMemberAsyncWaitInvoke<RetType(TClass(void))> {
+// Member function with void return type
+template <class TClass, class... Args>
+class DelegateMemberAsyncWaitInvoke<TClass, void(Args...)> {
 public:
-	void operator()(DelegateMember<RetType(TClass(void))>* instance) {
-		m_retVal = (*instance)();
+	void operator()(DelegateMember<void(TClass(Args...))>* instance,
+		Args... args) {
+		(*instance)(args...);
+	}
+
+	void GetRetVal() { }
+};
+
+// Member function with non-void return type
+template <class TClass, class RetType, class... Args>
+class DelegateMemberAsyncWaitInvoke<TClass, RetType(Args...)> {
+public:
+	void operator()(DelegateMember<RetType(TClass(Args...))>* instance,
+		Args... args) {
+		m_retVal = (*instance)(args...);
 	}
 
 	RetType GetRetVal() { return m_retVal; }
@@ -38,302 +51,33 @@ private:
 	RetType m_retVal;
 };
 
-// N=0 void return
-template <class TClass>
-class DelegateMemberAsyncWaitInvoke<void(TClass(void))> {
+template <class R>
+struct DelegateFreeAsyncWaitInvoke; // Not defined
+
+// Free function with void return type
+template <class... Args>
+class DelegateFreeAsyncWaitInvoke<void(Args...)> {
 public:
-	void operator()(DelegateMember<void(TClass(void))>* instance) {
-		(*instance)();
+	void operator()(DelegateFree<void(Args...)>* instance,
+		Args... args) {
+		(*instance)(args...);
 	}
 
 	void GetRetVal() { }
 };
 
-// N=1
-template <class TClass, class RetType, class Param1>
-class DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1))> {
+// Free function with non-void return type
+template <class RetType, class... Args>
+class DelegateFreeAsyncWaitInvoke<RetType(Args...)> {
 public:
-	void operator()(DelegateMember<RetType(TClass(Param1))>* instance,
-		Param1 p1) {
-		m_retVal = (*instance)(p1);
+	void operator()(DelegateFree<RetType(Args...)>* instance,
+		Args... args) {
+		m_retVal = (*instance)(args...);
 	}
 
 	RetType GetRetVal() { return m_retVal; }
 private:
 	RetType m_retVal;
-};
-
-// N=1 void return
-template <class TClass, class Param1>
-class DelegateMemberAsyncWaitInvoke<void(TClass(Param1))> {
-public:
-	void operator()(DelegateMember<void(TClass(Param1))>* instance,
-		Param1 p1) {
-		(*instance)(p1);
-	}
-
-	void GetRetVal() { }
-};
-
-// N=2
-template <class TClass, class RetType, class Param1, class Param2>
-class DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1, Param2))> {
-public:
-	void operator()(DelegateMember<RetType(TClass(Param1, Param2))>* instance,
-		Param1 p1, Param2 p2) {
-		m_retVal = (*instance)(p1, p2);
-	}
-
-	RetType GetRetVal() { return m_retVal; }
-private:
-	RetType m_retVal;
-};
-
-// N=2 void return
-template <class TClass, class Param1, class Param2>
-class DelegateMemberAsyncWaitInvoke<void(TClass(Param1, Param2))> {
-public:
-	void operator()(DelegateMember<void(TClass(Param1, Param2))>* instance,
-		Param1 p1, Param2 p2) {
-		(*instance)(p1, p2);
-	}
-
-	void GetRetVal() { }
-};
-
-// N=3
-template <class TClass, class RetType, class Param1, class Param2, class Param3>
-class DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1, Param2, Param3))> {
-public:
-	void operator()(DelegateMember<RetType(TClass(Param1, Param2, Param3))>* instance,
-		Param1 p1, Param2 p2, Param3 p3) {
-		m_retVal = (*instance)(p1, p2, p3);
-	}
-
-	RetType GetRetVal() { return m_retVal; }
-private:
-	RetType m_retVal;
-};
-
-// N=3 void return
-template <class TClass, class Param1, class Param2, class Param3>
-class DelegateMemberAsyncWaitInvoke<void(TClass(Param1, Param2, Param3))> {
-public:
-	void operator()(DelegateMember<void(TClass(Param1, Param2, Param3))>* instance,
-		Param1 p1, Param2 p2, Param3 p3) {
-		(*instance)(p1, p2, p3);
-	}
-
-	void GetRetVal() { }
-};
-
-// N=4
-template <class TClass, class RetType, class Param1, class Param2, class Param3, class Param4>
-class DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1, Param2, Param3, Param4))> {
-public:
-	void operator()(DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4))>* instance,
-		Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
-		m_retVal = (*instance)(p1, p2, p3, p4);
-	}
-
-	RetType GetRetVal() { return m_retVal; }
-private:
-	RetType m_retVal;
-};
-
-// N=4 void return
-template <class TClass, class Param1, class Param2, class Param3, class Param4>
-class DelegateMemberAsyncWaitInvoke<void(TClass(Param1, Param2, Param3, Param4))> {
-public:
-	void operator()(DelegateMember<void(TClass(Param1, Param2, Param3, Param4))>* instance,
-		Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
-		(*instance)(p1, p2, p3, p4);
-	}
-
-	void GetRetVal() { }
-};
-
-// N=5
-template <class TClass, class RetType, class Param1, class Param2, class Param3, class Param4, class Param5>
-class DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1, Param2, Param3, Param4, Param5))> {
-public:
-	void operator()(DelegateMember<RetType(TClass(Param1, Param2, Param3, Param4, Param5))>* instance,
-		Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
-		m_retVal = (*instance)(p1, p2, p3, p4, p5);
-	}
-
-	RetType GetRetVal() { return m_retVal; }
-private:
-	RetType m_retVal;
-};
-
-// N=5 void return
-template <class TClass, class Param1, class Param2, class Param3, class Param4, class Param5>
-class DelegateMemberAsyncWaitInvoke<void(TClass(Param1, Param2, Param3, Param4, Param5))> {
-public:
-	void operator()(DelegateMember<void(TClass(Param1, Param2, Param3, Param4, Param5))>* instance,
-		Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
-		(*instance)(p1, p2, p3, p4, p5);
-	}
-
-	void GetRetVal() { }
-};
-
-template <typename Signature>
-class DelegateFreeAsyncWaitInvoke;
-
-// N=0
-template <class RetType>
-class DelegateFreeAsyncWaitInvoke<RetType(void)> {
-public:
-	virtual void operator()(DelegateFree<RetType(void)>* instance) {
-		m_retVal = (*instance)();
-	}
-
-	RetType GetRetVal() { return m_retVal; }
-private:
-	RetType m_retVal;
-};
-
-// N=0 void return
-template <>
-class DelegateFreeAsyncWaitInvoke<void(void)> {
-public:
-	virtual void operator()(DelegateFree<void(void)>* instance) {
-		(*instance)();
-	}
-
-	void GetRetVal() { }
-};
-
-// N=1
-template <class RetType, class Param1>
-class DelegateFreeAsyncWaitInvoke<RetType(Param1)> {
-public:
-	virtual void operator()(DelegateFree<RetType(Param1)>* instance,
-		Param1 p1) {
-		m_retVal = (*instance)(p1);
-	}
-
-	RetType GetRetVal() { return m_retVal; }
-private:
-	RetType m_retVal;
-};
-
-// N=1 void return
-template <class Param1>
-class DelegateFreeAsyncWaitInvoke<void(Param1)> {
-public:
-	virtual void operator()(DelegateFree<void(Param1)>* instance,
-		Param1 p1) {
-		(*instance)(p1);
-	}
-
-	void GetRetVal() { }
-};
-
-// N=2
-template <class RetType, class Param1, class Param2>
-class DelegateFreeAsyncWaitInvoke<RetType(Param1, Param2)> {
-public:
-	virtual void operator()(DelegateFree<RetType(Param1, Param2)>* instance,
-		Param1 p1, Param2 p2) {
-		m_retVal = (*instance)(p1, p2);
-	}
-
-	RetType GetRetVal() { return m_retVal; }
-private:
-	RetType m_retVal;
-};
-
-// N=2 void return
-template <class Param1, class Param2>
-class DelegateFreeAsyncWaitInvoke<void(Param1, Param2)> {
-public:
-	virtual void operator()(DelegateFree<void(Param1, Param2)>* instance,
-		Param1 p1, Param2 p2) {
-		(*instance)(p1, p2);
-	}
-
-	void GetRetVal() { }
-};
-
-// N=3
-template <class RetType, class Param1, class Param2, class Param3>
-class DelegateFreeAsyncWaitInvoke<RetType(Param1, Param2, Param3)> {
-public:
-	virtual void operator()(DelegateFree<RetType(Param1, Param2, Param3)>* instance,
-		Param1 p1, Param2 p2, Param3 p3) {
-		m_retVal = (*instance)(p1, p2, p3);
-	}
-
-	RetType GetRetVal() { return m_retVal; }
-private:
-	RetType m_retVal;
-};
-
-// N=3 void return
-template <class Param1, class Param2, class Param3>
-class DelegateFreeAsyncWaitInvoke<void(Param1, Param2, Param3)> {
-public:
-	virtual void operator()(DelegateFree<void(Param1, Param2, Param3)>* instance,
-		Param1 p1, Param2 p2, Param3 p3) {
-		(*instance)(p1, p2, p3);
-	}
-
-	void GetRetVal() { }
-};
-
-// N=4
-template <class RetType, class Param1, class Param2, class Param3, class Param4>
-class DelegateFreeAsyncWaitInvoke<RetType(Param1, Param2, Param3, Param4)> {
-public:
-	virtual void operator()(DelegateFree<RetType(Param1, Param2, Param3, Param4)>* instance,
-		Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
-		m_retVal = (*instance)(p1, p2, p3, p4);
-	}
-
-	RetType GetRetVal() { return m_retVal; }
-private:
-	RetType m_retVal;
-};
-
-// N=4 void return
-template <class Param1, class Param2, class Param3, class Param4>
-class DelegateFreeAsyncWaitInvoke<void(Param1, Param2, Param3, Param4)> {
-public:
-	virtual void operator()(DelegateFree<void(Param1, Param2, Param3, Param4)>* instance,
-		Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
-		(*instance)(p1, p2, p3, p4);
-	}
-
-	void GetRetVal() { }
-};
-
-// N=5
-template <class RetType, class Param1, class Param2, class Param3, class Param4, class Param5>
-class DelegateFreeAsyncWaitInvoke<RetType(Param1, Param2, Param3, Param4, Param5)> {
-public:
-	virtual void operator()(DelegateFree<RetType(Param1, Param2, Param3, Param4, Param5)>* instance,
-		Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
-		m_retVal = (*instance)(p1, p2, p3, p4, p5);
-	}
-
-	RetType GetRetVal() { return m_retVal; }
-private:
-	RetType m_retVal;
-};
-
-// N=5 void return
-template <class Param1, class Param2, class Param3, class Param4, class Param5>
-class DelegateFreeAsyncWaitInvoke<void(Param1, Param2, Param3, Param4, Param5)> {
-public:
-	virtual void operator()(DelegateFree<void(Param1, Param2, Param3, Param4, Param5)>* instance,
-		Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
-		(*instance)(p1, p2, p3, p4, p5);
-	}
-
-	void GetRetVal() { }
 };
 
 // Declare DelegateMember as a class template. It will be specialized for all number of arguments.
@@ -465,7 +209,7 @@ private:
 	int m_timeout = 0;						// Time in mS to wait for async function to invoke
 	Semaphore m_sema;						// Semaphore to signal waiting thread
 	bool m_sync = false;                    // Set true when synchronous invocation is required
-	DelegateMemberAsyncWaitInvoke<RetType(TClass(void))> m_invoke;
+	DelegateMemberAsyncWaitInvoke<TClass, RetType(void)> m_invoke;
 };
 
 // N=1  
@@ -595,7 +339,7 @@ private:
 	int m_timeout = 0;						// Time in mS to wait for async function to invoke
 	Semaphore m_sema;						// Semaphore to signal waiting thread
 	bool m_sync = false;                    // Set true when synchronous invocation is required
-	DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1))> m_invoke;
+	DelegateMemberAsyncWaitInvoke<TClass, RetType(Param1)> m_invoke;
 };
 
 // N=2
@@ -726,7 +470,7 @@ private:
 	int m_timeout = 0;						// Time in mS to wait for async function to invoke
 	Semaphore m_sema;						// Semaphore to signal waiting thread
 	bool m_sync = false;                    // Set true when synchronous invocation is required
-	DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1, Param2))> m_invoke;
+	DelegateMemberAsyncWaitInvoke<TClass, RetType(Param1, Param2)> m_invoke;
 };
 
 // N=3 
@@ -858,7 +602,7 @@ private:
 	int m_timeout = 0;						// Time in mS to wait for async function to invoke
 	Semaphore m_sema;						// Semaphore to signal waiting thread
 	bool m_sync = false;                    // Set true when synchronous invocation is required
-	DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1, Param2, Param3))> m_invoke;
+	DelegateMemberAsyncWaitInvoke<TClass, RetType(Param1, Param2, Param3)> m_invoke;
 };
 
 // N=4
@@ -991,7 +735,7 @@ private:
 	int m_timeout = 0;						// Time in mS to wait for async function to invoke
 	Semaphore m_sema;						// Semaphore to signal waiting thread
 	bool m_sync = false;                    // Set true when synchronous invocation is required
-	DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1, Param2, Param3, Param4))> m_invoke;
+	DelegateMemberAsyncWaitInvoke<TClass, RetType(Param1, Param2, Param3, Param4)> m_invoke;
 };
 
 // N=5 
@@ -1125,7 +869,7 @@ private:
 	int m_timeout = 0;						// Time in mS to wait for async function to invoke
 	Semaphore m_sema;						// Semaphore to signal waiting thread
 	bool m_sync = false;                    // Set true when synchronous invocation is required
-	DelegateMemberAsyncWaitInvoke<RetType(TClass(Param1, Param2, Param3, Param4, Param5))> m_invoke;
+	DelegateMemberAsyncWaitInvoke<TClass, RetType(Param1, Param2, Param3, Param4, Param5)> m_invoke;
 };
 
 // *** Free Classes Start ***
