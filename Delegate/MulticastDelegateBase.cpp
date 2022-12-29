@@ -7,25 +7,7 @@ namespace DelegateLib {
 //------------------------------------------------------------------------------
 void MulticastDelegateBase::operator+=(const DelegateBase& delegate)
 {
-	InvocationNode* node = new InvocationNode();
-	node->Delegate = delegate.Clone();
-	
-	// First element in the list?
-	if (m_invocationHead == 0)
-	{
-		// Set the head element
-		m_invocationHead = node;
-	}
-	else
-	{
-		// Iterate over list until the end of list is found
-		InvocationNode* curr = m_invocationHead;
-		while (curr->Next != 0)
-			curr = curr->Next;
-		
-		// Set the info pointer at the end of the list
-		curr->Next = node;
-	}
+	m_delegates.push_back(delegate.Clone());
 }
 
 //------------------------------------------------------------------------------
@@ -33,26 +15,15 @@ void MulticastDelegateBase::operator+=(const DelegateBase& delegate)
 //------------------------------------------------------------------------------
 void MulticastDelegateBase::operator-=(const DelegateBase& delegate)
 {
-	// Iterate over list to find delegate to remove
-	InvocationNode* curr = m_invocationHead;
-	InvocationNode* prev = 0;
-	while (curr != 0)
+	for (auto it = m_delegates.begin(); it != m_delegates.end(); ++it)
 	{
-		// Is this the delegate to remove?
-		if (*curr->Delegate == delegate)
+		if (*(&delegate) == *((*it)))
 		{
-			if (curr == m_invocationHead)
-				m_invocationHead = curr->Next;
-			else
-				prev->Next = curr->Next;
-			
-			delete curr->Delegate;
-			delete curr;
+			delete (*it);
+			m_delegates.erase(it);
 			break;
 		}
-		prev = curr;
-		curr = curr->Next;
-	}	
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -60,12 +31,11 @@ void MulticastDelegateBase::operator-=(const DelegateBase& delegate)
 //------------------------------------------------------------------------------
 void MulticastDelegateBase::Clear()
 {
-	while (m_invocationHead)
+	auto it = m_delegates.begin();
+	while (it != m_delegates.end())
 	{
-		InvocationNode* curr = m_invocationHead;
-		m_invocationHead = curr->Next;
-		delete curr->Delegate;
-		delete curr;
+		delete (*it);
+		it = m_delegates.erase(it);
 	}
 }
 

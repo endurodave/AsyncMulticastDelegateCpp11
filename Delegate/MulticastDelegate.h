@@ -16,11 +16,10 @@ class MulticastDelegate : public MulticastDelegateBase
 public:
 	MulticastDelegate() = default;
 	void operator()() {
-		InvocationNode* node = GetInvocationHead();
-		while (node != 0) {
-			auto delegate = static_cast<Delegate<void(void)>*>(node->Delegate);
+		auto delegates = Delegates();
+		for (DelegateBase* d : delegates) {
+			auto delegate = static_cast<Delegate<void(void)>*>(d);
 			(*delegate)();	// Invoke delegate callback
-			node = node->Next;
 		}
 	}
 	void operator+=(const Delegate<void(void)>& delegate) { MulticastDelegateBase::operator+=(delegate); }
@@ -38,11 +37,10 @@ class MulticastDelegate<void(Param1)> : public MulticastDelegateBase
 public:
 	MulticastDelegate() = default;
 	void operator()(Param1 p1) {
-		InvocationNode* node = GetInvocationHead();
-		while (node != 0) {
-			auto delegate = static_cast<Delegate<void(Param1)>*>(node->Delegate);
+		auto delegates = Delegates();
+		for (DelegateBase* d : delegates) {
+			auto delegate = static_cast<Delegate<void(Param1)>*>(d);
 			(*delegate)(p1);	// Invoke delegate callback
-			node = node->Next;
 		}
 	}
 	void operator+=(const Delegate<void(Param1)>& delegate) { MulticastDelegateBase::operator+=(delegate); }
@@ -60,11 +58,10 @@ class MulticastDelegate<void(Param1, Param2)> : public MulticastDelegateBase
 public:
 	MulticastDelegate() = default;
 	void operator()(Param1 p1, Param2 p2) {
-		InvocationNode* node = GetInvocationHead();
-		while (node != 0) {
-			auto delegate = static_cast<Delegate<void(Param1, Param2)>*>(node->Delegate);
+		auto delegates = Delegates();
+		for (DelegateBase* d : delegates) {
+			auto delegate = static_cast<Delegate<void(Param1, Param2)>*>(d);
 			(*delegate)(p1, p2);	// Invoke delegate callback
-			node = node->Next;
 		}
 	}
 	void operator+=(const Delegate<void (Param1, Param2)>& delegate) { MulticastDelegateBase::operator+=(delegate); }
@@ -82,11 +79,10 @@ class MulticastDelegate<void(Param1, Param2, Param3)> : public MulticastDelegate
 public:
 	MulticastDelegate() = default;
 	void operator()(Param1 p1, Param2 p2, Param3 p3) {
-		InvocationNode* node = GetInvocationHead();
-		while (node != 0) {
-			auto delegate = static_cast<Delegate<void(Param1, Param2, Param3)>*>(node->Delegate);
+		auto delegates = Delegates();
+		for (DelegateBase* d : delegates) {
+			auto delegate = static_cast<Delegate<void(Param1, Param2, Param3)>*>(d);
 			(*delegate)(p1, p2, p3);	// Invoke delegate callback
-			node = node->Next;
 		}
 	}
 	void operator+=(const Delegate<void (Param1, Param2, Param3)>& delegate) { MulticastDelegateBase::operator+=(delegate); }
@@ -104,11 +100,10 @@ class MulticastDelegate<void(Param1, Param2, Param3, Param4)> : public Multicast
 public:
     MulticastDelegate() = default;
 	void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) {
-		InvocationNode* node = GetInvocationHead();
-		while (node != 0) {
-			auto delegate = static_cast<Delegate<void(Param1, Param2, Param3, Param4)>*>(node->Delegate);
+		auto delegates = Delegates();
+		for (DelegateBase* d : delegates) {
+			auto delegate = static_cast<Delegate<void(Param1, Param2, Param3, Param4)>*>(d);
 			(*delegate)(p1, p2, p3, p4);	// Invoke delegate callback
-			node = node->Next;
 		}
 	}
 	void operator+=(const Delegate<void (Param1, Param2, Param3, Param4)>& delegate) { MulticastDelegateBase::operator+=(delegate); }
@@ -126,11 +121,10 @@ class MulticastDelegate<void(Param1, Param2, Param3, Param4, Param5)> : public M
 public:
     MulticastDelegate() = default;
 	void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) {
-		InvocationNode* node = GetInvocationHead();
-		while (node != 0) {
-			auto delegate = static_cast<Delegate<void(Param1, Param2, Param3, Param4, Param5)>*>(node->Delegate);
+		auto delegates = Delegates();
+		for (DelegateBase* d : delegates) {
+			auto delegate = static_cast<Delegate<void(Param1, Param2, Param3, Param4, Param5)>*>(d);
 			(*delegate)(p1, p2, p3, p4, p5);	// Invoke delegate callback
-			node = node->Next;
 		}
 	}
 	void operator+=(const Delegate<void (Param1, Param2, Param3, Param4, Param5)>& delegate) { MulticastDelegateBase::operator+=(delegate); }

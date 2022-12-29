@@ -20,7 +20,7 @@
 
 namespace DelegateLib {
 
-const int WAIT_INFINITE = -1;
+constexpr int WAIT_INFINITE = -1;
 
 template <class C, class R>
 struct DelegateMemberAsyncWaitInvoke; // Not defined

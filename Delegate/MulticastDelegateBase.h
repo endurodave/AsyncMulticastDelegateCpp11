@@ -2,37 +2,27 @@
 #define _MULTICAST_DELEGATE_BASE_H
 
 #include "Delegate.h"
+#include <list>
 
 namespace DelegateLib {
 
 /// @brief A non-template base class for the multicast delegates. 
-/// @details Since the MulticastDelegate template class inherits from this class, 
-/// as much code is placed into this base class as possible to minimize the
-/// template code instantiation. 
 class MulticastDelegateBase
 {
 public:
 	/// Constructor
-	MulticastDelegateBase() : m_invocationHead(0) {}
+	MulticastDelegateBase() = default;
 
 	/// Destructor
 	virtual ~MulticastDelegateBase() { Clear(); }
 
 	/// Any registered delegates?
-	bool Empty() const { return !m_invocationHead; }
+	bool Empty() const { return m_delegates.empty(); }
 
 	/// Removal all registered delegates.
 	void Clear();
 
     explicit operator bool() const { return !Empty(); }
-
-protected:
-	struct InvocationNode
-	{
-		InvocationNode() : Next(0), Delegate(0) { }
-		InvocationNode* Next;
-		DelegateBase* Delegate;
-	};
 
 	/// Insert a delegate into the invocation list. A delegate argument 
 	/// pointer is not stored. Instead, the DelegateBase derived object is 
@@ -45,17 +35,18 @@ protected:
 	/// @param[in] delegate - a delegate to unregister. 
 	void operator-=(const DelegateBase& delegate);
 
+protected:
 	/// Get the head of the delegate invocation list. 
 	/// @return Pointer to the head of the invocation list. 
-	InvocationNode* GetInvocationHead() { return m_invocationHead; }
+	const std::list<DelegateBase*>& Delegates() const { return m_delegates; }
 
 private:
 	// Prevent copying objects
 	MulticastDelegateBase(const MulticastDelegateBase&) = delete;
 	MulticastDelegateBase& operator=(const MulticastDelegateBase&) = delete;
 
-	/// Head pointer to the delegate invocation list
-	InvocationNode* m_invocationHead;
+	/// List of registered delegates
+	std::list<DelegateBase*> m_delegates;
 };
 
 }
