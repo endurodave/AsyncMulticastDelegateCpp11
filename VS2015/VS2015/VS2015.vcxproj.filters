@@ -159,8 +159,5 @@
     <ClCompile Include="..\..\Port\Timer.cpp">
       <Filter>Port</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Delegate\DelegateAsync.cpp">
-      <Filter>Delegate</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
