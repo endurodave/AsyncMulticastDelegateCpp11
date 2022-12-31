@@ -262,7 +262,7 @@ MulticastDelegateSafe1&lt;TestStruct*&gt; delegateC;</pre>
 <p>A thread pointer as the last argument to <code>MakeDelegate()</code> forces creation of an asynchronous delegate. In this case, adding a thread argument causes <code>MakeDelegate()</code> to return a <code>DelegateMemberAsync1&lt;&gt;</code> as opposed to <code>DelegateMember1&lt;&gt;</code>.</p>
 
 <pre lang="C++">
-delegateC += MakeDelegate(&amp;testClass, &amp;TestClass::MemberFunc, &amp;workerThread1);</pre>
+delegateC += MakeDelegate(&amp;testClass, &amp;TestClass::MemberFunc, workerThread1);</pre>
 
 <p>Invocation is the same as the synchronous version, yet this time the callback function <code>TestClass::MemberFunc()</code> is called from <code>workerThread1</code>.</p>
 
@@ -276,7 +276,7 @@ if (delegateC)
 // Create delegate with std::string and int arguments then asychronously
 // invoke on a member function
 MulticastDelegateSafe2&lt;const std::string&amp;, int&gt; delegateH;
-delegateH += MakeDelegate(&amp;testClass, &amp;TestClass::MemberFuncStdString, &amp;workerThread1);
+delegateH += MakeDelegate(&amp;testClass, &amp;TestClass::MemberFuncStdString, workerThread1);
 delegateH(&quot;Hello world&quot;, 2016);</pre>
 
 <p>Usage of the library is consistent between synchronous and asynchronous delegates. The only difference is the addition of a thread pointer argument to<code> MakeDelegate()</code>. Remember to always use the thread-safe <code>MulticastDelegateSafeX&lt;&gt;</code> containers when using asynchronous delegates to callback across thread boundaries.</p>
@@ -309,7 +309,7 @@ delegateMemberSp(&quot;Hello world using shared_ptr&quot;, 2016);</pre>
 // the bound delegate function the testClassHeap instance is deleted and no longer valid.
 TestClass* testClassHeap = new TestClass();
 auto delegateMemberAsync = 
-    MakeDelegate(testClassHeap, &amp;TestClass::MemberFuncStdString, &amp;workerThread1);
+    MakeDelegate(testClassHeap, &amp;TestClass::MemberFuncStdString, workerThread1);
 delegateMemberAsync(&quot;Function async invoked on deleted object. Bug!&quot;, 2016);
 delegateMemberAsync.Clear();
 delete testClassHeap;
@@ -324,7 +324,7 @@ delete testClassHeap;
 // is only deleted after workerThread1 invokes the callback function thus solving the bug.
 std::shared_ptr&lt;TestClass&gt; testClassSp(new TestClass());
 auto delegateMemberSpAsync = 
-    MakeDelegate(testClassSp, &amp;TestClass::MemberFuncStdString, &amp;workerThread1);
+    MakeDelegate(testClassSp, &amp;TestClass::MemberFuncStdString, workerThread1);
 delegateMemberSpAsync(&quot;Function async invoked using smart pointer. Bug solved!&quot;, 2016);
 delegateMemberSpAsync.Clear();
 testClassSp.reset();
@@ -335,7 +335,7 @@ testClassSp.reset();
 <pre lang="C++">
 std::shared_ptr&lt;TestClass&gt; testClassSp(new TestClass());
 auto delegateMemberSpAsync = 
-    MakeDelegate(testClassSp, &amp;TestClass::MemberFuncStdString, &amp;workerThread1);
+    MakeDelegate(testClassSp, &amp;TestClass::MemberFuncStdString, workerThread1);
 delegateMemberSpAsync(&quot;testClassSp deletes after delegate invokes&quot;, 2016);
 </pre>
 
@@ -352,7 +352,7 @@ delegateMemberSpAsync(&quot;testClassSp deletes after delegate invokes&quot;, 20
 <pre lang="C++">
 DelegateMemberAsyncWait1&lt;TestClass, std::string&amp;, int&gt; delegateI =
               MakeDelegate(&amp;testClass, &amp;TestClass::MemberFuncStdStringRetInt, 
-                           &amp;workerThread1, WAIT_INFINITE);
+                           workerThread1, WAIT_INFINITE);
 std::string msg;
 int year = delegateI(msg);
 if (delegateI.IsSuccess())
@@ -363,7 +363,7 @@ if (delegateI.IsSuccess())
 <pre lang="C++">
 auto delegateI = 
     MakeDelegate(&amp;testClass, &amp;TestClass::MemberFuncStdStringRetInt, 
-                 &amp;workerThread1, WAIT_INFINITE);
+                 workerThread1, WAIT_INFINITE);
 std::string msg;
 int year = delegateI(msg);
 if (delegateI.IsSuccess())
@@ -381,7 +381,7 @@ auto LambdaFunc1 = +[](int i) -&gt; int
 };
 
 // Asynchronously invoke lambda on workerThread1 and wait for the return value
-auto lambdaDelegate1 = MakeDelegate(LambdaFunc1, &amp;workerThread1, WAIT_INFINITE);
+auto lambdaDelegate1 = MakeDelegate(LambdaFunc1, workerThread1, WAIT_INFINITE);
 int lambdaRetVal2 = lambdaDelegate1(123);
 </pre>
 
@@ -394,7 +394,7 @@ auto CountLambda = +[](int v) -&gt; int
 {
     return v &gt; 2 &amp;&amp; v &lt;= 6;
 };
-auto countLambdaDelegate = MakeDelegate(CountLambda, &amp;workerThread1, WAIT_INFINITE);
+auto countLambdaDelegate = MakeDelegate(CountLambda, workerThread1, WAIT_INFINITE);
 
 const auto valAsyncResult = std::count_if(v.begin(), v.end(),
     countLambdaDelegate);
@@ -810,7 +810,7 @@ void ArrayFunc(char a[]) {}</pre>
 
 <pre lang="C++">
 MulticastDelegateSafe1&lt;char*&gt; delegateArrayFunc;
-delegateArrayFunc += MakeDelegate(&amp;ArrayFunc, &amp;workerThread1);</pre>
+delegateArrayFunc += MakeDelegate(&amp;ArrayFunc, workerThread1);</pre>
 
 <p>There is no way to asynchronously pass a C-style array by value. The best that can be achieved is to pass the array by pointer using the previously described template specialization technique. The class below passes every <code>char*</code>, <code>char a[]</code> or <code>char a[N]</code> as a <code>char*</code> and the array pointer will be passed to the invoked function without attempting a copy. Remember, it is up to you to ensure the pointer remains valid on the destination thread.</p>
 
@@ -1190,9 +1190,9 @@ SysDataClient() :
 {
      // Register for async delegate callbacks
      SysData::GetInstance().SystemModeChangedDelegate += 
-           MakeDelegate(this, &amp;SysDataClient::CallbackFunction, &amp;workerThread1);
+           MakeDelegate(this, &amp;SysDataClient::CallbackFunction, workerThread1);
      SysDataNoLock::GetInstance().SystemModeChangedDelegate += 
-           MakeDelegate(this, &amp;SysDataClient::CallbackFunction, &amp;workerThread1);
+           MakeDelegate(this, &amp;SysDataClient::CallbackFunction, workerThread1);
 }</pre>
 
 <p><code>SysDataClient::CallbackFunction()</code> is now called on <code>workerThread1 </code>when the system mode changes.</p>
