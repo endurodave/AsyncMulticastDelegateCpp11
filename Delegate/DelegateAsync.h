@@ -10,7 +10,7 @@
 #include "DelegateInvoker.h"
 #include <memory>
 #include <type_traits>
-#if USE_XALLOCATOR
+#ifdef USE_XALLOCATOR
 	#include <new>
 #endif
 
@@ -55,7 +55,7 @@ class DelegateParam<Param *>
 {
 public:
 	static Param* New(Param* param)	{
-#if USE_XALLOCATOR
+#ifdef USE_XALLOCATOR
 		void* mem = xmalloc(sizeof(*param));
 		Param* newParam = new (mem) Param(*param);
 #else
@@ -65,7 +65,7 @@ public:
 	}
 
 	static void Delete(Param* param) {
-#if USE_XALLOCATOR
+#ifdef USE_XALLOCATOR
 		param->~Param();
 		xfree((void*)param);
 #else
@@ -80,7 +80,7 @@ class DelegateParam<Param **>
 {
 public:
 	static Param** New(Param** param) {
-#if USE_XALLOCATOR
+#ifdef USE_XALLOCATOR
 		void* mem = xmalloc(sizeof(*param));
 		Param** newParam = new (mem) Param*();
 
@@ -94,7 +94,7 @@ public:
 	}
 
 	static void Delete(Param** param) {
-#if USE_XALLOCATOR
+#ifdef USE_XALLOCATOR
 		(*param)->~Param();
 		xfree((void*)(*param));
 
@@ -112,7 +112,7 @@ class DelegateParam<Param &>
 {
 public:
 	static Param& New(Param& param)	{
-#if USE_XALLOCATOR
+#ifdef USE_XALLOCATOR
 		void* mem = xmalloc(sizeof(param));
 		Param* newParam = new (mem) Param(param);
 #else
@@ -122,7 +122,7 @@ public:
 	}
 
 	static void Delete(Param& param) {
-#if USE_XALLOCATOR
+#ifdef USE_XALLOCATOR
 		(&param)->~Param();
 		xfree((void*)(&param));
 #else
@@ -257,8 +257,9 @@ public:
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(msg.get());
-
+		auto delegateMsg = std::dynamic_pointer_cast<DelegateMsg1<Param1>>(msg);
+		ASSERT_TRUE(delegateMsg != nullptr);
+		
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
 
@@ -336,7 +337,8 @@ public:
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(msg.get());
+		auto delegateMsg = std::dynamic_pointer_cast<DelegateMsg2<Param1, Param2>>(msg);
+		ASSERT_TRUE(delegateMsg != nullptr);
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
@@ -419,7 +421,8 @@ public:
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg3<Param1, Param2, Param3>* delegateMsg = static_cast<DelegateMsg3<Param1, Param2, Param3>*>(msg.get());
+		auto delegateMsg = std::dynamic_pointer_cast<DelegateMsg3<Param1, Param2, Param3>>(msg);
+		ASSERT_TRUE(delegateMsg != nullptr);
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
@@ -506,7 +509,8 @@ public:
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg4<Param1, Param2, Param3, Param4>* delegateMsg = static_cast<DelegateMsg4<Param1, Param2, Param3, Param4>*>(msg.get());
+		auto delegateMsg = std::dynamic_pointer_cast<DelegateMsg4<Param1, Param2, Param3, Param4>>(msg);
+		ASSERT_TRUE(delegateMsg != nullptr);
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
@@ -597,7 +601,8 @@ public:
 	/// Called by the target thread to invoke the delegate function 
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* delegateMsg = static_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>*>(msg.get());
+		auto delegateMsg = std::dynamic_pointer_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>>(msg);
+		ASSERT_TRUE(delegateMsg != nullptr);
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
@@ -725,7 +730,8 @@ public:
 	// Called to invoke the delegate function on the target thread of control
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg1<Param1>* delegateMsg = static_cast<DelegateMsg1<Param1>*>(msg.get());
+		auto delegateMsg = std::dynamic_pointer_cast<DelegateMsg1<Param1>>(msg);
+		ASSERT_TRUE(delegateMsg != nullptr);
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
@@ -794,7 +800,8 @@ public:
 	// Called to invoke the delegate function on the target thread of control
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg2<Param1, Param2>* delegateMsg = static_cast<DelegateMsg2<Param1, Param2>*>(msg.get());
+		auto delegateMsg = std::dynamic_pointer_cast<DelegateMsg2<Param1, Param2>>(msg);
+		ASSERT_TRUE(delegateMsg != nullptr);
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
@@ -867,7 +874,8 @@ public:
 	// Called to invoke the delegate function on the target thread of control
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg3<Param1, Param2, Param3>* delegateMsg = static_cast<DelegateMsg3<Param1, Param2, Param3>*>(msg.get());
+		auto delegateMsg = std::dynamic_pointer_cast<DelegateMsg3<Param1, Param2, Param3>>(msg);
+		ASSERT_TRUE(delegateMsg != nullptr);
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
@@ -944,7 +952,8 @@ public:
 	// Called to invoke the delegate function on the target thread of control
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg4<Param1, Param2, Param3, Param4>* delegateMsg = static_cast<DelegateMsg4<Param1, Param2, Param3, Param4>*>(msg.get());
+		auto delegateMsg = std::dynamic_pointer_cast<DelegateMsg4<Param1, Param2, Param3, Param4>>(msg);
+		ASSERT_TRUE(delegateMsg != nullptr);
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();
@@ -1025,7 +1034,8 @@ public:
 	// Called to invoke the delegate function on the target thread of control
 	virtual void DelegateInvoke(std::shared_ptr<DelegateMsgBase> msg) override {
 		// Typecast the base pointer to back to the templatized instance
-		DelegateMsg5<Param1, Param2, Param3, Param4, Param5>* delegateMsg = static_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>*>(msg.get());
+		auto delegateMsg = std::dynamic_pointer_cast<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>>(msg);
+		ASSERT_TRUE(delegateMsg != nullptr);
 
 		// Get the function parameter data
 		Param1 param1 = delegateMsg->GetParam1();

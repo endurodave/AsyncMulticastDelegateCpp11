@@ -1,7 +1,7 @@
 #ifndef _THREAD_MSG_H
 #define _THREAD_MSG_H
 
-#if USE_XALLOCATOR
+#ifdef USE_XALLOCATOR
 	#include "xallocator.h"
 #endif
 
@@ -9,7 +9,7 @@
 /// through the OS message queue. 
 class ThreadMsg
 {
-#if USE_XALLOCATOR
+#ifdef USE_XALLOCATOR
 	XALLOCATOR
 #endif
 public:
