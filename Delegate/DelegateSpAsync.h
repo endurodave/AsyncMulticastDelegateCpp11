@@ -29,17 +29,17 @@ public:
     using BaseType = DelegateMemberSp<void(TClass(void))>;
 
 	// Contructors take a class instance, member function, and delegate thread
-	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
-	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread& thread) : BaseType(object, func), m_thread(thread) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread& thread) : BaseType(object, func), m_thread(thread) { Bind(object, func, thread); }
 	DelegateMemberSpAsync() = delete;
 
 	/// Bind a member function to a delegate. 
-	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
+	void Bind(ObjectPtr object, MemberFunc func, DelegateThread& thread) {
 		m_thread = thread; 
 		BaseType::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread& thread) {
 		m_thread = thread;
 		BaseType::Bind(object, func); }
 
@@ -48,25 +48,20 @@ public:
 	virtual bool operator==(const DelegateBase& rhs) const override {
 		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
-			m_thread == derivedRhs->m_thread && 
+			&m_thread == &derivedRhs->m_thread && 
 			BaseType::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()() override {
-		if (m_thread == nullptr)
-			BaseType::operator()();
-		else
-		{
-			// Create a clone instance of this delegate 
-			auto delegate = std::shared_ptr<ClassType>(Clone());
+		// Create a clone instance of this delegate 
+		auto delegate = std::shared_ptr<ClassType>(Clone());
 
-			// Create a new message instance 
-			auto msg = std::make_shared<DelegateMsgBase>(delegate);
+		// Create a new message instance 
+		auto msg = std::make_shared<DelegateMsgBase>(delegate);
 
-			// Dispatch message onto the callback destination thread. DelegateInvoke()
-			// will be called by the target thread. 
-			m_thread->DispatchDelegate(msg);
-		}
+		// Dispatch message onto the callback destination thread. DelegateInvoke()
+		// will be called by the target thread. 
+		m_thread.DispatchDelegate(msg);
 	}
 
 	/// Called by the target thread to invoke the delegate function 
@@ -77,7 +72,7 @@ public:
 
 private:
 	/// Target thread to invoke the delegate function
-	DelegateThread* m_thread = nullptr;
+	DelegateThread& m_thread;
 };
 
 template <class TClass, class Param1> 
@@ -90,17 +85,17 @@ public:
     using BaseType = DelegateMemberSp<void(TClass(Param1))>;
 
 	// Contructors take a class instance, member function, and callback thread
-	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
-	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread& thread) : BaseType(object, func), m_thread(thread) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread& thread) : BaseType(object, func), m_thread(thread) { Bind(object, func, thread); }
 	DelegateMemberSpAsync() = delete;
 
 	/// Bind a member function to a delegate. 
-	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
+	void Bind(ObjectPtr object, MemberFunc func, DelegateThread& thread) {
 		m_thread = thread; 
 		BaseType::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread& thread) {
 		m_thread = thread;
 		BaseType::Bind(object, func); }
 
@@ -109,28 +104,23 @@ public:
 	virtual bool operator==(const DelegateBase& rhs) const override {
 		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
-			m_thread == derivedRhs->m_thread && 
+			&m_thread == &derivedRhs->m_thread && 
 			BaseType::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1) override {
-		if (m_thread == nullptr)
-			BaseType::operator()(p1);
-		else
-		{
-			// Create a new instance of the function argument data and copy
-			Param1 heapParam1 = DelegateParam<Param1>::New(p1);
+		// Create a new instance of the function argument data and copy
+		Param1 heapParam1 = DelegateParam<Param1>::New(p1);
 
-			// Create a clone instance of this delegate 
-			auto delegate = std::shared_ptr<ClassType>(Clone());
+		// Create a clone instance of this delegate 
+		auto delegate = std::shared_ptr<ClassType>(Clone());
 
-			// Create a new message instance 
-			auto msg = std::make_shared<DelegateMsg1<Param1>>(delegate, heapParam1);
+		// Create a new message instance 
+		auto msg = std::make_shared<DelegateMsg1<Param1>>(delegate, heapParam1);
 
-			// Dispatch message onto the callback destination thread. DelegateInvoke()
-			// will be called by the target thread. 
-			m_thread->DispatchDelegate(msg);
-		}
+		// Dispatch message onto the callback destination thread. DelegateInvoke()
+		// will be called by the target thread. 
+		m_thread.DispatchDelegate(msg);
 
 		static_assert(!(
 			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference<Param1>::value == true || std::is_pointer<Param1>::value == true))),
@@ -155,7 +145,7 @@ public:
 
 private:
 	/// Target thread to invoke the delegate function
-	DelegateThread* m_thread = nullptr;
+	DelegateThread& m_thread;
 };
 
 template <class TClass, class Param1, class Param2> 
@@ -168,17 +158,17 @@ public:
     using BaseType = DelegateMemberSp<void(TClass(Param1, Param2))>;
 
 	// Contructors take a class instance, member function, and callback thread
-	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
-	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread& thread) : BaseType(object, func), m_thread(thread) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread& thread) : BaseType(object, func), m_thread(thread) { Bind(object, func, thread); }
 	DelegateMemberSpAsync() = delete;
 
 	/// Bind a member function to a delegate. 
-	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
+	void Bind(ObjectPtr object, MemberFunc func, DelegateThread& thread) {
 		m_thread = thread; 
 		BaseType::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread& thread) {
 		m_thread = thread;
 		BaseType::Bind(object, func); }
 
@@ -187,29 +177,24 @@ public:
 	virtual bool operator==(const DelegateBase& rhs) const override {
 		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
-			m_thread == derivedRhs->m_thread && 
+			&m_thread == &derivedRhs->m_thread && 
 			BaseType::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2) override {
-		if (m_thread == nullptr)
-			BaseType::operator()(p1, p2);
-		else
-		{
-			// Create a new instance of the function argument data and copy
-			Param1 heapParam1 = DelegateParam<Param1>::New(p1);
-			Param2 heapParam2 = DelegateParam<Param2>::New(p2);
+		// Create a new instance of the function argument data and copy
+		Param1 heapParam1 = DelegateParam<Param1>::New(p1);
+		Param2 heapParam2 = DelegateParam<Param2>::New(p2);
 
-			// Create a clone instance of this delegate 
-			auto delegate = std::shared_ptr<ClassType>(Clone());
+		// Create a clone instance of this delegate 
+		auto delegate = std::shared_ptr<ClassType>(Clone());
 
-			// Create a new message instance 
-			auto msg = std::make_shared<DelegateMsg2<Param1, Param2>>(delegate, heapParam1, heapParam2);
+		// Create a new message instance 
+		auto msg = std::make_shared<DelegateMsg2<Param1, Param2>>(delegate, heapParam1, heapParam2);
 
-			// Dispatch message onto the callback destination thread. DelegateInvoke()
-			// will be called by the target thread. 
-			m_thread->DispatchDelegate(msg);
-		}
+		// Dispatch message onto the callback destination thread. DelegateInvoke()
+		// will be called by the target thread. 
+		m_thread.DispatchDelegate(msg);
 
 		static_assert(!(
 			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference<Param1>::value || std::is_pointer<Param1>::value)) ||
@@ -237,7 +222,7 @@ public:
 
 private:
 	/// Target thread to invoke the delegate function
-	DelegateThread* m_thread = nullptr;
+	DelegateThread& m_thread;
 };
 
 template <class TClass, class Param1, class Param2, class Param3> 
@@ -250,17 +235,17 @@ public:
     using BaseType = DelegateMemberSp<void(TClass(Param1, Param2, Param3))>;
 
 	// Contructors take a class instance, member function, and callback thread
-	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
-	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread& thread) : BaseType(object, func), m_thread(thread) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread& thread) : BaseType(object, func), m_thread(thread) { Bind(object, func, thread); }
 	DelegateMemberSpAsync() = delete;
 
 	/// Bind a member function to a delegate. 
-	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
+	void Bind(ObjectPtr object, MemberFunc func, DelegateThread& thread) {
 		m_thread = thread; 
 		BaseType::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread& thread) {
 		m_thread = thread;
 		BaseType::Bind(object, func); }
 
@@ -269,30 +254,25 @@ public:
 	virtual bool operator==(const DelegateBase& rhs) const override {
 		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
-			m_thread == derivedRhs->m_thread && 
+			&m_thread == &derivedRhs->m_thread && 
 			BaseType::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3) override {
-		if (m_thread == nullptr)
-			BaseType::operator()(p1, p2, p3);
-		else
-		{
-			// Create a new instance of the function argument data and copy
-			Param1 heapParam1 = DelegateParam<Param1>::New(p1);
-			Param2 heapParam2 = DelegateParam<Param2>::New(p2);
-			Param3 heapParam3 = DelegateParam<Param3>::New(p3);
+		// Create a new instance of the function argument data and copy
+		Param1 heapParam1 = DelegateParam<Param1>::New(p1);
+		Param2 heapParam2 = DelegateParam<Param2>::New(p2);
+		Param3 heapParam3 = DelegateParam<Param3>::New(p3);
 
-			// Create a clone instance of this delegate 
-			auto delegate = std::shared_ptr<ClassType>(Clone());
+		// Create a clone instance of this delegate 
+		auto delegate = std::shared_ptr<ClassType>(Clone());
 
-			// Create a new message instance 
-			auto msg = std::make_shared<DelegateMsg3<Param1, Param2, Param3>>(delegate, heapParam1, heapParam2, heapParam3);
+		// Create a new message instance 
+		auto msg = std::make_shared<DelegateMsg3<Param1, Param2, Param3>>(delegate, heapParam1, heapParam2, heapParam3);
 
-			// Dispatch message onto the callback destination thread. DelegateInvoke()
-			// will be called by the target thread. 
-			m_thread->DispatchDelegate(msg);
-		}
+		// Dispatch message onto the callback destination thread. DelegateInvoke()
+		// will be called by the target thread. 
+		m_thread.DispatchDelegate(msg);
 
 		static_assert(!(
 			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference<Param1>::value || std::is_pointer<Param1>::value)) ||
@@ -323,7 +303,7 @@ public:
 
 private:
 	/// Target thread to invoke the delegate function
-	DelegateThread* m_thread = nullptr;
+	DelegateThread& m_thread;
 };
 
 template <class TClass, class Param1, class Param2, class Param3, class Param4> 
@@ -336,17 +316,17 @@ public:
     using BaseType = DelegateMemberSp<void(TClass(Param1, Param2, Param3, Param4))>;
 
 	// Contructors take a class instance, member function, and callback thread
-	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
-	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread& thread) : BaseType(object, func), m_thread(thread) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread& thread) : BaseType(object, func), m_thread(thread) { Bind(object, func, thread); }
 	DelegateMemberSpAsync() = delete;
 
 	/// Bind a member function to a delegate. 
-	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
+	void Bind(ObjectPtr object, MemberFunc func, DelegateThread& thread) {
 		m_thread = thread; 
 		BaseType::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread& thread) {
 		m_thread = thread;
 		BaseType::Bind(object, func); }
 
@@ -355,31 +335,26 @@ public:
 	virtual bool operator==(const DelegateBase& rhs) const override {
 		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
-			m_thread == derivedRhs->m_thread && 
+			&m_thread == &derivedRhs->m_thread && 
 			BaseType::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4) override {
-		if (m_thread == nullptr)
-			BaseType::operator()(p1, p2, p3, p4);
-		else
-		{
-			// Create a new instance of the function argument data and copy
-			Param1 heapParam1 = DelegateParam<Param1>::New(p1);
-			Param2 heapParam2 = DelegateParam<Param2>::New(p2);
-			Param3 heapParam3 = DelegateParam<Param3>::New(p3);
-			Param4 heapParam4 = DelegateParam<Param4>::New(p4);
+		// Create a new instance of the function argument data and copy
+		Param1 heapParam1 = DelegateParam<Param1>::New(p1);
+		Param2 heapParam2 = DelegateParam<Param2>::New(p2);
+		Param3 heapParam3 = DelegateParam<Param3>::New(p3);
+		Param4 heapParam4 = DelegateParam<Param4>::New(p4);
 
-			// Create a clone instance of this delegate 
-			auto delegate = std::shared_ptr<ClassType>(Clone());
+		// Create a clone instance of this delegate 
+		auto delegate = std::shared_ptr<ClassType>(Clone());
 
-			// Create a new message instance 
-			auto msg = std::make_shared<DelegateMsg4<Param1, Param2, Param3, Param4>>(delegate, heapParam1, heapParam2, heapParam3, heapParam4);
+		// Create a new message instance 
+		auto msg = std::make_shared<DelegateMsg4<Param1, Param2, Param3, Param4>>(delegate, heapParam1, heapParam2, heapParam3, heapParam4);
 
-			// Dispatch message onto the callback destination thread. DelegateInvoke()
-			// will be called by the target thread. 
-			m_thread->DispatchDelegate(msg);
-		}
+		// Dispatch message onto the callback destination thread. DelegateInvoke()
+		// will be called by the target thread. 
+		m_thread.DispatchDelegate(msg);
 
 		static_assert(!(
 			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference<Param1>::value || std::is_pointer<Param1>::value)) ||
@@ -413,7 +388,7 @@ public:
 
 private:
 	/// Target thread to invoke the delegate function
-	DelegateThread* m_thread = nullptr;
+	DelegateThread& m_thread;
 };
 
 template <class TClass, class Param1, class Param2, class Param3, class Param4, class Param5> 
@@ -426,17 +401,17 @@ public:
     using BaseType = DelegateMemberSp<void(TClass(Param1, Param2, Param3, Param4, Param5))>;
 
 	// Contructors take a class instance, member function, and callback thread
-	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
-	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) : BaseType(object, func) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, MemberFunc func, DelegateThread& thread) : BaseType(object, func), m_thread(thread) { Bind(object, func, thread); }
+	DelegateMemberSpAsync(ObjectPtr object, ConstMemberFunc func, DelegateThread& thread) : BaseType(object, func), m_thread(thread) { Bind(object, func, thread); }
 	DelegateMemberSpAsync() = delete;
 
 	/// Bind a member function to a delegate. 
-	void Bind(ObjectPtr object, MemberFunc func, DelegateThread* thread) {
+	void Bind(ObjectPtr object, MemberFunc func, DelegateThread& thread) {
 		m_thread = thread; 
 		BaseType::Bind(object, func); }
 
 	/// Bind a const member function to a delegate. 
-	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread* thread) {
+	void Bind(ObjectPtr object, ConstMemberFunc func, DelegateThread& thread) {
 		m_thread = thread;
 		BaseType::Bind(object, func); }
 
@@ -445,32 +420,27 @@ public:
 	virtual bool operator==(const DelegateBase& rhs) const override {
 		auto derivedRhs = dynamic_cast<const ClassType*>(&rhs);
 		return derivedRhs &&
-			m_thread == derivedRhs->m_thread && 
+			&m_thread == &derivedRhs->m_thread && 
 			BaseType::operator == (rhs); }
 
 	/// Invoke delegate function asynchronously
 	virtual void operator()(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) override {
-		if (m_thread == nullptr)
-			BaseType::operator()(p1, p2, p3, p4, p5);
-		else
-		{
-			// Create a new instance of the function argument data and copy
-			Param1 heapParam1 = DelegateParam<Param1>::New(p1);
-			Param2 heapParam2 = DelegateParam<Param2>::New(p2);
-			Param3 heapParam3 = DelegateParam<Param3>::New(p3);
-			Param4 heapParam4 = DelegateParam<Param4>::New(p4);
-			Param5 heapParam5 = DelegateParam<Param5>::New(p5);
+		// Create a new instance of the function argument data and copy
+		Param1 heapParam1 = DelegateParam<Param1>::New(p1);
+		Param2 heapParam2 = DelegateParam<Param2>::New(p2);
+		Param3 heapParam3 = DelegateParam<Param3>::New(p3);
+		Param4 heapParam4 = DelegateParam<Param4>::New(p4);
+		Param5 heapParam5 = DelegateParam<Param5>::New(p5);
 
-			// Create a clone instance of this delegate 
-			auto delegate = std::shared_ptr<ClassType>(Clone());
+		// Create a clone instance of this delegate 
+		auto delegate = std::shared_ptr<ClassType>(Clone());
 
-			// Create a new message instance 
-			auto msg = std::make_shared<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>>(delegate, heapParam1, heapParam2, heapParam3, heapParam4, heapParam5);
+		// Create a new message instance 
+		auto msg = std::make_shared<DelegateMsg5<Param1, Param2, Param3, Param4, Param5>>(delegate, heapParam1, heapParam2, heapParam3, heapParam4, heapParam5);
 
-			// Dispatch message onto the callback destination thread. DelegateInvoke()
-			// will be called by the target thread. 
-			m_thread->DispatchDelegate(msg);
-		}
+		// Dispatch message onto the callback destination thread. DelegateInvoke()
+		// will be called by the target thread. 
+		m_thread.DispatchDelegate(msg);
 
 		static_assert(!(
 			(is_shared_ptr<Param1>::value && (std::is_lvalue_reference<Param1>::value || std::is_pointer<Param1>::value)) ||
@@ -507,72 +477,72 @@ public:
 
 private:
 	/// Target thread to invoke the delegate function
-	DelegateThread* m_thread = nullptr;
+	DelegateThread& m_thread;
 };
 
 //N=0
 template <class TClass>
-DelegateMemberSpAsync<void(TClass(void))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(), DelegateThread* thread) { 
+DelegateMemberSpAsync<void(TClass(void))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(), DelegateThread& thread) { 
 	return DelegateMemberSpAsync<void(TClass(void))>(object, func, thread);
 }
 
 template <class TClass>
-DelegateMemberSpAsync<void(TClass(void))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)() const, DelegateThread* thread) {
+DelegateMemberSpAsync<void(TClass(void))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)() const, DelegateThread& thread) {
 	return DelegateMemberSpAsync<void(TClass(void))>(object, func, thread);
 }
 
 //N=1
 template <class TClass, class Param1>
-DelegateMemberSpAsync<void(TClass(Param1))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1), DelegateThread* thread) {
+DelegateMemberSpAsync<void(TClass(Param1))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1), DelegateThread& thread) {
 	return DelegateMemberSpAsync<void(TClass(Param1))>(object, func, thread);
 }
 
 template <class TClass, class Param1>
-DelegateMemberSpAsync<void(TClass(Param1))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1) const, DelegateThread* thread) {
+DelegateMemberSpAsync<void(TClass(Param1))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1) const, DelegateThread& thread) {
 	return DelegateMemberSpAsync<void(TClass(Param1))>(object, func, thread);
 }
 
 //N=2
 template <class TClass, class Param1, class Param2>
-DelegateMemberSpAsync<void(TClass(Param1, Param2))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2), DelegateThread* thread) {
+DelegateMemberSpAsync<void(TClass(Param1, Param2))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2), DelegateThread& thread) {
 	return DelegateMemberSpAsync<void(TClass(Param1, Param2))>(object, func, thread);
 }
 
 template <class TClass, class Param1, class Param2>
-DelegateMemberSpAsync<void(TClass(Param1, Param2))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2) const, DelegateThread* thread) {
+DelegateMemberSpAsync<void(TClass(Param1, Param2))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2) const, DelegateThread& thread) {
 	return DelegateMemberSpAsync<void(TClass(Param1, Param2))>(object, func, thread);
 }
 
 //N=3
 template <class TClass, class Param1, class Param2, class Param3>
-DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2, Param3 p3), DelegateThread* thread) {
+DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2, Param3 p3), DelegateThread& thread) {
 	return DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3))>(object, func, thread);
 }
 
 template <class TClass, class Param1, class Param2, class Param3>
-DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2, Param3 p3) const, DelegateThread* thread) {
+DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2, Param3 p3) const, DelegateThread& thread) {
 	return DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3))>(object, func, thread);
 }
 
 //N=4
 template <class TClass, class Param1, class Param2, class Param3, class Param4>
-DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4), DelegateThread* thread) {
+DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4), DelegateThread& thread) {
 	return DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4))>(object, func, thread);
 }
 
 template <class TClass, class Param1, class Param2, class Param3, class Param4>
-DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4) const, DelegateThread* thread) {
+DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4) const, DelegateThread& thread) {
 	return DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4))>(object, func, thread);
 }
 
 //N=5
 template <class TClass, class Param1, class Param2, class Param3, class Param4, class Param5>
-DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5), DelegateThread* thread) {
+DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5), DelegateThread& thread) {
 	return DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))>(object, func, thread);
 }
 
 template <class TClass, class Param1, class Param2, class Param3, class Param4, class Param5>
-DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) const, DelegateThread* thread) {
+DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))> MakeDelegate(std::shared_ptr<TClass> object, void (TClass::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) const, DelegateThread& thread) {
 	return DelegateMemberSpAsync<void(TClass(Param1, Param2, Param3, Param4, Param5))>(object, func, thread);
 }
 
