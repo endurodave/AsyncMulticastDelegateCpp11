@@ -80,10 +80,6 @@ private:
 	RetType m_retVal;
 };
 
-// Declare DelegateMember as a class template. It will be specialized for all number of arguments.
-template <typename Signature>
-class DelegateMember;
-
 // Declare DelegateMemberAsyncWait as a class template. It will be specialized for all number of arguments.
 template <typename Signature>
 class DelegateMemberAsyncWait;
