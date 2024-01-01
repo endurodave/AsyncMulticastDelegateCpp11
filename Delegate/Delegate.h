@@ -22,7 +22,7 @@ public:
 
 	/// Derived class must implement operator== to compare objects.
 	virtual bool operator==(const DelegateBase& rhs) const = 0;
-	virtual bool operator!=(const DelegateBase& rhs) { return !(*this == rhs); }
+	virtual bool operator!=(const DelegateBase& rhs) const { return !(*this == rhs); }
 
 	/// Use Clone to provide a deep copy using a base pointer. Covariant 
 	/// overloading is used so that a Clone() method return type is a
