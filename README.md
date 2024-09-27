@@ -63,7 +63,7 @@ Originally published on CodeProject at: <a href="http://www.codeproject.com/Arti
 	<li>C++11 or higher C++ compiler required</li>
 </ol>
 
-<p>The old vs. new syntax comparison is below. The old syntax below uses standard template arguments. It also requires using the number or function arguments as part of the delegate type (e.g. <code>DelegateFree<></code> is one function argument delegate).</p>
+<p>The old vs. new syntax comparison is below. The old syntax below uses standard template arguments. It also requires using the number or function arguments as part of the delegate type (e.g. <code>DelegateFree1<></code> is one function argument delegate).</p>
 
 <pre lang="C++">
 // Create a delegate bound to a free function then invoke
@@ -91,8 +91,6 @@ delegateMember(&testStruct);
 
 <p><strong><a href="https://www.codeproject.com/Articles/1160934/Asynchronous-Multicast-Delegates-in-Cplusplus">Asynchronous Multicast Delegates in C++</a></strong> - by David Lafreniere (CodeProject)</p>
 <p><strong><a href="https://github.com/endurodave/AsyncMulticastDelegate">Asynchronous Multicast Delegates in C++ (2016)</a></strong> - by David Lafreniere (GitHub)</p>
-
-<p><b>The article that follows uses the old syntax for examples. The code snippets in the Delegate Library section may be out of date with the latest source code. The explainations, however, are generally accurate.</b></p>
 
 <h2>Delegates Background</h2>
 
@@ -134,11 +132,11 @@ delegateMember(&testStruct);
 	<li><code>DelegateMemberRemoteRecv&lt;&gt;</code></li>
 </ul>
 
-<p><code>DelegateFree&gt;</code> binds to a free or static member function. <code>DelegateMember&gt;</code> binds to a class instance member function. <code>DelegateMemberSp&gt;</code> binds to a class instance member function using a <code>std::shared_ptr</code> instead of a raw object pointer. All versions offer synchronous function invocation.</p>
+<p><code>DelegateFree&lt;&gt;</code> binds to a free or static member function. <code>DelegateMember&lt;&gt;</code> binds to a class instance member function. <code>DelegateMemberSp&lt;&gt;</code> binds to a class instance member function using a <code>std::shared_ptr</code> instead of a raw object pointer. All versions offer synchronous function invocation.</p>
 
-<p><code>DelegateFreeAsync&lt;&gt;</code><font color="#111111" face="Segoe UI, Arial, sans-serif"><span style="font-size: 14px">, </span></font><code>DelegateMemberAsync&gt;</code> and <code>DelegateMemberSpAsync&lt;&gt;</code> operate in the same way as their synchronous counterparts; except these versions offer non-blocking asynchronous function execution on a specified thread of control.</p>
+<p><code>DelegateFreeAsync&lt;&gt;</code><font color="#111111" face="Segoe UI, Arial, sans-serif"><span style="font-size: 14px">, </span></font><code>DelegateMemberAsync&lt;&gt;</code> and <code>DelegateMemberSpAsync&lt;&gt;</code> operate in the same way as their synchronous counterparts; except these versions offer non-blocking asynchronous function execution on a specified thread of control.</p>
 
-<p><code>DelegateFreeAsyncWait&gt;</code> and <code>DelegateMemberAsyncWait&lt;&gt;</code> provides blocking asynchronous function execution on a target thread with a caller supplied maximum wait timeout.</p>
+<p><code>DelegateFreeAsyncWait&lt;&gt;</code> and <code>DelegateMemberAsyncWait&lt;&gt;</code> provides blocking asynchronous function execution on a target thread with a caller supplied maximum wait timeout.</p>
 
 <p><code>DelegateRemoteSend&lt;&gt;</code>, <code>DelegateFreeRemoteRecv&lt;&gt;</code> and <code>DelegateMemberRemoteRecv&gt;</code> are explained in the article <a href="https://www.codeproject.com/Articles/5262271/Remote-Procedure-Calls-using-Cplusplus-Delegates">Remote Procedure Calls using C++ Delegates</a>.&nbsp;</p>
 
@@ -150,11 +148,11 @@ delegateMember(&testStruct);
 	<li><code>MulticastDelegateSafe&lt;&gt;</code></li>
 </ul>
 
-<p><code>SinglecastDelegate&gt;</code> is a delegate container accepting a single delegate. The advantage of the single cast version is that it is slightly smaller and allows a return type other than <code>void</code> in the bound function.</p>
+<p><code>SinglecastDelegate&lt;&gt;</code> is a delegate container accepting a single delegate. The advantage of the single cast version is that it is slightly smaller and allows a return type other than <code>void</code> in the bound function.</p>
 
-<p><code>MulticastDelegate&gt;</code> is a delegate container implemented as a singly-linked list accepting multiple delegates. Only a delegate bound to a function with a <code>void</code> return type may be added to a multicast delegate container.</p>
+<p><code>MulticastDelegate&lt;&gt;</code> is a delegate container implemented as a singly-linked list accepting multiple delegates. Only a delegate bound to a function with a <code>void</code> return type may be added to a multicast delegate container.</p>
 
-<p><code>MultcastDelegateSafe&gt;</code> is a thread-safe container implemented as a singly-linked list accepting multiple delegates. Always use the thread-safe version if multiple threads access the container instance.</p>
+<p><code>MultcastDelegateSafe&lt;&gt;</code> is a thread-safe container implemented as a singly-linked list accepting multiple delegates. Always use the thread-safe version if multiple threads access the container instance.</p>
 
 <p>Each container stores the delegate by value. This means the delegate is copied internally into either heap or fixed block memory depending on the mode. The user is not required to manually create a delegate on the heap before insertion into the container. Typically, the overloaded template function <code>MakeDelegate()</code> is used to create a delegate instance based upon the function arguments.</p>
 
@@ -175,11 +173,11 @@ void FreeFuncInt(int value)
 DelegateFree&lt;void (int)&gt; delegateFree = MakeDelegate(&amp;FreeFuncInt);
 delegateFree(123);</pre>
 
-<p>A member function is bound to a delegate in the same way, only this time <code>MakeDelegate()</code> uses two arguments: a class instance and a member function pointer. The two <code>DelegateMember1</code> template arguments are the class name and the function argument.</p>
+<p>A member function is bound to a delegate in the same way. </p>
 
 <pre lang="C++">
 // Create a delegate bound to a member function then invoke
-DelegateMember&lt;void (TestClass, TestStruct*)&gt; delegateMember = 
+DelegateMember&lt;void (TestClass(TestStruct*))&gt; delegateMember = 
                 MakeDelegate(&amp;testClass, &amp;TestClass::MemberFunc);
 delegateMember(&amp;testStruct);</pre>
 
@@ -201,7 +199,7 @@ SinglecastDelegate&lt;float (int)&gt; delegateC;</pre>
 
 <p>A <code>SinglecastDelegate&lt;&gt;</code> may bind to a function that returns a value whereas a multicast versions cannot. The reason is that when multiple callbacks are invoked, which callback function return value should be used? The correct answer is none, so multicast containers only accept delegates with function signatures using <code>void</code> as the return type.</p>
 
-<p>More function arguments mean using the <code>MulticastDelegate2</code> or <code>MulticastDelegate3</code> versions. Currently, the library supports up to five function arguments.</p>
+<p>More function arguments mean using the <code>MulticastDelegate</code>. Currently, the library supports up to five function arguments.</p>
 
 <pre lang="C++">
 MulticastDelegate&lt;void (int, int)&gt; delegateD;
@@ -347,7 +345,7 @@ delegateMemberSpAsync(&quot;testClassSp deletes after delegate invokes&quot;, 20
 
 <p>A blocking delegate must specify a timeout in milliseconds or <code>WAIT_INFINITE</code>. Unlike a non-blocking asynchronous delegate, which is guaranteed to be invoked, if the timeout expires on a blocking delegate, the function is not invoked. Use <code>IsSuccess()</code> to determine if the delegate succeeded or not.</p>
 
-<p>Adding a timeout as the last argument to <code>MakeDelegate()</code> causes a <code>DelegateFreeAsyncWait&gt;</code> or <code>DelegateMemberAsyncWait&gt;</code> instance to be returned depending on if a free or member function is being bound. A &quot;<code>Wait</code>&quot; delegate is typically not added to a delegate container. The typical usage pattern is to create a delegate and function arguments on the stack, then invoke. The code fragment below creates a blocking delegate with the function signature <code>int (std::string&amp;)</code>. The function is called on <code>workerThread1</code>. The function <code>MemberFuncStdStringRetInt()</code> will update the outgoing string <code>msg </code>and return an integer to the caller.</p>
+<p>Adding a timeout as the last argument to <code>MakeDelegate()</code> causes a <code>DelegateFreeAsyncWait&lt;&gt;</code> or <code>DelegateMemberAsyncWait&lt;&gt;</code> instance to be returned depending on if a free or member function is being bound. A &quot;<code>Wait</code>&quot; delegate is typically not added to a delegate container. The typical usage pattern is to create a delegate and function arguments on the stack, then invoke. The code fragment below creates a blocking delegate with the function signature <code>int (std::string&amp;)</code>. The function is called on <code>workerThread1</code>. The function <code>MemberFuncStdStringRetInt()</code> will update the outgoing string <code>msg </code>and return an integer to the caller.</p>
 
 <pre lang="C++">
 DelegateMemberAsyncWait&lt;void (TestClass, std::string&amp;, int)&gt; delegateI =
