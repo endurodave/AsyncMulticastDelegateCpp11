@@ -404,33 +404,17 @@ cout &lt;&lt; &quot;Asynchronous lambda result: &quot; &lt;&lt; valAsyncResult &
 
 <p>The delegate library contains numerous classes. A single include <em>DelegateLib.h</em> provides access to all delegate library features. The defines within <em>DelegateOpt.h</em> set the library options. The library is wrapped within a <code>DelegateLib </code>namespace. Included unit tests help ensure a robust implementation. The table below shows the delegate class hierarchy.</p>
 
-<ul class="class">
-	<li style="margin-left: 40px"><code>DelegateBase</code></li>
-	<li style="margin-left: 80px"><code>Delegate0&lt;&gt;</code></li>
-	<li style="margin-left: 120px"><code>DelegateFree0&lt;&gt;</code></li>
-	<li style="margin-left: 160px"><code>DelegateFreeAsync0&lt;&gt;</code></li>
-	<li style="margin-left: 160px"><code>DelegateFreeAsyncWaitBase0&lt;&gt;</code></li>
-	<li style="margin-left: 200px"><code>DelegateFreeAsyncWait0&lt;&gt;</code></li>
-	<li style="margin-left: 120px"><code>DelegateMember0&lt;&gt;</code></li>
-	<li style="margin-left: 160px"><code>DelegateMemberAsync0&lt;&gt;</code></li>
-	<li style="margin-left: 160px"><code>DelegateMemberAsyncWaitBase0&lt;&gt;</code></li>
-	<li style="margin-left: 200px"><code>DelegateMemberAsyncWait0&lt;&gt;</code></li>
-	<li style="margin-left: 120px"><code>DelegateMemberSp0&lt;&gt;</code></li>
-	<li style="margin-left: 160px"><code>DelegateMemberSpAsync0&lt;&gt;</code></li>
-	<li style="margin-left: 80px"><code>Delegate1&lt;&gt;</code></li>
-	<li style="margin-left: 120px"><code>DelegateFree1&lt;&gt;</code></li>
-	<li style="margin-left: 160px"><code>DelegateFreeAsync1&lt;&gt;</code></li>
-	<li style="margin-left: 160px"><code>DelegateFreeAsyncWaitBase0&lt;&gt;</code></li>
-	<li style="margin-left: 200px"><code>DelegateFreeAsyncWait0&lt;&gt;</code></li>
-	<li style="margin-left: 120px"><code>DelegateMember1&lt;&gt;</code></li>
-	<li style="margin-left: 160px"><code>DelegateMemberAsync1&lt;&gt;</code></li>
-	<li style="margin-left: 160px"><code>DelegateMemberAsyncWaitBase1&lt;&gt;</code></li>
-	<li style="margin-left: 200px"><code>DelegateMemberAsyncWait1&lt;&gt;</code></li>
-	<li style="margin-left: 120px"><code>DelegateMemberSp1&lt;&gt;</code></li>
-	<li style="margin-left: 160px"><code>DelegateMemberSpAsync1&lt;&gt;</code></li>
-</ul>
-
-<p style="margin-left: 40px">etc...</p>
+```cpp
+DelegateBase
+    Delegate<>
+        DelegateFree<>
+            DelegateFreeAsync<>
+                DelegateFreeAsyncWait<>
+        DelegateMember<>
+            DelegateMemberAsync<>
+                DelegateMemberAsyncWait<>
+        DelegateMemberSp<>
+```
 
 <p>Throughout the following discussion, I&rsquo;ll be using the one parameter version of the delegates.</p>
 
@@ -1001,20 +985,11 @@ virtual RetType operator()(Param1 p1) const {
 
 <p>Delegate containers store one or more delegates. The delegate container hierarchy is shown below:</p>
 
-<ul class="class">
-	<li style="margin-left: 40px"><code>MulticastDelegateBase</code></li>
-	<li style="margin-left: 80px"><code>MulticastDelegate0</code></li>
-	<li style="margin-left: 120px"><code>MulticastDelegateSafe0</code></li>
-	<li style="margin-left: 80px"><code>MulticastDelegate1&lt;&gt;</code></li>
-	<li style="margin-left: 120px"><code>MulticastDelegateSafe1&lt;&gt;</code></li>
-</ul>
-
-<p style="margin-left: 80px">etc...</p>
-
-<ul class="class">
-	<li style="margin-left: 40px"><code>SinglecastDelegate0&lt;&gt;</code></li>
-	<li style="margin-left: 40px"><code>SinglecastDelegate1&lt;&gt;</code></li>
-</ul>
+```cpp
+MulticastDelegate<>
+    MulticastDelegateSafe<>
+SinglecastDelegate<>
+```
 
 <p style="margin-left: 40px">etc...</p>
 
