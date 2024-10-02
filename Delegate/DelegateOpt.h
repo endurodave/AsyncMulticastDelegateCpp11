@@ -5,7 +5,8 @@
 // Define either USE_WIN32_THREADS or USE_STD_THREADS to specify WIN32 or std::thread threading model.
 // Define USE_XALLOCATOR to use fixed block memory allocation.
 
-#define USE_CXX17
+// Define USE_CXX17 is using a C++17 and want additional Delegate library features
+//#define USE_CXX17
 
 #if _MSC_VER >= 1700
 	#define USE_STD_THREADS	1

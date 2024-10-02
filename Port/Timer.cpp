@@ -132,7 +132,7 @@ void Timer::ProcessTimers()
 
 unsigned long Timer::GetTime()
 {
-    unsigned long milliseconds_since_epoch =
+    auto milliseconds_since_epoch =
         std::chrono::duration_cast<std::chrono::milliseconds>
         (std::chrono::system_clock::now().time_since_epoch()).count();
     return (unsigned long)milliseconds_since_epoch;

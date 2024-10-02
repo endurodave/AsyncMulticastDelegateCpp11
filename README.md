@@ -110,6 +110,112 @@ delegateMember(&testStruct);
 
 <p>This C++ delegate implementation is full featured and allows calling any function, even instance member functions, with any arguments either synchronously or asynchronously. The delegate library makes binding to and invoking any function a snap.</p>
 
+<h2>Quick Start</h2>
+
+A simple publish/subscribe asynchronous delegate example.
+
+<h3>Publisher</h3>
+
+Typically a delegate is inserted into a delegate container. <code>AlarmCd</code> is a delegate container. 
+
+<figure>
+    <img src="Figure1.jpg" alt="Figure 1" style="width:65%;">
+    <figcaption>Figure 1: AlarmCb Delegate Container</figcaption>
+</figure>
+
+<p></p>
+
+1. <code>MulticastDelegateSafe</code> - the delegate container type.
+2. <code>void(int, const string&)</code> - the function signature accepted by the delegate container. Any function matching can be inserted, such as a class member, static or lambda function.
+3. <code>AlarmCb</code> - the delegate container name. 
+
+<p>Invoke delegate container to notify subscribers.</p>
+
+```cpp
+MulticastDelegateSafe<void(int, const string&)> AlarmCb;
+
+void NotifyAlarmSubscribers(int alarmId, const string& note)
+{
+    // Invoke delegate to generate callback(s) to subscribers
+    AlarmCb(alarmId, note);
+}
+```
+<h3>Subscriber</h3>
+
+<p>Typically a subscriber registers with a delegate container instance to receive callbacks, either synchronously or asynchronously.</p>
+
+<figure>
+    <img src="Figure2.jpg" alt="Figure 2" style="width:75%;">
+    <figcaption>Figure 2: Insert into AlarmCb Delegate Container</figcaption>
+</figure>
+
+<p></p>
+
+1. <code>AlarmCb</code> - the publisher delegate container instance.
+2. <code>+=</code> - add a function target to the container. 
+3. <code>MakeDelegate</code> - creates a delegate instance.
+4. <code>&alarmSub</code> - the subscriber object pointer.
+5. <code>&AlarmSub::MemberAlarmCb</code> - the subscriber callback member function.
+6. <code>workerThread1</code> - the thread the callback will be invoked on. Adding a thread argument changes the callback type from synchronous to asynchronous.
+
+<p>Create a function conforming to the delegate signature. Insert a callable functions into the delegate container.</p>
+
+```cpp
+class AlarmSub
+{
+    void AlarmSub()
+    {
+        // Register to receive callbacks on workerThread1
+        AlarmCb += MakeDelegate(this, &AlarmSub::HandleAlarmCb, workerThread1);
+    }
+
+    void ~AlarmSub()
+    {
+        // Unregister from callbacks
+        AlarmCb -= MakeDelegate(this, &AlarmSub::HandleAlarmCb, workerThread1);
+    }
+
+    void HandleAlarmCb(int alarmId, const string& note)
+    {
+        // Handle callback here. Called on workerThread1 context.
+    }
+}
+```
+
+<p>This is a simple example. Many other usage patterns exist including asynchronous API's, blocking delegates with a timeout, and more.</p>
+
+<h2>Project Build</h2>
+
+<a href="https://www.cmake.org">CMake</a> is used to create the build files. CMake is free and open-source software. Windows, Linux and other toolchains are supported. Example CMake console commands executed inside the project root directory: 
+
+<h3>Windows Visual Studio</h3>
+
+<code>cmake -G "Visual Studio 17 2022" -A Win32 -B ../AsyncMulticastDelegateCpp11Build -S .</code>
+
+<code>cmake -G "Visual Studio 17 2022" -A x64 -B ../AsyncMulticastDelegateCpp11Build -S .</code>
+
+<code>cmake -G "Visual Studio 17 2022" -A x64 -B ../AsyncMulticastDelegateCpp11Build -S . -DENABLE_UNIT_TESTS=ON</code>
+
+After executed, open the Visual Studio project from within the <code>AsyncMulticastDelegateCpp11Build</code> directory.
+
+<figure>
+    <img src="Figure3.jpg" alt="Figure 3" style="width:100%;">
+    <figcaption>Figure 3: Visual Studio Build</figcaption>
+</figure>
+
+<h3>Linux Make</h3>
+
+<code>cmake -G "Unix Makefiles" -B ../AsyncMulticastDelegateCpp11Build -S .</code>
+
+<code>cmake -G "Unix Makefiles" -B ../AsyncMulticastDelegateCpp11Build -S . -DENABLE_UNIT_TESTS=ON</code>
+
+After executed, build the software from within the AsyncMulticastDelegateCpp11Build directory using the command <code>make</code>. Run the console app using <code>./DelegateApp</code>.
+
+<figure>
+    <img src="Figure4.jpg" alt="Figure 4" style="width:70%;">
+    <figcaption>Figure 4: Linux Makefile Build</figcaption>
+</figure>
+
 <h2>Using the Code</h2>
 
 <p>I&rsquo;ll first present how to use the code, and then get into the implementation details.</p>
