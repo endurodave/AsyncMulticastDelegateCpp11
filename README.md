@@ -45,53 +45,6 @@ Originally published on CodeProject at: <a href="http://www.codeproject.com/Arti
 
 <p>The delegate implementation significantly eases multithreaded application development by executing the delegate function with all of the function arguments on the thread of control that you specify. The framework handles all of the low-level machinery to safely invoke any function signature on a target thread.</p>
 
-<p>Windows 2008, 2015 and Eclipse projects are included for easy experimentation. While the Windows operating system provides threads, locks and message queues, the code is partitioned for easy porting to other embedded or PC-based systems. Building the <code>std::thread</code> version means any C++11 compiler supporting the C++ Standard Library thread API is able to use the delegates with no porting effort.</p>
-
-<p>Three asynchronous multicast callback implementations are available: Two in C++ and one written in C. See the <a href="#References">References</a> section for the two other related articles.</p>
-
-<p>A remote procedure call (RPC) using C++ delegates extends this&nbsp;library to include inter-process and inter-processor communications. See the <a href="#References">References</a> section for the this related article.</p>
-
-<p>I&rsquo;ve created four versions of the &ldquo;asynchronous callback&rdquo; idea; three C++ versions and one C version. See the&nbsp;<strong>References</strong>&nbsp;section at the end of the article for links to the other implementations.</p>
-
-<h2>2022 Library Updates</h2>
-
-<p>The C++ delegate library was updated with the following features:</p>
-
-<ol>
-	<li>Function-like delegate syntax</li>
-    <li><code>AsyncInvoke()</code> to simplify asynchronous function invocation</li>
-	<li>C++11 or higher C++ compiler required</li>
-</ol>
-
-<p>The old vs. new syntax comparison is below. The old syntax below uses standard template arguments. It also requires using the number or function arguments as part of the delegate type (e.g. <code>DelegateFree1<></code> is one function argument delegate).</p>
-
-<pre lang="C++">
-// Create a delegate bound to a free function then invoke
-DelegateFree1&lt;int&gt; delegateFree = MakeDelegate(&FreeFuncInt);
-delegateFree(123);
-
-// Create a delegate bound to a member function then invoke
-DelegateMember1&lt;TestClass, TestStruct*&gt; delegateMember = MakeDelegate(&testClass, &TestClass::MemberFunc);
-delegateMember(&testStruct);
-</pre>
-
-<p>The new syntax uses function-like template arguments for improved readability:</p>
-
-<pre lang="C++">
-// Create a delegate bound to a free function then invoke
-DelegateFree&lt;void (int)&gt; delegateFree = MakeDelegate(&FreeFuncInt);
-delegateFree(123);
-
-// Create a delegate bound to a member function then invoke
-DelegateMember&lt;void (TestClass(TestStruct*))&gt; delegateMember = MakeDelegate(&testClass, &TestClass::MemberFunc);
-delegateMember(&testStruct);
-</pre>
-
-<p>Prefer this 2022 updated version of the library. The original C++03 version of the library is located below for reference.</p>
-
-<p><strong><a href="https://www.codeproject.com/Articles/1160934/Asynchronous-Multicast-Delegates-in-Cplusplus">Asynchronous Multicast Delegates in C++</a></strong> - by David Lafreniere (CodeProject)</p>
-<p><strong><a href="https://github.com/endurodave/AsyncMulticastDelegate">Asynchronous Multicast Delegates in C++ (2016)</a></strong> - by David Lafreniere (GitHub)</p>
-
 <h2>Delegates Background</h2>
 
 <p>If you&rsquo;re not familiar with a delegate, the concept is quite simple. A delegate can be thought of as a super function pointer. In C++, there&#39;s no pointer type capable of pointing to all the possible function variations: instance member, virtual, const, static, and free (global). A function pointer can&rsquo;t point to instance member functions, and pointers to member functions have all sorts of limitations. However, delegate classes can, in a type-safe way, point to any function provided the function signature matches. In short, a delegate points to any function with a matching signature to support anonymous function invocation.</p>
