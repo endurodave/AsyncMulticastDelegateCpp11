@@ -37,7 +37,7 @@ Originally published on CodeProject at: <a href="http://www.codeproject.com/Arti
 	<li><strong>Automatic Heap Handling</strong> &ndash; automatically copy argument data to the heap for safe transport through a message queue</li>
 	<li><strong>Fixed Block Allocator</strong> &ndash; optionally divert heap allocation to fixed block memory pools</li>
 	<li><strong>Any OS</strong> &ndash; easy porting to any OS. Win32 and <code>std::thread</code> ports included</li>
-	<li><strong>Visual Studio and Eclipse</strong> - VC++ and GCC projects included</li>
+	<li><strong>CMake</strong> - CMake supports most toolchains including Windows and Linux.</li>
 	<li><strong>Unit Tests</strong> - extensive unit testing of the delegate library included</li>
 	<li><strong>No External Libraries</strong> &ndash; delegate does not rely upon external libraries</li>
 	<li><strong>Ease of Use</strong> &ndash; match the <code>FastDelegate</code> API as close as possible</li>
