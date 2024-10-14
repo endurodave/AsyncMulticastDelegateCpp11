@@ -13,12 +13,8 @@
 #endif
 
 // main.cpp
-// @see https://www.codeproject.com/Articles/1160934/Asynchronous-Multicast-Delegates-in-Cplusplus
-// David Lafreniere, Dec 2016 
-// Oct 2022. Updated delegates to function-like template arguments. Old syntax depricated. 
-//
-// @see https://www.codeproject.com/Articles/5262271/Remote-Procedure-Calls-using-Cplusplus-Delegates
-// David Lafreniere, Mar 2020.
+// @see https://github.com/endurodave/AsyncMulticastDelegateCpp11
+// David Lafreniere, Oct 2022
 
 using namespace std;
 using namespace DelegateLib;
@@ -615,7 +611,6 @@ int main(void)
 	// Start remote delegate test code
 	// The code below just instantiates a send/recv delegates and shows sending
 	// See links below for a complete example of remote delegates:
-	// https://www.codeproject.com/Articles/5262271/Remote-Procedure-Calls-using-Cplusplus-Delegates
 	// https://github.com/endurodave/RemoteDelegate
 	// Sender Code:
 	std::stringstream ss(ios::in | ios::out | ios::binary);

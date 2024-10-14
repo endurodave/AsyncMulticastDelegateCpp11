@@ -2,7 +2,7 @@
 #define _DELEGATE_SP_H
 
 // Delegate.h
-// @see https://www.codeproject.com/Articles/1160934/Asynchronous-Multicast-Delegates-in-Cplusplus
+// @see https://github.com/endurodave/AsyncMulticastDelegateCpp11
 // David Lafreniere, Oct 2022.
 //
 // The DelegateMemberSpX delegate implemenations synchronously bind and invoke class instance member functions. 
