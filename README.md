@@ -8,6 +8,7 @@ A C++ delegate library capable of targeting any callable function synchronously 
 - [Table of Contents](#table-of-contents)
 - [Preface](#preface)
   - [Related repositories](#related-repositories)
+  - [Library Comparison](#library-comparison)
 - [Introduction](#introduction)
 - [Delegates Background](#delegates-background)
 - [Quick Start](#quick-start)
@@ -58,6 +59,8 @@ Originally published on CodeProject at: <a href="http://www.codeproject.com/Arti
 
 * <a href="https://github.com/endurodave/AsyncStateMachine">Asynchronous State Machine Design in C++</a> - an asynchronous C++ state machine implemented using an asynchronous delegate library.
 * <a href="https://github.com/endurodave/IntegrationTestFramework">Integration Test Framework using Google Test and Delegates</a> - a multi-threaded C++ software integration test framework using Google Test and Delegate libraries.
+
+## Library Comparison
 
 <p>Asynchronous function invocation allows for easy movement of data between threads. The table below summarizes the various asynchronous function invocation implementations available in C and C++.</p>
 
