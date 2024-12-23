@@ -2,7 +2,7 @@
 
 A C++ delegate library capable of targeting any callable function synchronously or asynchronously.
 
-# ⚠️ Deprecated Repository
+## ⚠️ Deprecated Repository
 
 > **Warning:** This repository is no longer maintained. Please use the modern delegate library in link below.
 
@@ -13,7 +13,7 @@ A C++ delegate library capable of targeting any callable function synchronously 
 # Table of Contents
 
 - [Asynchronous Multicast Delegates in C++](#asynchronous-multicast-delegates-in-c)
-- [⚠️ Deprecated Repository](#️-deprecated-repository)
+  - [⚠️ Deprecated Repository](#️-deprecated-repository)
   - [New Repository](#new-repository)
 - [Table of Contents](#table-of-contents)
 - [Preface](#preface)
