@@ -1,13 +1,13 @@
 # Example CMake command line to create project build files:
 #
 # *** Windows ***
-# cmake -G "Visual Studio 17 2022" -A Win32 -B ../AsyncMulticastDelegateCpp11Build -S .
-# cmake -G "Visual Studio 17 2022" -A x64 -B ../AsyncMulticastDelegateCpp11Build -S .
-# cmake -G "Visual Studio 17 2022" -A x64 -B ../AsyncMulticastDelegateCpp11Build -S . -DENABLE_UNIT_TESTS=ON
+# cmake -G "Visual Studio 17 2022" -A Win32 -B Build -S .
+# cmake -G "Visual Studio 17 2022" -A x64 -B Build -S .
+# cmake -G "Visual Studio 17 2022" -A x64 -B Build -S . -DENABLE_UNIT_TESTS=ON
 #
 # *** Linux ***
-# cmake -G "Unix Makefiles" -B ../AsyncMulticastDelegateCpp11Build -S .
-# cmake -G "Unix Makefiles" -B ../AsyncMulticastDelegateCpp11Build -S . -DENABLE_UNIT_TESTS=ON
+# cmake -G "Unix Makefiles" -B Build -S .
+# cmake -G "Unix Makefiles" -B Build -S . -DENABLE_UNIT_TESTS=ON
 
 # Specify the minimum CMake version required
 cmake_minimum_required(VERSION 3.10)
